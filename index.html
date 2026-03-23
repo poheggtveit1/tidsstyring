@@ -905,6 +905,22 @@ label.toggle-wrap { cursor: pointer; }
   }
 
   /* ── Apply tidsstyring state (activates Jobbprofil automatically if set up) ── */
+  function buildTidsstyringSubtext(sched) {
+    const dagNavn   = ['mandag','tirsdag','onsdag','torsdag','fredag','lørdag','søndag'];
+    const endTime   = sched.endTime   || '16:00';
+    const startTime = sched.startTime || '08:00';
+    const days      = (sched.days && sched.days.length) ? sched.days : [0,1,2,3,4];
+
+    // Find next scheduled day after today (0 = mandag)
+    const jsDay  = new Date().getDay();        // 0 = søndag
+    const today  = (jsDay + 6) % 7;           // konverter til 0 = mandag
+    const sorted = [...days].sort((a, b) => a - b);
+    let   next   = sorted.find(d => d > today);
+    if (next === undefined) next = sorted[0];  // wrap til neste uke
+
+    return `Aktiv til ${endTime} · Neste: ${dagNavn[next]} ${startTime}`;
+  }
+
   function applyTidsstyringState() {
     const sub  = document.getElementById('tids-sub');
     const link = document.getElementById('tids-link');
@@ -913,7 +929,7 @@ label.toggle-wrap { cursor: pointer; }
 
     if (s && s.active) {
       const sched = (s.schedules && s.schedules[0]) || s;
-      sub.textContent = `${sched.startTime}–${sched.endTime} · ${sched.dayLabel}`;
+      sub.textContent = buildTidsstyringSubtext(sched);
       link.style.display = 'inline-flex';
       // Aktiver Jobbprofil automatisk og gjenopprett siste tilstand
       const togJob = document.getElementById('tog-job');
