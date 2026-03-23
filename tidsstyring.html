@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MBN App – Tidsstyring av jobbprofil</title>
+<style>
+/* ── Design tokens (Figma: MBN App / node 276-6744) ── */
+:root {
+  --blue:       #1020F9;
+  --blue-light: #EBF3FF;
+  --navy:       #000B2E;
+  --text:       #293351;
+  --muted:      #4F5A7D;
+  --bg-grey:    #F2F3F7;
+  --white:      #FFFFFF;
+  --border:     rgba(79,90,125,.15);
+  --red:        #C70505;
+  --green:      #37C65D;
+  --r-btn:      999px;
+  --r-card:     14px;
+  --r-phone:    48px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #B0B8CC;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Phone shell ── */
+.phone {
+  width: 375px;
+  height: 812px;
+  background: var(--white);
+  border-radius: var(--r-phone);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,.18),
+    0 40px 100px rgba(0,0,0,.4);
+}
+
+/* ── Notch ── */
+.notch {
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 160px; height: 34px;
+  background: var(--navy);
+  border-radius: 0 0 24px 24px;
+  z-index: 30;
+}
+
+/* ── Status bar ── */
+.status-bar {
+  height: 44px;
+  padding: 0 24px 8px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 20;
+  background: var(--white);
+}
+.status-time { font-size: 15px; font-weight: 700; color: var(--navy); letter-spacing: -.4px; }
+.status-icons { display: flex; align-items: center; gap: 7px; }
+
+/* ── Top bar ── */
+.top-bar {
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
+}
+.top-bar-cancel {
+  font-size: 14px; font-weight: 500;
+  color: var(--blue);
+  background: none; border: none;
+  cursor: pointer; padding: 4px 0;
+  min-width: 56px;
+}
+.top-bar-title {
+  font-size: 16px; font-weight: 600;
+  color: var(--text);
+  position: absolute;
+  left: 50%; transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+/* ── Scrollable content area ── */
+.screen {
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: none;
+  background: var(--white);
+}
+.screen::-webkit-scrollbar { display: none; }
+
+/* ── Step wrapper (animated) ── */
+.step {
+  display: none;
+  flex-direction: column;
+  padding: 24px 16px 32px;
+  gap: 24px;
+  min-height: 100%;
+  animation: fadeSlide .2s ease;
+}
+.step.active { display: flex; }
+
+@keyframes fadeSlide {
+  from { opacity: 0; transform: translateX(18px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.step.back-anim {
+  animation: fadeSlideBack .2s ease;
+}
+@keyframes fadeSlideBack {
+  from { opacity: 0; transform: translateX(-18px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* Confirm step has no top-bar, centered content */
+.step-confirm {
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+/* ── Progress indicator ── */
+.progress {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 0 4px;
+}
+.prog-dot {
+  height: 12px;
+  border-radius: 999px;
+  background: var(--blue-light);
+  transition: all .3s cubic-bezier(.4,0,.2,1);
+  width: 12px;
+}
+.prog-dot.done { background: var(--blue); width: 12px; }
+.prog-dot.current { background: var(--blue); width: 28px; }
+
+/* ── Section heading ── */
+.step-heading { display: flex; flex-direction: column; gap: 6px; }
+.step-title {
+  font-size: 16px; font-weight: 600;
+  color: var(--text); line-height: 1.35;
+}
+.step-desc {
+  font-size: 14px; font-weight: 300;
+  color: var(--muted); line-height: 1.45;
+}
+
+/* ── Field label ── */
+.field-label {
+  font-size: 14px; font-weight: 600;
+  color: var(--muted); margin-bottom: 8px;
+}
+.field-label .req { color: var(--red); }
+
+/* ── Time section ── */
+.time-card {
+  background: var(--bg-grey);
+  border-radius: var(--r-card);
+  overflow: hidden;
+}
+.time-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  gap: 12px;
+}
+.time-row + .time-row { border-top: 1px solid var(--border); }
+.time-label { font-size: 14px; color: var(--text); flex: 1; }
+.time-picker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-btn);
+  padding: 6px 14px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  -webkit-appearance: none;
+  min-width: 100px;
+}
+.time-picker svg { flex-shrink: 0; }
+
+/* ── Day picker ── */
+.daypicker-card {
+  background: var(--bg-grey);
+  border-radius: var(--r-card);
+  padding: 14px 16px 10px;
+}
+.days-row {
+  display: flex;
+  gap: 6px;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.day-btn {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: none;
+  font-size: 13px; font-weight: 500;
+  cursor: pointer;
+  transition: background .18s, color .18s;
+  background: var(--white);
+  color: var(--muted);
+  display: flex; align-items: center; justify-content: center;
+}
+.day-btn.selected {
+  background: var(--blue);
+  color: var(--white);
+}
+.daypicker-sub {
+  font-size: 10px; font-weight: 300;
+  color: var(--muted);
+}
+
+/* ── Option row (tappable) ── */
+.option-row {
+  background: var(--bg-grey);
+  border-radius: var(--r-card);
+  overflow: hidden;
+}
+.option-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  cursor: pointer;
+  gap: 12px;
+  transition: background .12s;
+}
+.option-item:active { background: #E8E9EF; }
+.option-item + .option-item { border-top: 1px solid var(--border); }
+.option-text { flex: 1; }
+.option-main { font-size: 14px; font-weight: 300; color: var(--text); }
+.option-sub  { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.option-sms  { font-size: 12px; color: var(--muted); margin-top: 2px; display: none; }
+.option-sms.on { display: block; }
+.chevron { color: var(--blue); flex-shrink: 0; }
+
+/* ── Radio options ── */
+.radio-group { display: flex; flex-direction: column; gap: 4px; }
+.radio-item {
+  background: var(--bg-grey);
+  border-radius: var(--r-card);
+  border: 1.5px solid transparent;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  cursor: pointer;
+  transition: background .15s, border-color .15s;
+}
+.radio-item.selected {
+  background: var(--blue-light);
+  border-color: var(--blue);
+}
+.radio-circle {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(79,90,125,.3);
+  position: relative;
+  flex-shrink: 0;
+  transition: border-color .15s;
+  background: var(--white);
+}
+.radio-circle::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--text);
+  opacity: 0;
+  transition: opacity .15s;
+}
+.radio-item.selected .radio-circle {
+  border-color: var(--text);
+}
+.radio-item.selected .radio-circle::after { opacity: 1; }
+.radio-text { flex: 1; }
+.radio-label { font-size: 14px; font-weight: 400; color: var(--text); line-height: 1.3; }
+.radio-desc  { font-size: 12px; color: var(--muted); margin-top: 3px; line-height: 1.4; }
+
+/* ── Button group ── */
+.btn-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 16px;
+}
+.btn {
+  width: 100%;
+  height: 50px;
+  border-radius: var(--r-btn);
+  border: none;
+  font-size: 16px; font-weight: 500;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  gap: 8px;
+  transition: opacity .15s, transform .1s;
+}
+.btn:active { opacity: .85; transform: scale(.98); }
+.btn-primary { background: var(--blue); color: var(--white); }
+.btn-secondary { background: var(--blue-light); color: var(--blue); }
+
+/* ── Confirm screen ── */
+.confirm-icon {
+  width: 56px; height: 56px;
+  background: var(--green);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 24px;
+}
+.confirm-title {
+  font-size: 18px; font-weight: 600;
+  color: var(--text); line-height: 1.4;
+  margin-bottom: 32px;
+  max-width: 260px;
+}
+
+/* ── Bottom sheet overlay ── */
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,22,87,.5);
+  z-index: 50;
+  display: none;
+  align-items: flex-end;
+}
+.overlay.open { display: flex; animation: fadein .2s ease; }
+@keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
+
+.sheet {
+  background: var(--white);
+  border-radius: 20px 20px 0 0;
+  width: 100%;
+  padding: 12px 16px 32px;
+  animation: slideup .25s cubic-bezier(.4,0,.2,1);
+}
+@keyframes slideup {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+.sheet-handle {
+  width: 36px; height: 5px;
+  border-radius: 3px;
+  background: var(--muted);
+  opacity: .4;
+  margin: 0 auto 16px;
+}
+.sheet-title {
+  font-size: 16px; font-weight: 600;
+  color: var(--text); margin-bottom: 16px;
+}
+.sheet-options { display: flex; flex-direction: column; gap: 4px; margin-bottom: 16px; }
+.sheet-option {
+  background: var(--bg-grey);
+  border-radius: 12px;
+  border: 1.5px solid transparent;
+  padding: 14px 16px;
+  display: flex; align-items: center; gap: 12px;
+  cursor: pointer;
+  transition: background .12s, border-color .12s;
+}
+.sheet-option.selected { background: var(--blue-light); border-color: var(--blue); }
+.sheet-option-text { flex: 1; font-size: 14px; color: var(--text); }
+.sheet-option-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+.sheet-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  gap: 12px;
+}
+.sheet-title-block { flex: 1; }
+.sheet-title { font-size: 16px; font-weight: 600; color: var(--text); }
+.sheet-subtitle { font-size: 14px; color: var(--muted); font-weight: 300; margin-top: 3px; }
+.sheet-close {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--bg-grey);
+  border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--navy); flex-shrink: 0;
+}
+.sheet-option-icon {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: rgba(199,5,5,.08);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.sheet-option-icon.green { background: rgba(55,198,93,.12); }
+.sheet-sms-row {
+  background: var(--bg-grey);
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 16px;
+}
+.sheet-sms-label { font-size: 14px; color: var(--text); }
+/* ── Toggle (reused in bottom sheet) ── */
+.toggle-wrap {
+  position: relative; width: 51px; height: 31px; flex-shrink: 0; cursor: pointer;
+}
+.toggle-wrap input { position: absolute; opacity: 0; width: 0; height: 0; }
+.toggle-track {
+  position: absolute; inset: 0; border-radius: 999px;
+  background: var(--muted); opacity: .5;
+  transition: background .22s, opacity .22s;
+}
+.toggle-wrap input:checked ~ .toggle-track { background: var(--blue); opacity: 1; }
+.toggle-thumb {
+  position: absolute; top: 2px; left: 2px;
+  width: 27px; height: 27px; border-radius: 50%;
+  background: var(--white);
+  box-shadow: 0 2px 5px rgba(0,0,0,.28);
+  transition: transform .22s cubic-bezier(.4,0,.2,1);
+  pointer-events: none;
+}
+.toggle-wrap input:checked ~ .toggle-track ~ .toggle-thumb { transform: translateX(20px); }
+.toggle-wrap input:disabled ~ .toggle-track { opacity: .25; }
+.toggle-wrap input:disabled ~ .toggle-track ~ .toggle-thumb { opacity: .5; }
+.toggle-wrap:has(input:disabled) { cursor: not-allowed; }
+
+/* ── Home indicator (just for bottom) ── */
+.home-bar-wrap {
+  height: 26px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--white);
+  flex-shrink: 0;
+}
+.home-bar {
+  width: 134px; height: 5px;
+  border-radius: 3px;
+  background: var(--navy);
+  opacity: .18;
+}
+</style>
+</head>
+<body>
+
+<div class="phone">
+
+  <!-- Notch -->
+  <div class="notch"></div>
+
+  <!-- Status bar -->
+  <div class="status-bar">
+    <span class="status-time">9:41</span>
+    <div class="status-icons">
+      <svg width="17" height="12" viewBox="0 0 17 12" fill="none">
+        <rect x="0"   y="9" width="3" height="3" rx="1" fill="#000B2E"/>
+        <rect x="4.5" y="6" width="3" height="6" rx="1" fill="#000B2E"/>
+        <rect x="9"   y="3" width="3" height="9" rx="1" fill="#000B2E"/>
+        <rect x="13.5" y="0" width="3" height="12" rx="1" fill="#000B2E"/>
+      </svg>
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
+        <circle cx="8" cy="10.5" r="1.5" fill="#000B2E"/>
+        <path d="M4.8 7.6A4.5 4.5 0 0 1 8 6.3a4.5 4.5 0 0 1 3.2 1.3" stroke="#000B2E" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+        <path d="M2.2 5.1A7.5 7.5 0 0 1 8 2.7a7.5 7.5 0 0 1 5.8 2.4" stroke="#000B2E" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+      </svg>
+      <svg width="26" height="13" viewBox="0 0 26 13" fill="none">
+        <rect x=".75" y=".75" width="22.5" height="11.5" rx="3.25" stroke="#000B2E" stroke-width="1.5"/>
+        <rect x="2.5" y="2.5" width="18" height="8" rx="1.8" fill="#000B2E"/>
+        <path d="M24.5 4.5v4a2 2 0 0 0 0-4z" fill="#000B2E" opacity=".4"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Top bar (hidden on confirm) -->
+  <div class="top-bar" id="topBar">
+    <button class="top-bar-cancel" onclick="cancelWizard()">Avbryt</button>
+    <span class="top-bar-title">Tidsstyring av jobbprofil</span>
+    <div style="min-width:56px"></div>
+  </div>
+
+  <!-- ── Scrollable area ── -->
+  <div class="screen">
+
+    <!-- STEP 1: Når jobber du? -->
+    <div class="step active" id="step1">
+      <!-- Progress -->
+      <div class="progress">
+        <div class="prog-dot current" id="p1"></div>
+        <div class="prog-dot" id="p2"></div>
+        <div class="prog-dot" id="p3"></div>
+        <div class="prog-dot" id="p4"></div>
+        <div class="prog-dot" id="p5"></div>
+      </div>
+
+      <!-- Heading -->
+      <div class="step-heading">
+        <div class="step-title">Når jobber du?</div>
+        <div class="step-desc">Arbeidstiden styrer når du er pålogget køer og hvilket nummer som vises. Du kan legge til flere tidspunkt senere.</div>
+      </div>
+
+      <!-- Time picker -->
+      <div>
+        <div class="field-label">Velg tidspunkt <span class="req">*</span></div>
+        <div class="time-card">
+          <div class="time-row">
+            <span class="time-label">Starttid</span>
+            <label class="time-picker">
+              <input type="time" id="startTime" value="08:00" style="border:none;background:transparent;font-size:14px;font-weight:500;color:#293351;outline:none;cursor:pointer;">
+            </label>
+          </div>
+          <div class="time-row">
+            <span class="time-label">Sluttid</span>
+            <label class="time-picker">
+              <input type="time" id="endTime" value="16:00" style="border:none;background:transparent;font-size:14px;font-weight:500;color:#293351;outline:none;cursor:pointer;">
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Day picker -->
+      <div>
+        <div class="field-label">Velg dager <span class="req">*</span></div>
+        <div class="daypicker-card">
+          <div class="days-row" id="dayPicker">
+            <button class="day-btn selected" data-day="0" onclick="toggleDay(this)">M</button>
+            <button class="day-btn selected" data-day="1" onclick="toggleDay(this)">T</button>
+            <button class="day-btn selected" data-day="2" onclick="toggleDay(this)">O</button>
+            <button class="day-btn selected" data-day="3" onclick="toggleDay(this)">T</button>
+            <button class="day-btn selected" data-day="4" onclick="toggleDay(this)">F</button>
+            <button class="day-btn" data-day="5" onclick="toggleDay(this)">L</button>
+            <button class="day-btn" data-day="6" onclick="toggleDay(this)">S</button>
+          </div>
+          <div class="daypicker-sub" id="daySubtext">Alle hverdager</div>
+        </div>
+      </div>
+
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="goStep(2)">
+          Fortsett
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <path d="M4 9h10M10 5l4 4-4 4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- STEP 2: Visningsnummer -->
+    <div class="step" id="step2">
+      <div class="progress">
+        <div class="prog-dot done"></div>
+        <div class="prog-dot current"></div>
+        <div class="prog-dot"></div>
+        <div class="prog-dot"></div>
+        <div class="prog-dot"></div>
+      </div>
+
+      <div class="step-heading">
+        <div class="step-title">Hvilket nummer skal vises?</div>
+        <div class="step-desc">Velg hvilket nummer som vises når arbeidstiden er aktiv</div>
+      </div>
+
+      <div>
+        <div class="field-label">Visningsnummer <span class="req">*</span></div>
+        <div class="option-row">
+          <div class="option-item" onclick="openSheet('displayNumber')">
+            <div class="option-text">
+              <div class="option-main" id="displayNumberValue">Mitt eget nummer (999 99 999)</div>
+              <div class="option-sub" id="displayNumberExternalStatus" style="display:none">Kun for eksterne samtaler</div>
+            </div>
+            <div class="chevron">
+              <svg width="7" height="13" viewBox="0 0 7 13" fill="none">
+                <path d="M1 1 6 6.5 1 12" stroke="#1020F9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="goStep(3)">
+          Fortsett
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <path d="M4 9h10M10 5l4 4-4 4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <button class="btn btn-secondary" onclick="goStep(1, true)">Tilbake</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: Køer -->
+    <div class="step" id="step3">
+      <div class="progress">
+        <div class="prog-dot done"></div>
+        <div class="prog-dot done"></div>
+        <div class="prog-dot current"></div>
+        <div class="prog-dot"></div>
+        <div class="prog-dot"></div>
+      </div>
+
+      <div class="step-heading">
+        <div class="step-title">Hva skal skje med køene når arbeidstiden starter?</div>
+        <div class="step-desc">Valgene aktiveres automatisk når arbeidstiden starter</div>
+      </div>
+
+      <div>
+        <div class="option-row" id="queueList">
+          <div class="option-item" onclick="openSheet('queue', this, 0)">
+            <div class="option-text">
+              <div class="option-main">Administrasjon (123 45 678)</div>
+              <div class="option-sub" id="queue0-val">Ingen endring</div>
+              <div class="option-sms" id="queue0-sms">SMS-varsling</div>
+            </div>
+            <div class="chevron">
+              <svg width="7" height="13" viewBox="0 0 7 13" fill="none">
+                <path d="M1 1 6 6.5 1 12" stroke="#1020F9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+          <div class="option-item" onclick="openSheet('queue', this, 1)">
+            <div class="option-text">
+              <div class="option-main">Support (123 45 678)</div>
+              <div class="option-sub" id="queue1-val">Ingen endring</div>
+              <div class="option-sms" id="queue1-sms">SMS-varsling</div>
+            </div>
+            <div class="chevron">
+              <svg width="7" height="13" viewBox="0 0 7 13" fill="none">
+                <path d="M1 1 6 6.5 1 12" stroke="#1020F9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+          <div class="option-item" onclick="openSheet('queue', this, 2)">
+            <div class="option-text">
+              <div class="option-main">Verksted (123 45 678)</div>
+              <div class="option-sub" id="queue2-val">Ingen endring</div>
+              <div class="option-sms" id="queue2-sms">SMS-varsling</div>
+            </div>
+            <div class="chevron">
+              <svg width="7" height="13" viewBox="0 0 7 13" fill="none">
+                <path d="M1 1 6 6.5 1 12" stroke="#1020F9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="goStep(4)">
+          Fortsett
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <path d="M4 9h10M10 5l4 4-4 4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <button class="btn btn-secondary" onclick="goStep(2, true)">Tilbake</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: Login og avlogging -->
+    <div class="step" id="step4">
+      <div class="progress">
+        <div class="prog-dot done"></div>
+        <div class="prog-dot done"></div>
+        <div class="prog-dot done"></div>
+        <div class="prog-dot current"></div>
+        <div class="prog-dot"></div>
+      </div>
+
+      <div class="step-heading">
+        <div class="step-title">Hvordan ønsker du å logge på og av?</div>
+        <div class="step-desc">På- og avlogging skjer i henhold til arbeidstiden du har satt</div>
+      </div>
+
+      <div class="radio-group">
+        <div class="radio-item selected" onclick="selectRadio(this, 'login')">
+          <div class="radio-circle"></div>
+          <div class="radio-text">
+            <div class="radio-label">Automatisk på- og avlogging</div>
+            <div class="radio-desc">Køer, visningsnummer og SMS-varsling styres automatisk</div>
+          </div>
+        </div>
+        <div class="radio-item" onclick="selectRadio(this, 'login')">
+          <div class="radio-circle"></div>
+          <div class="radio-text">
+            <div class="radio-label">Manuell på- og avlogging</div>
+            <div class="radio-desc">Du får varsel når arbeidstiden starter og slutter, og logger selv på og av i appen</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="goToStep5()">
+          Fortsett
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <path d="M4 9h10M10 5l4 4-4 4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <button class="btn btn-secondary" onclick="goStep(3, true)">Tilbake</button>
+      </div>
+    </div>
+
+    <!-- STEP 5: Varsler -->
+    <div class="step" id="step5">
+      <div class="progress">
+        <div class="prog-dot done"></div>
+        <div class="prog-dot done"></div>
+        <div class="prog-dot done"></div>
+        <div class="prog-dot done"></div>
+        <div class="prog-dot current"></div>
+      </div>
+
+      <!-- Automatisk: Ja/Nei-valg for varsel -->
+      <div id="step5-auto">
+        <div class="step-heading">
+          <div class="step-title">Vil du ha varsel før arbeidstiden starter og slutter?</div>
+          <div class="step-desc">Du varsles 10 minutter før arbeidstiden starter og slutter</div>
+        </div>
+        <div class="radio-group" style="margin-top:24px">
+          <div class="radio-item selected" onclick="selectRadio(this, 'notif')">
+            <div class="radio-circle"></div>
+            <div class="radio-text">
+              <div class="radio-label">Ja</div>
+            </div>
+          </div>
+          <div class="radio-item" onclick="selectRadio(this, 'notif')">
+            <div class="radio-circle"></div>
+            <div class="radio-text">
+              <div class="radio-label">Nei</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Manuell: kun informasjon -->
+      <div id="step5-manual" style="display:none">
+        <div class="step-heading">
+          <div class="step-title">Varsel før arbeidstiden starter og slutter</div>
+          <div class="step-desc">Du vil varsles 10 minutter før arbeidstiden starter og slutter slik at du selv kan velge å slå på og av jobbprofilen manuelt fra varselet.</div>
+        </div>
+      </div>
+
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="goConfirm()">Aktiver tidsstyring</button>
+        <button class="btn btn-secondary" onclick="goStep(4, true)">Tilbake</button>
+      </div>
+    </div>
+
+    <!-- STEP 6: Confirm -->
+    <div class="step step-confirm" id="stepConfirm">
+      <div class="confirm-icon">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <path d="M6 14l6 6 10-10" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="confirm-title">Tidsstyring av jobbprofil er satt opp og klar til bruk</div>
+      <div class="btn-group" style="width:100%">
+        <button class="btn btn-primary" onclick="window.location.href='index.html'">Til jobbprofil</button>
+        <button class="btn btn-secondary" onclick="window.location.href='index.html'">Se innstillinger</button>
+      </div>
+    </div>
+
+  </div><!-- /screen -->
+
+  <!-- Home bar -->
+  <div class="home-bar-wrap">
+    <div class="home-bar"></div>
+  </div>
+
+  <!-- ── Bottom sheet overlay ── -->
+  <div class="overlay" id="overlay" onclick="closeSheet()">
+    <div class="sheet" id="sheetInner" onclick="event.stopPropagation()">
+      <div class="sheet-handle"></div>
+      <div class="sheet-heading">
+        <div class="sheet-title-block">
+          <div class="sheet-title" id="sheetTitle"></div>
+          <div class="sheet-subtitle" id="sheetSubtitle" style="display:none"></div>
+        </div>
+        <button class="sheet-close" onclick="closeSheet()">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+      <div class="sheet-options" id="sheetOptions"></div>
+      <div class="sheet-sms-row" id="sheetSmsRow" style="display:none">
+        <div class="sheet-sms-label" style="flex:1">SMS-varsling</div>
+        <label class="toggle-wrap" onclick="event.stopPropagation()">
+          <input type="checkbox" id="sheetSmsToggle">
+          <span class="toggle-track"></span>
+          <span class="toggle-thumb"></span>
+        </label>
+      </div>
+      <div class="sheet-sms-row" id="sheetExternalRow" style="display:none">
+        <div class="sheet-sms-label" style="flex:1">Bruk kun for eksterne samtaler</div>
+        <label class="toggle-wrap" onclick="event.stopPropagation()">
+          <input type="checkbox" id="sheetExternalToggle">
+          <span class="toggle-track"></span>
+          <span class="toggle-thumb"></span>
+        </label>
+      </div>
+      <button class="btn btn-primary" id="sheetConfirmBtn" onclick="confirmSheet()">Velg</button>
+    </div>
+  </div>
+
+</div><!-- /phone -->
+
+<script>
+/* ── Radio button SVG (perfectly symmetric) ── */
+function radioSVG(checked) {
+  if (checked) {
+    return `<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="10" cy="10" r="9" stroke="#293351" stroke-width="1.5"/>
+      <circle cx="10" cy="10" r="5" fill="#293351"/>
+    </svg>`;
+  }
+  return `<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="10" cy="10" r="9" stroke="rgba(79,90,125,0.3)" stroke-width="1.5"/>
+  </svg>`;
+}
+
+/* ── State ── */
+let currentStep = 1;
+let activeQueueIdx = -1;
+let activeSheetType = '';
+let displayNumbers = [
+  { label: 'Mitt eget nummer (999 99 999)', selected: true,  externalOnly: false },
+  { label: 'Ekstern (888 88 888)',           selected: false, externalOnly: false },
+  { label: 'Sentralbord (777 77 777)',        selected: false, externalOnly: false },
+  { label: 'Skjult nummer',                  selected: false, externalOnly: false },
+];
+let queueStates = [
+  { name: 'Administrasjon (123 45 678)', options: ['Ingen endring', 'Logg på', 'Logg av'], selected: 0, smsEnabled: false },
+  { name: 'Support (444 44 444)',        options: ['Ingen endring', 'Logg på', 'Logg av'], selected: 0, smsEnabled: false },
+  { name: 'Verksted (12 34 56 78)',      options: ['Ingen endring', 'Logg på', 'Logg av'], selected: 0, smsEnabled: false },
+];
+
+/* ── Navigation ── */
+function goStep(n, back = false) {
+  const from = document.getElementById(currentStep === 6 ? 'stepConfirm' : `step${currentStep}`);
+  const to   = document.getElementById(`step${n}`);
+  if (!to) return;
+
+  from.classList.remove('active');
+  to.classList.remove('back-anim');
+  if (back) to.classList.add('back-anim');
+  to.classList.add('active');
+  to.parentElement.scrollTop = 0;
+  currentStep = n;
+
+  document.getElementById('topBar').style.display = '';
+}
+
+function goConfirm() {
+  // Persist wizard results to localStorage so index.html can read them
+  const days    = [...document.querySelectorAll('.day-btn.selected')].map(b => parseInt(b.dataset.day));
+  const dayMap  = ['M','T','O','T','F','L','S'];
+  const dayFull = ['mandag','tirsdag','onsdag','torsdag','fredag','lørdag','søndag'];
+  let dayLabel  = '';
+  if (JSON.stringify(days) === JSON.stringify([0,1,2,3,4]))         dayLabel = 'alle hverdager';
+  else if (JSON.stringify(days) === JSON.stringify([0,1,2,3,4,5,6])) dayLabel = 'alle dager';
+  else if (JSON.stringify(days) === JSON.stringify([5,6]))           dayLabel = 'helg';
+  else dayLabel = days.map(i => dayFull[i]).join(', ');
+
+  const settings = {
+    active:    true,
+    startTime: document.getElementById('startTime').value || '08:00',
+    endTime:   document.getElementById('endTime').value   || '16:00',
+    days,
+    dayLabel,
+    loginMode: (() => {
+      const sel = document.querySelector('#step4 .radio-item.selected .radio-label');
+      return sel ? sel.textContent.trim() : 'Automatisk på- og avlogging';
+    })(),
+    notification: (() => {
+      const sel = document.querySelector('#step5 .radio-item.selected .radio-label');
+      return sel ? sel.textContent.trim() : 'Ja';
+    })(),
+  };
+  localStorage.setItem('mbn_tidsstyring', JSON.stringify(settings));
+
+  const from = document.getElementById(`step${currentStep}`);
+  from.classList.remove('active');
+  const to = document.getElementById('stepConfirm');
+  to.classList.add('active');
+  to.parentElement.scrollTop = 0;
+  currentStep = 6;
+  document.getElementById('topBar').style.display = 'none';
+}
+
+function cancelWizard() {
+  window.location.href = 'index.html';
+}
+
+function goToStep5() {
+  const isManual = document.querySelector('#step4 .radio-item:last-child').classList.contains('selected');
+  document.getElementById('step5-auto').style.display   = isManual ? 'none' : '';
+  document.getElementById('step5-manual').style.display = isManual ? ''     : 'none';
+  goStep(5);
+}
+
+/* ── Day picker ── */
+const dayNames = ['M','T','O','T','F','L','S'];
+const dayLabels = ['Mandag','Tirsdag','Onsdag','Torsdag','Fredag','Lørdag','Søndag'];
+
+function toggleDay(btn) {
+  btn.classList.toggle('selected');
+  updateDaySubtext();
+}
+
+function updateDaySubtext() {
+  const selected = [...document.querySelectorAll('.day-btn.selected')].map(b => parseInt(b.dataset.day));
+  let text = '';
+  if (selected.length === 0) text = 'Ingen dager valgt';
+  else if (JSON.stringify(selected) === JSON.stringify([0,1,2,3,4])) text = 'Alle hverdager';
+  else if (JSON.stringify(selected) === JSON.stringify([0,1,2,3,4,5,6])) text = 'Alle dager';
+  else if (JSON.stringify(selected) === JSON.stringify([5,6])) text = 'Helg';
+  else text = selected.map(i => dayLabels[i]).join(', ');
+  document.getElementById('daySubtext').textContent = text;
+}
+
+/* ── Radio ── */
+function selectRadio(el, group) {
+  el.closest('.radio-group').querySelectorAll('.radio-item').forEach(r => r.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+/* ── Bottom sheets ── */
+function openSheet(type, el, idx) {
+  activeSheetType = type;
+  activeQueueIdx  = idx;
+  const overlay = document.getElementById('overlay');
+  const title   = document.getElementById('sheetTitle');
+  const opts    = document.getElementById('sheetOptions');
+  opts.innerHTML = '';
+
+  if (type === 'displayNumber') {
+    title.textContent = 'Velg visningsnummer';
+    const selIdx = displayNumbers.findIndex(n => n.selected);
+    const extToggle = document.getElementById('sheetExternalToggle');
+    document.getElementById('sheetExternalRow').style.display = '';
+    extToggle.checked  = selIdx > 0 ? (displayNumbers[selIdx].externalOnly ?? true) : false;
+    extToggle.disabled = selIdx === 0;
+    displayNumbers.forEach((n, i) => {
+      const d = document.createElement('div');
+      d.className = 'sheet-option' + (n.selected ? ' selected' : '');
+      d.innerHTML = `<div class="sheet-option-text">${n.label}</div>
+        ${radioSVG(n.selected)}`;
+      d.onclick = () => selectSheetOption(i);
+      opts.appendChild(d);
+    });
+  } else if (type === 'queue') {
+    const q = queueStates[idx];
+    title.textContent = 'Velg køstatus';
+    const subtitleEl = document.getElementById('sheetSubtitle');
+    subtitleEl.textContent = q.name;
+    subtitleEl.style.display = '';
+    document.getElementById('sheetSmsRow').style.display = '';
+    const smsToggle = document.getElementById('sheetSmsToggle');
+    smsToggle.checked  = q.smsEnabled;
+    smsToggle.disabled = (q.selected === 0); // deaktivert ved "Ingen endring"
+    document.getElementById('sheetConfirmBtn').textContent = 'Bekreft';
+
+    const icons = [
+      `<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1H2a1 1 0 0 0-1 1v7l2-2h4a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1z" stroke="#C70505" stroke-width="1.3" fill="none"/><circle cx="11" cy="10" r="2.5" stroke="#C70505" stroke-width="1.3" fill="none"/><path d="M11 9v1.4l.8.6" stroke="#C70505" stroke-width="1.2" stroke-linecap="round"/></svg>`,
+      `<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5 7h7M9 4l3 3-3 3" stroke="#C70505" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 2v10" stroke="#C70505" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+      `<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 7H2M5 4L2 7l3 3" stroke="#37C65D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 2v10" stroke="#37C65D" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+    ];
+    const iconClasses = ['', '', 'green'];
+    const subs = [
+      'Beholder samme status som i forrige arbeidstid',
+      'Logger automatisk på kø',
+      'Logger automatisk av kø',
+    ];
+    q.options.forEach((opt, i) => {
+      const d = document.createElement('div');
+      d.className = 'sheet-option' + (q.selected === i ? ' selected' : '');
+      d.innerHTML = `
+        <div class="sheet-option-text" style="flex:1">${opt}<div class="sheet-option-sub">${subs[i]}</div></div>
+        ${radioSVG(q.selected === i)}`;
+      d.onclick = () => selectSheetOption(i);
+      opts.appendChild(d);
+    });
+  }
+
+  overlay.classList.add('open');
+}
+
+function selectSheetOption(i) {
+  if (activeSheetType === 'displayNumber') {
+    displayNumbers.forEach((n, idx) => n.selected = idx === i);
+    // Default externalOnly ON for non-default numbers
+    displayNumbers[i].externalOnly = i > 0;
+  } else if (activeSheetType === 'queue') {
+    queueStates[activeQueueIdx].selected = i;
+    // SMS følger køvalg (Logg på → på, Logg av / Ingen endring → av)
+    queueStates[activeQueueIdx].smsEnabled = (i === 1);
+  }
+  openSheet(activeSheetType, null, activeQueueIdx); // re-render
+}
+
+function confirmSheet() {
+  if (activeSheetType === 'displayNumber') {
+    const sel    = displayNumbers.find(n => n.selected);
+    const selIdx = displayNumbers.indexOf(sel);
+    sel.externalOnly = selIdx > 0
+      ? document.getElementById('sheetExternalToggle').checked
+      : false;
+    document.getElementById('displayNumberValue').textContent = sel.label;
+    document.getElementById('displayNumberExternalStatus').style.display =
+      sel.externalOnly ? '' : 'none';
+  } else if (activeSheetType === 'queue') {
+    const q = queueStates[activeQueueIdx];
+    q.smsEnabled = document.getElementById('sheetSmsToggle').checked;
+    document.getElementById(`queue${activeQueueIdx}-val`).textContent = q.options[q.selected];
+    document.getElementById(`queue${activeQueueIdx}-sms`).classList.toggle('on', q.smsEnabled);
+  }
+  closeSheet();
+}
+
+function closeSheet() {
+  document.getElementById('overlay').classList.remove('open');
+  document.getElementById('sheetSubtitle').style.display = 'none';
+  document.getElementById('sheetSmsRow').style.display = 'none';
+  document.getElementById('sheetExternalRow').style.display = 'none';
+  document.getElementById('sheetConfirmBtn').textContent = 'Velg';
+}
+</script>
+</body>
+</html>
