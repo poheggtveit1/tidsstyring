@@ -912,7 +912,8 @@ label.toggle-wrap { cursor: pointer; }
     try { s = JSON.parse(localStorage.getItem('mbn_tidsstyring')); } catch(e) {}
 
     if (s && s.active) {
-      sub.textContent = `${s.startTime}–${s.endTime} · ${s.dayLabel}`;
+      const sched = (s.schedules && s.schedules[0]) || s;
+      sub.textContent = `${sched.startTime}–${sched.endTime} · ${sched.dayLabel}`;
       link.style.display = 'inline-flex';
       // Aktiver Jobbprofil automatisk og gjenopprett siste tilstand
       const togJob = document.getElementById('tog-job');

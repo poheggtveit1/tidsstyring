@@ -593,6 +593,12 @@
         externalOnly:  state.externalOnly,
         queues:        state.queues
       };
+      // Keep flat fields in sync so index.html always has fresh data
+      if (scheduleIdx === 0) {
+        ts.startTime = state.startTime;
+        ts.endTime   = state.endTime;
+        ts.dayLabel  = state.dayLabel;
+      }
       localStorage.setItem('mbn_tidsstyring', JSON.stringify(ts));
     } catch(e) {}
     window.location.href = 'tidsstyring-detaljer.html';
