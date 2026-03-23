@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+<title>Tidspunkt og dager</title>
+<style>
+  :root {
+    --blue:    #1020F9;
+    --navy:    #000B2E;
+    --text:    #293351;
+    --muted:   #4F5A7D;
+    --bg-blue: #EBF3FF;
+    --bg-grey: #F2F3F7;
+    --divider: #E4E7EF;
+    --input-border: #7C88AB;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    background: #E5E5E5;
+    display: flex; justify-content: center; align-items: center;
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+  }
+  .phone {
+    width: 375px; height: 812px; background: #fff;
+    border-radius: 44px; overflow: hidden; position: relative;
+    box-shadow: 0 30px 80px rgba(0,0,0,.35);
+    display: flex; flex-direction: column;
+  }
+  .notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 150px; height: 30px; background: #000; border-radius: 0 0 20px 20px; z-index: 50; }
+  .status-bar { flex-shrink: 0; height: 44px; background: #fff; display: flex; align-items: center; justify-content: space-between; padding: 14px 20px 0; }
+  .status-bar .time { font-size: 15px; font-weight: 700; color: var(--navy); }
+  .status-icons { display: flex; gap: 6px; align-items: center; }
+  .nav-bar { flex-shrink: 0; background: #fff; height: 52px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; border-bottom: 1px solid var(--divider); }
+  .nav-action { font-size: 14px; font-weight: 500; color: var(--blue); cursor: pointer; padding: 4px 0; min-width: 52px; }
+  .nav-action.right { text-align: right; color: #B2BAD1; }
+  .nav-action.right.active { color: var(--blue); }
+  .nav-action:active { opacity: .6; }
+  .nav-title { font-size: 16px; font-weight: 500; color: var(--text); text-align: center; flex: 1; padding: 0 8px; }
+  .content { flex: 1; overflow-y: auto; padding: 24px 16px; -webkit-overflow-scrolling: touch; display: flex; flex-direction: column; gap: 16px; }
+  .content::-webkit-scrollbar { display: none; }
+
+  /* Section */
+  .section { display: flex; flex-direction: column; gap: 8px; }
+  .section-label { font-size: 14px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: .3px; }
+  .section-req { color: #C70505; margin-left: 3px; }
+  .section-desc { font-size: 12px; font-weight: 300; color: var(--muted); }
+
+  /* Time card */
+  .time-card {
+    background: var(--bg-grey); border-radius: 8px; overflow: hidden;
+    border: 1px solid var(--divider);
+  }
+  .time-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 16px; gap: 12px;
+    position: relative;
+  }
+  .time-row + .time-row { border-top: 1px solid var(--divider); }
+  .time-row-label { font-size: 14px; font-weight: 300; color: var(--text); flex: 1; }
+  .time-picker {
+    display: flex; align-items: center; gap: 8px;
+    background: #fff; border: 1.5px solid rgba(79,90,125,.15);
+    border-radius: 999px; padding: 6px 14px;
+    font-size: 14px; font-weight: 500; color: var(--text);
+    cursor: pointer; -webkit-appearance: none; min-width: 100px;
+  }
+  .time-picker input[type="time"] {
+    border: none; background: transparent;
+    font-size: 14px; font-weight: 500; color: var(--text);
+    outline: none; cursor: pointer; font-family: inherit;
+  }
+  .time-picker svg { flex-shrink: 0; }
+
+  /* Day card */
+  .day-card {
+    background: var(--bg-grey); border-radius: 8px;
+    border: 1px solid var(--divider);
+    padding: 16px;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .days-row {
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .day-pill {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 300; color: var(--text);
+    background: #fff; border: none;
+    cursor: pointer; user-select: none; transition: background .15s, color .15s;
+    flex-shrink: 0;
+  }
+  .day-pill.active { background: var(--blue); color: #fff; }
+  .day-pill:active { opacity: .7; }
+  .day-summary { font-size: 10px; font-weight: 300; color: var(--muted); }
+
+  .tab-bar { flex-shrink: 0; background: #fff; border-top: 1px solid var(--divider); height: 60px; display: flex; align-items: flex-start; padding-top: 6px; }
+  .tab { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; padding: 0 4px; }
+  .tab svg { opacity: .4; }
+  .tab.active svg { opacity: 1; }
+  .tab-label { font-size: 9px; font-weight: 500; color: var(--muted); }
+  .tab.active .tab-label { color: var(--blue); }
+  .home-indicator { flex-shrink: 0; height: 22px; display: flex; align-items: center; justify-content: center; background: #fff; }
+  .home-bar { width: 120px; height: 4px; background: #000; border-radius: 2px; opacity: .18; }
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="notch"></div>
+
+  <div class="status-bar">
+    <span class="time">9:41</span>
+    <div class="status-icons">
+      <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="7" width="3" height="5" rx="1" fill="#293351"/><rect x="4.5" y="5" width="3" height="7" rx="1" fill="#293351"/><rect x="9" y="2.5" width="3" height="9.5" rx="1" fill="#293351"/><rect x="13.5" y="0" width="3" height="12" rx="1" fill="#293351"/></svg>
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M8 9.5a1.5 1.5 0 100 3 1.5 1.5 0 000-3z" fill="#293351"/><path d="M8 6C5.87 6 3.94 6.84 2.5 8.22l1.42 1.42A5 5 0 018 8a5 5 0 014.08 1.64l1.42-1.42A7 7 0 008 6z" fill="#293351"/><path d="M8 2C4.69 2 1.69 3.31-.07 5.5l1.45 1.45A9 9 0 018 4a9 9 0 016.62 2.95L16.07 5.5C14.31 3.31 11.31 2 8 2z" fill="#293351"/></svg>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#293351" stroke-opacity=".35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#293351"/><path d="M23 4v4a2 2 0 000-4z" fill="#293351" fill-opacity=".4"/></svg>
+    </div>
+  </div>
+
+  <div class="nav-bar">
+    <div class="nav-action" onclick="cancel()">Avbryt</div>
+    <div class="nav-title">Tidspunkt og dager</div>
+    <div class="nav-action right active" id="lagreBtn" onclick="saveAndBack()">Lagre</div>
+  </div>
+
+  <div class="content">
+
+    <!-- Tidspunkt -->
+    <div class="section">
+      <div class="section-label">Velg tidspunkt</div>
+      <div class="section-desc">Velg dager og tidspunkt</div>
+      <div class="time-card">
+        <div class="time-row">
+          <span class="time-row-label">Starttid</span>
+          <label class="time-picker">
+            <input type="time" id="startInput" value="08:00">
+          </label>
+        </div>
+        <div class="time-row">
+          <span class="time-row-label">Sluttid</span>
+          <label class="time-picker">
+            <input type="time" id="endInput" value="16:00">
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dager -->
+    <div class="section">
+      <div class="section-label">Velg dager</div>
+      <div class="day-card">
+        <div class="days-row" id="daysRow">
+          <div class="day-pill" data-day="1" onclick="toggleDay(1)">M</div>
+          <div class="day-pill" data-day="2" onclick="toggleDay(2)">T</div>
+          <div class="day-pill" data-day="3" onclick="toggleDay(3)">O</div>
+          <div class="day-pill" data-day="4" onclick="toggleDay(4)">T</div>
+          <div class="day-pill" data-day="5" onclick="toggleDay(5)">F</div>
+          <div class="day-pill" data-day="6" onclick="toggleDay(6)">L</div>
+          <div class="day-pill" data-day="0" onclick="toggleDay(0)">S</div>
+        </div>
+        <div class="day-summary" id="daySummary"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="tab-bar">
+    <div class="tab"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="3" y="3" width="7" height="7" rx="2" fill="#293351"/><rect x="12" y="3" width="7" height="7" rx="2" fill="#293351"/><rect x="3" y="12" width="7" height="7" rx="2" fill="#293351"/><rect x="12" y="12" width="7" height="7" rx="2" fill="#293351"/></svg><span class="tab-label">Logg</span></div>
+    <div class="tab"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="10" cy="10" r="6" stroke="#293351" stroke-width="2"/><path d="M14.5 14.5 19 19" stroke="#293351" stroke-width="2" stroke-linecap="round"/></svg><span class="tab-label">Søk</span></div>
+    <div class="tab"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="2" y="4" width="18" height="14" rx="3" stroke="#293351" stroke-width="2"/><path d="M7 9h8M7 13h5" stroke="#293351" stroke-width="1.5" stroke-linecap="round"/></svg><span class="tab-label">Tastatur</span></div>
+    <div class="tab active"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="7" r="3.5" fill="#1020F9"/><path d="M4 18c0-3.866 3.134-7 7-7h0c3.866 0 7 3.134 7 7" stroke="#1020F9" stroke-width="2" stroke-linecap="round"/></svg><span class="tab-label" style="color:#1020F9">Jobbprofil</span></div>
+    <div class="tab"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M3 6h16M3 11h16M3 16h16" stroke="#293351" stroke-width="2" stroke-linecap="round"/></svg><span class="tab-label">Meny</span></div>
+  </div>
+  <div class="home-indicator"><div class="home-bar"></div></div>
+</div>
+
+<script>
+  let activeDays = new Set([1,2,3,4,5]);
+  const DAY_NAMES = { 0:'Søndag', 1:'Mandag', 2:'Tirsdag', 3:'Onsdag', 4:'Torsdag', 5:'Fredag', 6:'Lørdag' };
+  const ORDER = [1,2,3,4,5,6,0];
+
+  (function init() {
+    try {
+      const cur = JSON.parse(sessionStorage.getItem('mbn_arbeidstid_current'));
+      if (cur) {
+        if (cur.startTime) document.getElementById('startInput').value = cur.startTime;
+        if (cur.endTime)   document.getElementById('endInput').value   = cur.endTime;
+        if (cur.dayLabel)  activeDays = labelToDays(cur.dayLabel);
+      }
+    } catch(e) {}
+    renderDays();
+    updateSummary();
+  })();
+
+  function labelToDays(label) {
+    if (label === 'Alle hverdager') return new Set([1,2,3,4,5]);
+    if (label === 'Alle dager')     return new Set([0,1,2,3,4,5,6]);
+    if (label === 'Helg')           return new Set([0,6]);
+    // parse comma-separated abbreviated names
+    const map = { 'Man':1,'Tir':2,'Ons':3,'Tor':4,'Fre':5,'Lør':6,'Søn':0 };
+    const days = label.split(', ').map(n => map[n]).filter(d => d !== undefined);
+    return days.length ? new Set(days) : new Set([1,2,3,4,5]);
+  }
+
+  function renderDays() {
+    document.querySelectorAll('.day-pill').forEach(pill => {
+      const d = parseInt(pill.dataset.day);
+      pill.classList.toggle('active', activeDays.has(d));
+    });
+  }
+
+  function toggleDay(d) {
+    if (activeDays.has(d)) { if (activeDays.size > 1) activeDays.delete(d); }
+    else activeDays.add(d);
+    renderDays();
+    updateSummary();
+  }
+
+  function updateSummary() {
+    const s = activeDays;
+    let label;
+    if (s.size === 5 && [1,2,3,4,5].every(d => s.has(d))) label = 'Alle hverdager';
+    else if (s.size === 7) label = 'Alle dager';
+    else if (s.size === 2 && s.has(0) && s.has(6)) label = 'Lørdag, søndag';
+    else {
+      const sorted = ORDER.filter(d => s.has(d));
+      label = sorted.map(d => DAY_NAMES[d]).join(', ');
+    }
+    document.getElementById('daySummary').textContent = label;
+  }
+
+  function getDayLabel() {
+    const s = activeDays;
+    if (s.size === 5 && [1,2,3,4,5].every(d => s.has(d))) return 'Alle hverdager';
+    if (s.size === 7) return 'Alle dager';
+    if (s.size === 2 && s.has(0) && s.has(6)) return 'Helg';
+    const sorted = ORDER.filter(d => s.has(d));
+    return sorted.map(d => DAY_NAMES[d].substring(0,3)).join(', ');
+  }
+
+  function returnPage() {
+    return sessionStorage.getItem('mbn_tpd_return') || 'endre-arbeidstid.html';
+  }
+
+  function cancel() { window.location.href = returnPage(); }
+
+  function saveAndBack() {
+    const start = document.getElementById('startInput').value || '08:00';
+    const end   = document.getElementById('endInput').value   || '16:00';
+    sessionStorage.setItem('mbn_arbeidstid_draft', JSON.stringify({
+      startTime: start, endTime: end, dayLabel: getDayLabel()
+    }));
+    window.location.href = returnPage();
+  }
+</script>
+</body>
+</html>

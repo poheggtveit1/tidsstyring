@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+<title>Endre tidsstyring</title>
+<style>
+  :root {
+    --blue:    #1020F9;
+    --navy:    #000B2E;
+    --text:    #293351;
+    --muted:   #4F5A7D;
+    --bg-blue: #EBF3FF;
+    --bg-grey: #F2F3F7;
+    --red:     #E53935;
+    --divider: #E4E7EF;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    background: #E5E5E5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+  }
+
+  /* ── Phone shell ── */
+  .phone {
+    width: 375px;
+    height: 812px;
+    background: #fff;
+    border-radius: 44px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 30px 80px rgba(0,0,0,.35);
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Status bar */
+  .status-bar {
+    flex-shrink: 0;
+    height: 44px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px 0;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--navy);
+  }
+  .status-bar .time { font-size: 15px; font-weight: 700; }
+  .status-icons { display: flex; gap: 6px; align-items: center; }
+
+  /* Notch */
+  .notch {
+    position: absolute;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 150px; height: 30px;
+    background: #000;
+    border-radius: 0 0 20px 20px;
+    z-index: 50;
+  }
+
+  /* Nav bar */
+  .nav-bar {
+    flex-shrink: 0;
+    background: #fff;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    border-bottom: 1px solid var(--divider);
+    gap: 12px;
+  }
+  .nav-back {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    flex-shrink: 0;
+    color: var(--blue);
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .nav-back:active { opacity: .6; }
+  .nav-title {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text);
+    flex: 1;
+    text-align: center;
+  }
+
+  /* Scrollable content */
+  .content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px 16px;
+    -webkit-overflow-scrolling: touch;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  .content::-webkit-scrollbar { display: none; }
+
+  /* Section */
+  .section {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+  .section-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--muted);
+  }
+  .section-desc {
+    font-size: 12px;
+    font-weight: 300;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+
+  /* Card group */
+  .card {
+    background: var(--bg-grey);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  /* Row */
+  .row {
+    display: flex;
+    align-items: center;
+    padding: 8px 16px;
+    min-height: 56px;
+    position: relative;
+    cursor: pointer;
+    user-select: none;
+  }
+  .row:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 1px;
+    background: var(--divider);
+  }
+  .row:active { opacity: .7; }
+  .row.no-tap { cursor: default; }
+  .row.no-tap:active { opacity: 1; }
+
+  .row-body {
+    flex: 1;
+    min-width: 0;
+  }
+  .row-label {
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--text);
+  }
+  .row-sub {
+    font-size: 12px;
+    font-weight: 300;
+    color: var(--muted);
+    margin-top: 2px;
+    line-height: 1.4;
+  }
+  .row-value {
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--muted);
+    margin-left: 8px;
+    flex-shrink: 0;
+  }
+  .row-chevron {
+    margin-left: 8px;
+    flex-shrink: 0;
+  }
+
+  /* Schedule row specifics */
+  .schedule-row {
+    padding: 8px 16px;
+    cursor: pointer;
+    position: relative;
+    background: var(--bg-grey);
+  }
+  .schedule-row:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 1px;
+    background: var(--divider);
+  }
+  .schedule-row:active { opacity: .7; }
+  .schedule-label {
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--text);
+  }
+  .schedule-detail {
+    font-size: 12px;
+    font-weight: 300;
+    color: var(--muted);
+    margin-top: 2px;
+    line-height: 1.45;
+  }
+  .schedule-row-inner {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  /* Add button row */
+  .add-row {
+    display: flex;
+    align-items: center;
+    padding: 8px 16px;
+    min-height: 56px;
+    gap: 10px;
+    cursor: pointer;
+    user-select: none;
+    background: var(--bg-grey);
+  }
+  .add-row:active { opacity: .7; }
+  .add-icon {
+    width: 24px; height: 24px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .add-label {
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--blue);
+  }
+
+  /* Toggle */
+  .toggle {
+    position: relative;
+    width: 48px; height: 28px;
+    flex-shrink: 0;
+  }
+  .toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+  .toggle-track {
+    position: absolute; inset: 0;
+    background: #D1D5DB;
+    border-radius: 14px;
+    transition: background .2s;
+    cursor: pointer;
+  }
+  .toggle-track::after {
+    content: '';
+    position: absolute;
+    top: 3px; left: 3px;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 4px rgba(0,0,0,.25);
+    transition: transform .2s;
+  }
+  .toggle input:checked + .toggle-track { background: var(--blue); }
+  .toggle input:checked + .toggle-track::after { transform: translateX(20px); }
+
+  /* Nullstill button */
+  .reset-btn {
+    display: block;
+    width: 100%;
+    padding: 14px 16px;
+    background: #FFEBEB;
+    border: none;
+    border-radius: 50px;
+    color: #5C0000;
+    font-size: 16px;
+    font-weight: 500;
+    text-align: center;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .reset-btn:active { opacity: .7; }
+
+  /* Tab bar */
+  .tab-bar { flex-shrink: 0; background: #fff; border-top: 1px solid rgba(79,90,125,.1); padding-top: 4px; }
+  .tabs { display: flex; }
+  .tab { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 4px 2px; cursor: pointer; background: none; border: none; outline: none; -webkit-tap-highlight-color: transparent; }
+  .tab-icon-wrap { position: relative; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; color: var(--muted); }
+  .tab.active .tab-icon-wrap { color: var(--blue); }
+  .tab-lbl { font-size: 10px; font-weight: 400; color: var(--muted); letter-spacing: .1px; }
+  .tab.active .tab-lbl { color: var(--blue); font-weight: 600; }
+  .badge { position: absolute; top: -3px; right: -5px; min-width: 16px; height: 16px; border-radius: 8px; padding: 0 4px; font-size: 10px; font-weight: 600; color: #fff; display: flex; align-items: center; justify-content: center; line-height: 1; }
+  .badge-orange { background: #FF852F; }
+  .badge-green  { background: #178222; }
+  .home-indicator { height: 28px; display: flex; align-items: center; justify-content: center; }
+  .home-bar { width: 134px; height: 5px; border-radius: 3px; background: var(--navy); opacity: .9; }
+
+  /* ── Bottom sheet overlay ── */
+  .sheet-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,11,46,.4);
+    z-index: 100;
+    display: none;
+    align-items: flex-end;
+  }
+  .sheet-backdrop.open { display: flex; }
+
+  .sheet {
+    width: 100%;
+    background: #fff;
+    border-radius: 20px 20px 0 0;
+    padding: 12px 0 0;
+    animation: slideUp .25s ease;
+  }
+  @keyframes slideUp {
+    from { transform: translateY(100%); }
+    to   { transform: translateY(0); }
+  }
+  .sheet-handle {
+    width: 36px; height: 4px;
+    background: #D1D5DB;
+    border-radius: 2px;
+    margin: 0 auto 16px;
+  }
+  .sheet-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--navy);
+    padding: 0 20px 16px;
+    line-height: 1.35;
+  }
+  .sheet-divider {
+    height: 1px;
+    background: var(--divider);
+    margin: 0 20px;
+  }
+
+  /* Radio option rows in sheet */
+  .radio-row {
+    display: flex;
+    align-items: flex-start;
+    padding: 14px 20px;
+    gap: 14px;
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+  }
+  .radio-row:not(:last-of-type)::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 20px; right: 20px;
+    height: 1px;
+    background: var(--divider);
+  }
+  .radio-row:active { background: var(--bg-grey); }
+  .radio-circle {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 2px solid var(--divider);
+    flex-shrink: 0;
+    margin-top: 1px;
+    display: flex; align-items: center; justify-content: center;
+    transition: border-color .15s;
+  }
+  .radio-circle.selected {
+    border-color: var(--blue);
+    background: var(--blue);
+  }
+  .radio-circle.selected::after {
+    content: '';
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #fff;
+  }
+  .radio-body { flex: 1; }
+  .radio-label {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text);
+  }
+  .radio-desc {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 3px;
+    line-height: 1.4;
+  }
+
+  .sheet-btn {
+    display: block;
+    width: calc(100% - 32px);
+    margin: 16px 16px;
+    padding: 15px;
+    background: var(--blue);
+    border: none;
+    border-radius: 12px;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+    text-align: center;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .sheet-btn:active { opacity: .85; }
+
+  /* ── Reset confirm dialog ── */
+  .reset-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,11,46,.5);
+    z-index: 200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .reset-backdrop.open { display: flex; }
+  .reset-dialog {
+    background: #fff;
+    border-radius: 16px;
+    width: 100%;
+    padding: 24px 20px 20px;
+    animation: fadeScale .2s ease;
+  }
+  @keyframes fadeScale {
+    from { transform: scale(.92); opacity: 0; }
+    to   { transform: scale(1); opacity: 1; }
+  }
+  .reset-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 10px;
+    line-height: 1.3;
+  }
+  .reset-body {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.5;
+    margin-bottom: 20px;
+  }
+  .reset-confirm-btn {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    background: var(--red);
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+    text-align: center;
+    cursor: pointer;
+    font-family: inherit;
+    margin-bottom: 10px;
+  }
+  .reset-confirm-btn:active { opacity: .85; }
+  .reset-cancel-btn {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    background: var(--bg-grey);
+    border: none;
+    border-radius: 10px;
+    color: var(--text);
+    font-size: 15px;
+    font-weight: 600;
+    text-align: center;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .reset-cancel-btn:active { opacity: .75; }
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <!-- Notch -->
+  <div class="notch"></div>
+
+  <!-- Status bar -->
+  <div class="status-bar">
+    <span class="time">9:41</span>
+    <div class="status-icons">
+      <!-- Signal -->
+      <svg width="17" height="12" viewBox="0 0 17 12" fill="none">
+        <rect x="0" y="7" width="3" height="5" rx="1" fill="#293351"/>
+        <rect x="4.5" y="5" width="3" height="7" rx="1" fill="#293351"/>
+        <rect x="9" y="2.5" width="3" height="9.5" rx="1" fill="#293351"/>
+        <rect x="13.5" y="0" width="3" height="12" rx="1" fill="#293351"/>
+      </svg>
+      <!-- WiFi -->
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
+        <path d="M8 9.5a1.5 1.5 0 100 3 1.5 1.5 0 000-3z" fill="#293351"/>
+        <path d="M8 6C5.87 6 3.94 6.84 2.5 8.22l1.42 1.42A5 5 0 018 8a5 5 0 014.08 1.64l1.42-1.42A7 7 0 008 6z" fill="#293351"/>
+        <path d="M8 2C4.69 2 1.69 3.31-.07 5.5l1.45 1.45A9 9 0 018 4a9 9 0 016.62 2.95L16.07 5.5C14.31 3.31 11.31 2 8 2z" fill="#293351"/>
+      </svg>
+      <!-- Battery -->
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="none">
+        <rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#293351" stroke-opacity=".35"/>
+        <rect x="2" y="2" width="16" height="8" rx="2" fill="#293351"/>
+        <path d="M23 4v4a2 2 0 000-4z" fill="#293351" fill-opacity=".4"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Nav bar -->
+  <div class="nav-bar">
+    <div class="nav-back" onclick="goBack()">
+      <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+        <path d="M7 1 1 7l6 6" stroke="#1020F9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Tilbake
+    </div>
+    <div class="nav-title">Endre tidsstyring</div>
+    <div style="min-width:60px"></div>
+  </div>
+
+  <!-- Content -->
+  <div class="content">
+
+    <!-- Arbeidstid section -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-label">Arbeidstid</span>
+      </div>
+      <div class="section-desc">Arbeidstiden styrer når tidsstyringen skal være aktiv</div>
+      <div class="card">
+        <!-- Schedule entries (dynamic) -->
+        <div id="schedulesList"></div>
+        <!-- Add -->
+        <div class="add-row" onclick="addSchedule()">
+          <div class="add-icon">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M7 1v12M1 7h12" stroke="#1020F9" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <span class="add-label">Legg til arbeidstid</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Utenfor arbeidstid section -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-label">Utenfor arbeidstid</span>
+      </div>
+      <div class="section-desc">Innstillingene gjelder når ingen arbeidstid er aktiv</div>
+      <div class="card">
+        <div class="row" onclick="editOutsideHours()">
+          <div class="row-body">
+            <div class="row-label" id="utenforLabel">Alt slås av</div>
+          </div>
+          <span class="row-value" style="color:var(--blue)">Endre</span>
+          <svg class="row-chevron" width="7" height="13" viewBox="0 0 7 13" fill="none">
+            <path d="M1 1 6 6.5 1 12" stroke="#1020F9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Innstillinger section -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-label">Innstillinger</span>
+      </div>
+      <div class="card">
+        <!-- Varsel -->
+        <div class="row no-tap">
+          <div class="row-body">
+            <div class="row-label">Varsel</div>
+            <div class="row-sub">10 minutter før arbeidstiden starter og slutter</div>
+          </div>
+          <label class="toggle" onclick="event.stopPropagation()">
+            <input type="checkbox" id="notifToggle" onchange="onNotifChange()"/>
+            <div class="toggle-track"></div>
+          </label>
+        </div>
+        <!-- På- og avlogging -->
+        <div class="row" onclick="openLoginSheet()">
+          <div class="row-body">
+            <div class="row-label">På- og avlogging</div>
+          </div>
+          <span class="row-value" id="loginValue">Automatisk</span>
+          <svg class="row-chevron" width="7" height="13" viewBox="0 0 7 13" fill="none">
+            <path d="M1 1 6 6.5 1 12" stroke="#1020F9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reset button -->
+    <button class="reset-btn" onclick="openResetDialog()">Nullstill tidsstyring</button>
+
+  </div><!-- /content -->
+
+  <!-- Tab bar -->
+  <div class="tab-bar">
+    <nav class="tabs" role="tablist">
+      <button class="tab" role="tab" onclick="switchTab(this)" aria-label="Logg">
+        <div class="tab-icon-wrap">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="9" stroke="currentColor" stroke-width="1.7"/><path d="M11 6.5v5l3 2.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <span class="tab-lbl">Logg</span>
+      </button>
+      <button class="tab" role="tab" onclick="switchTab(this)" aria-label="Søk">
+        <div class="tab-icon-wrap">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="10" cy="10" r="6.5" stroke="currentColor" stroke-width="1.7"/><path d="M15 15 20 20" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+        </div>
+        <span class="tab-lbl">Søk</span>
+      </button>
+      <button class="tab" role="tab" onclick="switchTab(this)" aria-label="Tastatur">
+        <div class="tab-icon-wrap">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="5" cy="6" r="1.6" fill="currentColor"/><circle cx="11" cy="6" r="1.6" fill="currentColor"/><circle cx="17" cy="6" r="1.6" fill="currentColor"/><circle cx="5" cy="11" r="1.6" fill="currentColor"/><circle cx="11" cy="11" r="1.6" fill="currentColor"/><circle cx="17" cy="11" r="1.6" fill="currentColor"/><circle cx="5" cy="16" r="1.6" fill="currentColor"/><circle cx="11" cy="16" r="1.6" fill="currentColor"/><circle cx="17" cy="16" r="1.6" fill="currentColor"/></svg>
+        </div>
+        <span class="tab-lbl">Tastatur</span>
+      </button>
+      <button class="tab active" role="tab" onclick="switchTab(this)" aria-label="Jobbprofil" aria-selected="true">
+        <div class="tab-icon-wrap">
+          <span class="badge badge-green" id="job-badge" style="display:none"></span>
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11 3a7 7 0 0 0-7 7v.5H5.5a1.5 1.5 0 0 1 1.5 1.5v3A1.5 1.5 0 0 1 5.5 16.5H4.5A1.5 1.5 0 0 1 3 15v-5a8 8 0 0 1 16 0v5a1.5 1.5 0 0 1-1.5 1.5h-1A1.5 1.5 0 0 1 15 15v-3a1.5 1.5 0 0 1 1.5-1.5H18V10a7 7 0 0 0-7-7z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+        </div>
+        <span class="tab-lbl">Jobbprofil</span>
+      </button>
+      <button class="tab" role="tab" onclick="switchTab(this)" aria-label="Meny">
+        <div class="tab-icon-wrap">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M3 6h16M3 11h16M3 16h16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+        </div>
+        <span class="tab-lbl">Meny</span>
+      </button>
+    </nav>
+    <div class="home-indicator"><div class="home-bar"></div></div>
+  </div>
+
+  <!-- ── Login mode bottom sheet ── -->
+  <div class="sheet-backdrop" id="loginSheetBackdrop" onclick="closeLoginSheet(event)">
+    <div class="sheet" id="loginSheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title">Hvordan ønsker du å logge på og av?</div>
+      <div class="sheet-divider"></div>
+
+      <div class="radio-row" id="radioAuto" onclick="selectLoginMode(0)">
+        <div class="radio-circle selected" id="radioCircle0"></div>
+        <div class="radio-body">
+          <div class="radio-label">Automatisk på- og avlogging</div>
+          <div class="radio-desc">Køer, visningsnummer og SMS-varsling styres automatisk</div>
+        </div>
+      </div>
+      <div class="radio-row" id="radioManual" onclick="selectLoginMode(1)">
+        <div class="radio-circle" id="radioCircle1"></div>
+        <div class="radio-body">
+          <div class="radio-label">Manuell på- og avlogging</div>
+          <div class="radio-desc">Du får varsel når arbeidstiden starter og slutter, og logger selv på og av i appen</div>
+        </div>
+      </div>
+
+      <button class="sheet-btn" onclick="confirmLoginMode()">Bekreft</button>
+    </div>
+  </div>
+
+  <!-- ── Reset confirm dialog ── -->
+  <div class="reset-backdrop" id="resetBackdrop">
+    <div class="reset-dialog">
+      <div class="reset-title">Ønsker du å nullstille tidsstyring?</div>
+      <div class="reset-body">All arbeidstid og innstillinger vil tilbakestilles, og tidsstyring slås av.</div>
+      <button class="reset-confirm-btn" onclick="confirmReset()">Nullstill tidsstyring</button>
+      <button class="reset-cancel-btn" onclick="closeResetDialog()">Avbryt</button>
+    </div>
+  </div>
+
+</div><!-- /phone -->
+
+<script>
+  /* ─── State ─── */
+  let savedState = null;
+  let selectedLoginMode = 0; // 0=Automatisk, 1=Manuell
+
+  const DISPLAY_NUMBERS = [
+    'Mitt eget nummer (999 99 999)',
+    'Test1 (123 45 678)',
+    'Test2 (12 34 56 78)',
+    'Test3 (876 54 321)'
+  ];
+
+  function buildDetailText(s) {
+    const lines = [];
+    const numLabel = (DISPLAY_NUMBERS[s.displayNumIdx || 0] || '').replace(/ \(.*\)$/, '');
+    lines.push('Visningsnummer: ' + numLabel);
+    if (s.queues) {
+      const loggedOn = s.queues.filter(q => q.status === 'pa').map(q => q.name.replace(/ \(.*\)$/, ''));
+      if (loggedOn.length) lines.push('Pålogget: ' + loggedOn.join(', '));
+      const smsCount = s.queues.filter(q => q.sms).length;
+      if (smsCount) lines.push('SMS-varsling: ' + smsCount + (smsCount === 1 ? ' kø' : ' køer'));
+    }
+    return lines.join('<br>');
+  }
+
+  function renderSchedules() {
+    const schedules = savedState.schedules || [];
+    const container = document.getElementById('schedulesList');
+    container.innerHTML = schedules.map((s, i) => `
+      <div class="schedule-row" onclick="editSchedule(${i})">
+        <div class="schedule-row-inner">
+          <div>
+            <div class="schedule-label">${s.startTime} - ${s.endTime}: ${s.dayLabel}</div>
+            <div class="schedule-detail">${buildDetailText(s)}</div>
+          </div>
+          <svg class="row-chevron" width="7" height="13" viewBox="0 0 7 13" fill="none" style="margin-top:4px;flex-shrink:0">
+            <path d="M1 1 6 6.5 1 12" stroke="#1020F9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  /* ─── Init ─── */
+  (function init() {
+    try {
+      savedState = JSON.parse(localStorage.getItem('mbn_tidsstyring')) || {};
+    } catch(e) { savedState = {}; }
+
+    // Migrate legacy flat format to schedules array
+    if (!savedState.schedules) {
+      savedState.schedules = [];
+      if (savedState.startTime) {
+        savedState.schedules.push({
+          startTime: savedState.startTime,
+          endTime:   savedState.endTime   || '16:00',
+          dayLabel:  savedState.dayLabel  || 'Alle hverdager',
+          displayNumIdx: 0, externalOnly: false,
+          queues: [
+            { name: 'Administrasjon (123 45 678)', status: 'pa', sms: true },
+            { name: 'Support (123 45 678)',        status: 'pa', sms: true },
+            { name: 'Verksted (123 45 678)',       status: 'av', sms: false }
+          ]
+        });
+      }
+    }
+
+    // Render schedule rows
+    renderSchedules();
+
+    // Notification toggle
+    const notifToggle = document.getElementById('notifToggle');
+    if (savedState.notification !== undefined) {
+      notifToggle.checked = !!savedState.notification;
+    } else {
+      notifToggle.checked = true; // default on
+    }
+
+    // Login mode
+    const lm = savedState.loginMode || 'auto';
+    if (lm === 'manual') {
+      selectedLoginMode = 1;
+      document.getElementById('loginValue').textContent = 'Manuell';
+    } else {
+      selectedLoginMode = 0;
+      document.getElementById('loginValue').textContent = 'Automatisk';
+    }
+
+    // Sync radio circles
+    updateRadioUI();
+
+    // Utenfor arbeidstid label
+    try {
+      const uh = JSON.parse(localStorage.getItem('mbn_utenfor_arbeidstid'));
+      if (uh && uh.queues) {
+        const isCustom = uh.queues.some(q => q.status !== 'av' || q.sms);
+        document.getElementById('utenforLabel').textContent = isCustom ? 'Tilpasset' : 'Alt slås av';
+      }
+    } catch(e) {}
+  })();
+
+  /* ─── Navigation ─── */
+  function goBack() {
+    window.location.href = 'index.html';
+  }
+
+  function editSchedule(idx) {
+    sessionStorage.setItem('mbn_arbeidstid_idx', idx);
+    window.location.href = 'endre-arbeidstid.html';
+  }
+
+  function addSchedule() {
+    window.location.href = 'ny-arbeidstid.html';
+  }
+
+  function editOutsideHours() {
+    window.location.href = 'utenfor-arbeidstid.html';
+  }
+
+  function editQueues() {
+    alert('Rediger kø-innstillinger');
+  }
+
+  function editSmsVarsling() {
+    alert('Rediger SMS-varsling');
+  }
+
+  /* ─── Notification toggle ─── */
+  function onNotifChange() {
+    const checked = document.getElementById('notifToggle').checked;
+    savedState.notification = checked;
+    localStorage.setItem('mbn_tidsstyring', JSON.stringify(savedState));
+  }
+
+  /* ─── Login mode sheet ─── */
+  function openLoginSheet() {
+    updateRadioUI();
+    document.getElementById('loginSheetBackdrop').classList.add('open');
+  }
+
+  function closeLoginSheet(e) {
+    if (e && e.target !== document.getElementById('loginSheetBackdrop')) return;
+    document.getElementById('loginSheetBackdrop').classList.remove('open');
+  }
+
+  function selectLoginMode(idx) {
+    selectedLoginMode = idx;
+    updateRadioUI();
+  }
+
+  function updateRadioUI() {
+    document.getElementById('radioCircle0').className =
+      'radio-circle' + (selectedLoginMode === 0 ? ' selected' : '');
+    document.getElementById('radioCircle1').className =
+      'radio-circle' + (selectedLoginMode === 1 ? ' selected' : '');
+  }
+
+  function confirmLoginMode() {
+    const isManual = selectedLoginMode === 1;
+    savedState.loginMode = isManual ? 'manual' : 'auto';
+    document.getElementById('loginValue').textContent = isManual ? 'Manuell' : 'Automatisk';
+    localStorage.setItem('mbn_tidsstyring', JSON.stringify(savedState));
+    document.getElementById('loginSheetBackdrop').classList.remove('open');
+  }
+
+  /* ─── Reset ─── */
+  function openResetDialog() {
+    document.getElementById('resetBackdrop').classList.add('open');
+  }
+
+  function closeResetDialog() {
+    document.getElementById('resetBackdrop').classList.remove('open');
+  }
+
+  function confirmReset() {
+    localStorage.removeItem('mbn_tidsstyring');
+    window.location.href = 'index.html';
+  }
+
+  /* ─── Tab bar ─── */
+  function switchTab(el) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  (function() {
+    try {
+      const d = JSON.parse(localStorage.getItem('mbn_job_badge'));
+      if (d && d.count > 0) {
+        const b = document.getElementById('job-badge');
+        if (b) { b.textContent = d.count; b.style.display = ''; }
+      }
+    } catch(e) {}
+  })();
+</script>
+</body>
+</html>

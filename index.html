@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MBN App – Jobbprofil</title>
+<style>
+/* ─────────────────────────────────────────
+   Design tokens — extracted from Figma
+   File: MBN App  |  Node: 892-20973
+───────────────────────────────────────── */
+:root {
+  --c-blue:       #1020F9;
+  --c-navy:       #000B2E;
+  --c-text:       #293351;
+  --c-muted:      #4F5A7D;
+  --c-bg-blue:    #EBF3FF;
+  --c-bg-grey:    #F2F3F7;
+  --c-white:      #FFFFFF;
+  --c-border:     rgba(79,90,125,.18);
+  --c-track-off:  #7C88AB;
+  --c-orange:     #FF852F;
+  --c-green:      #178222;
+  --c-teal:       #00C8BE;
+  --c-red:        #C70505;
+
+  --r-card:   14px;
+  --r-phone:  48px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #B0B8CC;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Phone shell ─────────────────────── */
+.phone {
+  position: relative;
+  width: 375px;
+  height: 812px;
+  background: var(--c-white);
+  border-radius: var(--r-phone);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,.18),
+    0 40px 100px rgba(0,0,0,.4),
+    inset 0 0 0 1px rgba(255,255,255,.08);
+}
+
+/* ── Notch ───────────────────────────── */
+.notch {
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 160px; height: 34px;
+  background: var(--c-navy);
+  border-radius: 0 0 24px 24px;
+  z-index: 20;
+}
+
+/* ── Status bar ──────────────────────── */
+.status-bar {
+  height: 44px;
+  padding: 0 24px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding-bottom: 8px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
+}
+.status-time {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--c-navy);
+  letter-spacing: -.4px;
+}
+.status-icons {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+/* ── Scrollable body ─────────────────── */
+.scroll-body {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+}
+.scroll-body::-webkit-scrollbar { display: none; }
+
+.content {
+  padding: 8px 16px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+/* ── AtWork panel ────────────────────── */
+.panel {
+  background: var(--c-bg-blue);
+  border-radius: var(--r-card);
+  overflow: hidden;
+}
+.panel-row {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  gap: 14px;
+  cursor: pointer;
+  transition: background .15s;
+}
+.panel-row:active { background: rgba(16,32,249,.06); }
+.panel-row + .panel-row {
+  border-top: 1px solid var(--c-border);
+}
+.panel-text { flex: 1; min-width: 0; }
+.panel-label {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--c-text);
+  line-height: 1.35;
+}
+.panel-sub {
+  font-size: 12px;
+  color: var(--c-muted);
+  margin-top: 3px;
+  line-height: 1.35;
+}
+.panel-link {
+  font-size: 12px;
+  color: var(--c-blue);
+  margin-top: 5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+/* ── Toggle ──────────────────────────── */
+.toggle-wrap {
+  position: relative;
+  width: 51px;
+  height: 31px;
+  flex-shrink: 0;
+}
+.toggle-wrap input {
+  position: absolute;
+  opacity: 0;
+  width: 0; height: 0;
+}
+.toggle-track {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: var(--c-track-off);
+  transition: background .22s cubic-bezier(.4,0,.2,1);
+}
+.toggle-wrap input:checked ~ .toggle-track {
+  background: var(--c-blue);
+}
+.toggle-thumb {
+  position: absolute;
+  top: 2px; left: 2px;
+  width: 27px; height: 27px;
+  border-radius: 50%;
+  background: var(--c-white);
+  box-shadow: 0 2px 5px rgba(0,0,0,.28), 0 1px 2px rgba(0,0,0,.18);
+  transition: transform .22s cubic-bezier(.4,0,.2,1);
+  pointer-events: none;
+}
+.toggle-wrap input:checked ~ .toggle-track ~ .toggle-thumb {
+  transform: translateX(20px);
+}
+label.toggle-wrap { cursor: pointer; }
+
+/* ── Chevron ─────────────────────────── */
+.chevron { flex-shrink: 0; color: var(--c-blue); display: flex; align-items: center; }
+
+/* ── Section header ──────────────────── */
+.section-hd {
+  padding: 0 2px;
+}
+.section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--c-text);
+  line-height: 1.3;
+}
+.section-desc {
+  font-size: 12px;
+  color: var(--c-muted);
+  margin-top: 3px;
+  line-height: 1.4;
+}
+
+/* ── Option row (Visningsnummer) ─────── */
+.option-card {
+  background: var(--c-bg-grey);
+  border-radius: var(--r-card);
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: background .15s;
+}
+.option-card:active { background: #E8E9EF; }
+.option-main {
+  font-size: 14px;
+  color: var(--c-text);
+  flex: 1;
+}
+
+/* ── Queue list ──────────────────────── */
+.queue-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.queue-card {
+  background: var(--c-bg-grey);
+  border-radius: var(--r-card);
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ── Avatar ──────────────────────────── */
+.avatar {
+  width: 36px; height: 36px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Queue text ──────────────────────── */
+.queue-text { flex: 1; min-width: 0; }
+.queue-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--c-text);
+}
+.queue-name span {
+  font-weight: 400;
+  color: var(--c-muted);
+}
+.queue-meta {
+  font-size: 12px;
+  color: var(--c-muted);
+  margin-top: 3px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  line-height: 1.3;
+}
+.meta-dot {
+  width: 3px; height: 3px;
+  border-radius: 50%;
+  background: var(--c-muted);
+  flex-shrink: 0;
+}
+
+/* ── Tab bar ─────────────────────────── */
+.tab-bar {
+  background: var(--c-white);
+  border-top: 1px solid rgba(79,90,125,.1);
+  flex-shrink: 0;
+  padding-top: 4px;
+}
+.tabs { display: flex; }
+.tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 4px 2px;
+  position: relative;
+  cursor: pointer;
+  background: none;
+  border: none;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.tab-icon-wrap {
+  position: relative;
+  width: 28px; height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--c-muted);
+}
+.tab.active .tab-icon-wrap { color: var(--c-blue); }
+.tab-lbl {
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--c-muted);
+  letter-spacing: .1px;
+}
+.tab.active .tab-lbl { color: var(--c-blue); font-weight: 600; }
+.badge {
+  position: absolute;
+  top: -3px; right: -5px;
+  min-width: 16px; height: 16px;
+  border-radius: 8px;
+  padding: 0 4px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--c-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+.badge-orange { background: var(--c-orange); }
+.badge-green  { background: var(--c-green); }
+
+/* ── Home indicator ──────────────────── */
+.home-indicator {
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.home-bar {
+  width: 134px; height: 5px;
+  border-radius: 3px;
+  background: var(--c-navy);
+  opacity: .9;
+}
+
+/* ── Number selector bottom sheet ───── */
+.sheet-backdrop {
+  position: absolute; inset: 0;
+  background: rgba(0,11,46,.45);
+  z-index: 100; display: none; align-items: flex-end;
+}
+.sheet-backdrop.open { display: flex; animation: sheet-fadein .2s ease; }
+@keyframes sheet-fadein { from { opacity:0 } to { opacity:1 } }
+.sheet {
+  width: 100%; background: var(--c-white);
+  border-radius: 20px 20px 0 0;
+  padding-bottom: 8px;
+  max-height: 80%;
+  overflow-y: auto;
+  animation: sheet-slideup .25s cubic-bezier(.4,0,.2,1);
+}
+@keyframes sheet-slideup { from { transform:translateY(100%) } to { transform:translateY(0) } }
+.sheet-handle {
+  width: 36px; height: 4px; border-radius: 2px;
+  background: var(--c-muted); opacity: .3;
+  margin: 12px auto 0;
+}
+.sheet-header { padding: 14px 20px 12px; }
+.sheet-title { font-size: 16px; font-weight: 700; color: var(--c-navy); }
+.sheet-divider { height: 1px; background: var(--c-border); }
+.radio-row {
+  display: flex; align-items: center;
+  padding: 14px 20px; gap: 14px;
+  cursor: pointer; position: relative;
+}
+.radio-row:not(:last-of-type) { border-bottom: 1px solid var(--c-border); }
+.radio-row:active { background: var(--c-bg-grey); }
+.radio-circle {
+  width: 22px; height: 22px; border-radius: 50%;
+  border: 2px solid var(--c-border);
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.radio-circle.sel { border-color: var(--c-blue); background: var(--c-blue); }
+.radio-circle.sel::after { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #fff; }
+.radio-body { flex: 1; }
+.radio-label { font-size: 15px; font-weight: 500; color: var(--c-text); }
+.sheet-btn {
+  display: block; width: calc(100% - 32px);
+  margin: 14px 16px 16px;
+  padding: 15px; background: var(--c-blue);
+  border: none; border-radius: 12px;
+  color: #fff; font-size: 16px; font-weight: 700;
+  text-align: center; cursor: pointer; font-family: inherit;
+}
+.sheet-btn:active { opacity: .85; }
+
+/* ── Queue bottom sheet ──────────────── */
+.q-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,22,87,.5);
+  z-index: 50;
+  display: none;
+  align-items: flex-end;
+}
+.q-overlay.open { display: flex; animation: q-fadein .2s ease; }
+@keyframes q-fadein { from { opacity:0 } to { opacity:1 } }
+.q-sheet {
+  background: var(--c-white);
+  border-radius: 20px 20px 0 0;
+  width: 100%;
+  padding: 12px 16px 8px;
+  animation: q-slideup .25s cubic-bezier(.4,0,.2,1);
+}
+@keyframes q-slideup { from { transform:translateY(100%) } to { transform:translateY(0) } }
+.q-handle {
+  width: 36px; height: 5px; border-radius: 3px;
+  background: var(--c-muted); opacity: .35;
+  margin: 0 auto 14px;
+}
+.q-head {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 14px;
+}
+.q-head-text { flex: 1; }
+.q-head-name { font-size: 15px; font-weight: 600; color: var(--c-text); }
+.q-head-num  { font-size: 13px; color: var(--c-muted); margin-top: 1px; }
+.q-close {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--c-bg-grey); border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--c-navy); flex-shrink: 0;
+}
+.q-actions { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; }
+.q-action {
+  background: var(--c-bg-grey); border-radius: 12px;
+  padding: 14px 16px;
+  display: flex; align-items: center; gap: 12px;
+  cursor: pointer;
+  transition: background .12s;
+}
+.q-action:active { background: #E8E9EF; }
+.q-action-label { flex: 1; font-size: 14px; color: var(--c-text); }
+.q-sms-row {
+  background: var(--c-bg-grey); border-radius: 12px;
+  padding: 14px 16px;
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 14px;
+}
+.q-sms-label { flex: 1; font-size: 14px; color: var(--c-text); }
+/* Toggle reuse */
+.toggle-wrap {
+  position: relative; width: 51px; height: 31px; flex-shrink: 0; cursor: pointer;
+}
+.toggle-wrap input { position: absolute; opacity: 0; width: 0; height: 0; }
+.toggle-track {
+  position: absolute; inset: 0; border-radius: 999px;
+  background: var(--c-track-off);
+  transition: background .22s cubic-bezier(.4,0,.2,1);
+}
+.toggle-wrap input:checked ~ .toggle-track { background: var(--c-blue); }
+.toggle-thumb {
+  position: absolute; top: 2px; left: 2px;
+  width: 27px; height: 27px; border-radius: 50%;
+  background: var(--c-white);
+  box-shadow: 0 2px 5px rgba(0,0,0,.28), 0 1px 2px rgba(0,0,0,.18);
+  transition: transform .22s cubic-bezier(.4,0,.2,1);
+  pointer-events: none;
+}
+.toggle-wrap input:checked ~ .toggle-track ~ .toggle-thumb { transform: translateX(20px); }
+</style>
+</head>
+<body>
+
+<div class="phone">
+
+  <!-- Notch -->
+  <div class="notch"></div>
+
+  <!-- Status bar -->
+  <div class="status-bar">
+    <span class="status-time">9:41</span>
+    <div class="status-icons">
+      <!-- Signal -->
+      <svg width="17" height="12" viewBox="0 0 17 12" fill="none">
+        <rect x="0"  y="9"  width="3" height="3" rx="1"   fill="#000B2E"/>
+        <rect x="4.5" y="6"  width="3" height="6" rx="1" fill="#000B2E"/>
+        <rect x="9"  y="3"  width="3" height="9" rx="1"   fill="#000B2E"/>
+        <rect x="13.5" y="0" width="3" height="12" rx="1" fill="#000B2E"/>
+      </svg>
+      <!-- WiFi -->
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
+        <circle cx="8" cy="10.5" r="1.5" fill="#000B2E"/>
+        <path d="M4.8 7.6A4.5 4.5 0 0 1 8 6.3a4.5 4.5 0 0 1 3.2 1.3" stroke="#000B2E" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+        <path d="M2.2 5.1A7.5 7.5 0 0 1 8 2.7a7.5 7.5 0 0 1 5.8 2.4" stroke="#000B2E" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+      </svg>
+      <!-- Battery -->
+      <svg width="26" height="13" viewBox="0 0 26 13" fill="none">
+        <rect x=".75" y=".75" width="22.5" height="11.5" rx="3.25" stroke="#000B2E" stroke-width="1.5"/>
+        <rect x="2.5" y="2.5" width="18"  height="8"  rx="1.8" fill="#000B2E"/>
+        <path d="M24.5 4.5v4a2 2 0 0 0 0-4z" fill="#000B2E" opacity=".4"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Scrollable content -->
+  <div class="scroll-body">
+    <div class="content">
+
+      <!-- ── AtWork panel ── -->
+      <div class="panel">
+
+        <!-- Jobbprofil row -->
+        <div class="panel-row" onclick="document.getElementById('tog-job').click()">
+          <div class="panel-text">
+            <div class="panel-label">Jobbprofil</div>
+            <div class="panel-sub" id="job-status">Avlogget</div>
+          </div>
+          <label class="toggle-wrap" onclick="event.stopPropagation()">
+            <input type="checkbox" id="tog-job" onchange="onJobToggle(this)">
+            <span class="toggle-track"></span>
+            <span class="toggle-thumb"></span>
+          </label>
+        </div>
+
+        <!-- Tidsstyring row -->
+        <div class="panel-row" onclick="onTidsstyring()">
+          <div class="panel-text">
+            <div class="panel-label">Tidsstyring</div>
+            <div class="panel-sub" id="tids-sub">Aktiver for å tidsstyre jobbprofil</div>
+            <span class="panel-link" id="tids-link" style="display:none" onclick="event.stopPropagation(); window.location.href='tidsstyring-detaljer.html'">
+              Endre tidsstyring
+              <svg width="6" height="10" viewBox="0 0 6 10" fill="none">
+                <path d="M1 1 5 5 1 9" stroke="#1020F9" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+          </div>
+          <div class="chevron">
+            <svg width="7" height="13" viewBox="0 0 7 13" fill="none">
+              <path d="M1 1 6 6.5 1 12" stroke="#1020F9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ── Visningsnummer ── -->
+      <div>
+        <div class="section-hd" style="margin-bottom:10px">
+          <div class="section-title">Visningsnummer</div>
+        </div>
+        <div class="option-card" onclick="openNumSheet()">
+          <div style="flex:1">
+            <div class="option-main" id="numDisplay" style="flex:none">Mitt eget nummer (999 99 999)</div>
+            <div id="numExternalStatus" style="display:none;font-size:12px;color:var(--c-muted);margin-top:3px">Kun for eksterne samtaler</div>
+          </div>
+          <div class="chevron">
+            <svg width="7" height="13" viewBox="0 0 7 13" fill="none">
+              <path d="M1 1 6 6.5 1 12" stroke="#1020F9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Mine køer ── -->
+      <div>
+        <div class="section-hd" style="margin-bottom:10px">
+          <div class="section-title">Mine køer</div>
+          <div class="section-desc">Køer er styrt av tidsstyring, overstyr i panelet</div>
+        </div>
+        <div class="queue-list">
+
+          <!-- Queue: Administrasjon -->
+          <div class="queue-card" style="cursor:pointer" onclick="openQueueSheet(0)"  data-idx="0">
+            <div class="avatar">
+              <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0 18C0 8.05888 8.05888 0 18 0C27.9411 0 36 8.05888 36 18C36 27.9411 27.9411 36 18 36C8.05888 36 0 27.9411 0 18Z" fill="#42F0F0"/>
+                <path d="M21.75 9C21.75 8.58579 22.0858 8.25 22.5 8.25C24.5711 8.25 26.25 9.92893 26.25 12C26.25 13.1415 25.74 14.1638 24.9355 14.8516C26.62 15.7674 27.7499 17.6281 27.7499 19.7273V24C27.7499 24.4142 27.4141 24.75 26.9999 24.75C26.5857 24.75 26.2499 24.4142 26.2499 24V19.7273C26.2499 17.4844 24.5567 15.75 22.5681 15.75C22.5611 15.75 22.5541 15.7499 22.5471 15.7497C22.5314 15.7499 22.5157 15.75 22.5 15.75C22.0858 15.75 21.75 15.4142 21.75 15C21.75 14.5858 22.0858 14.25 22.5 14.25C23.7426 14.25 24.75 13.2426 24.75 12C24.75 10.7574 23.7426 9.75 22.5 9.75C22.0858 9.75 21.75 9.41421 21.75 9Z" fill="#003333"/>
+                <path d="M18 9.75C17.5858 9.75 17.25 10.0858 17.25 10.5C17.25 10.9142 17.5858 11.25 18 11.25C19.2426 11.25 20.25 12.2574 20.25 13.5C20.25 14.7426 19.2426 15.75 18 15.75C17.5858 15.75 17.25 16.0858 17.25 16.5C17.25 16.9142 17.5858 17.25 18 17.25C18.0157 17.25 18.0314 17.2499 18.0471 17.2497C18.0541 17.2499 18.0611 17.25 18.0681 17.25C20.0567 17.25 21.7499 18.9844 21.7499 21.2273V25.5C21.7499 25.9142 22.0857 26.25 22.4999 26.25C22.9141 26.25 23.2499 25.9142 23.2499 25.5V21.2273C23.2499 19.1281 22.12 17.2674 20.4355 16.3516C21.24 15.6638 21.75 14.6415 21.75 13.5C21.75 11.4289 20.0711 9.75 18 9.75Z" fill="#003333"/>
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M15.9207 17.8641C16.7338 17.1763 17.25 16.1484 17.25 15C17.25 12.9289 15.5711 11.25 13.5 11.25C11.4289 11.25 9.75 12.9289 9.75 15C9.75 16.1484 10.2662 17.1763 11.0793 17.8641C9.3881 18.7825 8.25 20.6315 8.25 22.7273V27C8.25 27.4142 8.58579 27.75 9 27.75C9.41421 27.75 9.75 27.4142 9.75 27V22.7273C9.75 20.4954 11.4633 18.75 13.5 18.75C15.5367 18.75 17.25 20.4954 17.25 22.7273V27C17.25 27.4142 17.5858 27.75 18 27.75C18.4142 27.75 18.75 27.4142 18.75 27V22.7273C18.75 20.6315 17.6119 18.7825 15.9207 17.8641ZM11.25 15C11.25 13.7574 12.2574 12.75 13.5 12.75C14.7426 12.75 15.75 13.7574 15.75 15C15.75 16.2426 14.7426 17.25 13.5 17.25C12.2574 17.25 11.25 16.2426 11.25 15Z" fill="#003333"/>
+              </svg>
+            </div>
+            <div class="queue-text">
+              <div class="queue-name">Administrasjon <span>(123 45 678)</span></div>
+              <div class="queue-meta" id="queue-meta-0">
+                1/4 agenter
+                <span class="meta-dot"></span>
+                SMS-varsling av
+              </div>
+            </div>
+            <label class="toggle-wrap" onclick="event.stopPropagation()">
+              <input type="checkbox" id="queue-toggle-0" onchange="onQueueToggleChange(0)">
+              <span class="toggle-track"></span>
+              <span class="toggle-thumb"></span>
+            </label>
+          </div>
+
+          <!-- Queue: Support -->
+          <div class="queue-card" style="cursor:pointer" onclick="openQueueSheet(1)" data-idx="1">
+            <div class="avatar">
+              <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0 18C0 8.05888 8.05888 0 18 0C27.9411 0 36 8.05888 36 18C36 27.9411 27.9411 36 18 36C8.05888 36 0 27.9411 0 18Z" fill="#42F0F0"/>
+                <path d="M21.75 9C21.75 8.58579 22.0858 8.25 22.5 8.25C24.5711 8.25 26.25 9.92893 26.25 12C26.25 13.1415 25.74 14.1638 24.9355 14.8516C26.62 15.7674 27.7499 17.6281 27.7499 19.7273V24C27.7499 24.4142 27.4141 24.75 26.9999 24.75C26.5857 24.75 26.2499 24.4142 26.2499 24V19.7273C26.2499 17.4844 24.5567 15.75 22.5681 15.75C22.5611 15.75 22.5541 15.7499 22.5471 15.7497C22.5314 15.7499 22.5157 15.75 22.5 15.75C22.0858 15.75 21.75 15.4142 21.75 15C21.75 14.5858 22.0858 14.25 22.5 14.25C23.7426 14.25 24.75 13.2426 24.75 12C24.75 10.7574 23.7426 9.75 22.5 9.75C22.0858 9.75 21.75 9.41421 21.75 9Z" fill="#003333"/>
+                <path d="M18 9.75C17.5858 9.75 17.25 10.0858 17.25 10.5C17.25 10.9142 17.5858 11.25 18 11.25C19.2426 11.25 20.25 12.2574 20.25 13.5C20.25 14.7426 19.2426 15.75 18 15.75C17.5858 15.75 17.25 16.0858 17.25 16.5C17.25 16.9142 17.5858 17.25 18 17.25C18.0157 17.25 18.0314 17.2499 18.0471 17.2497C18.0541 17.2499 18.0611 17.25 18.0681 17.25C20.0567 17.25 21.7499 18.9844 21.7499 21.2273V25.5C21.7499 25.9142 22.0857 26.25 22.4999 26.25C22.9141 26.25 23.2499 25.9142 23.2499 25.5V21.2273C23.2499 19.1281 22.12 17.2674 20.4355 16.3516C21.24 15.6638 21.75 14.6415 21.75 13.5C21.75 11.4289 20.0711 9.75 18 9.75Z" fill="#003333"/>
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M15.9207 17.8641C16.7338 17.1763 17.25 16.1484 17.25 15C17.25 12.9289 15.5711 11.25 13.5 11.25C11.4289 11.25 9.75 12.9289 9.75 15C9.75 16.1484 10.2662 17.1763 11.0793 17.8641C9.3881 18.7825 8.25 20.6315 8.25 22.7273V27C8.25 27.4142 8.58579 27.75 9 27.75C9.41421 27.75 9.75 27.4142 9.75 27V22.7273C9.75 20.4954 11.4633 18.75 13.5 18.75C15.5367 18.75 17.25 20.4954 17.25 22.7273V27C17.25 27.4142 17.5858 27.75 18 27.75C18.4142 27.75 18.75 27.4142 18.75 27V22.7273C18.75 20.6315 17.6119 18.7825 15.9207 17.8641ZM11.25 15C11.25 13.7574 12.2574 12.75 13.5 12.75C14.7426 12.75 15.75 13.7574 15.75 15C15.75 16.2426 14.7426 17.25 13.5 17.25C12.2574 17.25 11.25 16.2426 11.25 15Z" fill="#003333"/>
+              </svg>
+            </div>
+            <div class="queue-text">
+              <div class="queue-name">Support <span>(444 44 444)</span></div>
+              <div class="queue-meta" id="queue-meta-1">
+                1/4 agenter
+                <span class="meta-dot"></span>
+                SMS-varsling av
+              </div>
+            </div>
+            <label class="toggle-wrap" onclick="event.stopPropagation()">
+              <input type="checkbox" id="queue-toggle-1" onchange="onQueueToggleChange(1)">
+              <span class="toggle-track"></span>
+              <span class="toggle-thumb"></span>
+            </label>
+          </div>
+
+          <!-- Queue: Verksted -->
+          <div class="queue-card" style="cursor:pointer" onclick="openQueueSheet(2)" data-idx="2">
+            <div class="avatar">
+              <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0 18C0 8.05888 8.05888 0 18 0C27.9411 0 36 8.05888 36 18C36 27.9411 27.9411 36 18 36C8.05888 36 0 27.9411 0 18Z" fill="#42F0F0"/>
+                <path d="M21.75 9C21.75 8.58579 22.0858 8.25 22.5 8.25C24.5711 8.25 26.25 9.92893 26.25 12C26.25 13.1415 25.74 14.1638 24.9355 14.8516C26.62 15.7674 27.7499 17.6281 27.7499 19.7273V24C27.7499 24.4142 27.4141 24.75 26.9999 24.75C26.5857 24.75 26.2499 24.4142 26.2499 24V19.7273C26.2499 17.4844 24.5567 15.75 22.5681 15.75C22.5611 15.75 22.5541 15.7499 22.5471 15.7497C22.5314 15.7499 22.5157 15.75 22.5 15.75C22.0858 15.75 21.75 15.4142 21.75 15C21.75 14.5858 22.0858 14.25 22.5 14.25C23.7426 14.25 24.75 13.2426 24.75 12C24.75 10.7574 23.7426 9.75 22.5 9.75C22.0858 9.75 21.75 9.41421 21.75 9Z" fill="#003333"/>
+                <path d="M18 9.75C17.5858 9.75 17.25 10.0858 17.25 10.5C17.25 10.9142 17.5858 11.25 18 11.25C19.2426 11.25 20.25 12.2574 20.25 13.5C20.25 14.7426 19.2426 15.75 18 15.75C17.5858 15.75 17.25 16.0858 17.25 16.5C17.25 16.9142 17.5858 17.25 18 17.25C18.0157 17.25 18.0314 17.2499 18.0471 17.2497C18.0541 17.2499 18.0611 17.25 18.0681 17.25C20.0567 17.25 21.7499 18.9844 21.7499 21.2273V25.5C21.7499 25.9142 22.0857 26.25 22.4999 26.25C22.9141 26.25 23.2499 25.9142 23.2499 25.5V21.2273C23.2499 19.1281 22.12 17.2674 20.4355 16.3516C21.24 15.6638 21.75 14.6415 21.75 13.5C21.75 11.4289 20.0711 9.75 18 9.75Z" fill="#003333"/>
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M15.9207 17.8641C16.7338 17.1763 17.25 16.1484 17.25 15C17.25 12.9289 15.5711 11.25 13.5 11.25C11.4289 11.25 9.75 12.9289 9.75 15C9.75 16.1484 10.2662 17.1763 11.0793 17.8641C9.3881 18.7825 8.25 20.6315 8.25 22.7273V27C8.25 27.4142 8.58579 27.75 9 27.75C9.41421 27.75 9.75 27.4142 9.75 27V22.7273C9.75 20.4954 11.4633 18.75 13.5 18.75C15.5367 18.75 17.25 20.4954 17.25 22.7273V27C17.25 27.4142 17.5858 27.75 18 27.75C18.4142 27.75 18.75 27.4142 18.75 27V22.7273C18.75 20.6315 17.6119 18.7825 15.9207 17.8641ZM11.25 15C11.25 13.7574 12.2574 12.75 13.5 12.75C14.7426 12.75 15.75 13.7574 15.75 15C15.75 16.2426 14.7426 17.25 13.5 17.25C12.2574 17.25 11.25 16.2426 11.25 15Z" fill="#003333"/>
+              </svg>
+            </div>
+            <div class="queue-text">
+              <div class="queue-name">Verksted <span>(12 34 56 78)</span></div>
+              <div class="queue-meta" id="queue-meta-2">
+                1/4 agenter
+                <span class="meta-dot"></span>
+                SMS-varsling av
+              </div>
+            </div>
+            <label class="toggle-wrap" onclick="event.stopPropagation()">
+              <input type="checkbox" id="queue-toggle-2" onchange="onQueueToggleChange(2)">
+              <span class="toggle-track"></span>
+              <span class="toggle-thumb"></span>
+            </label>
+          </div>
+
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /scroll-body -->
+
+  <!-- ── Tab bar ── -->
+  <div class="tab-bar">
+    <nav class="tabs" role="tablist">
+
+      <!-- Logg -->
+      <button class="tab" role="tab" onclick="switchTab(this)" aria-label="Logg">
+        <div class="tab-icon-wrap">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <circle cx="11" cy="11" r="9" stroke="currentColor" stroke-width="1.7"/>
+            <path d="M11 6.5v5l3 2.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <span class="tab-lbl">Logg</span>
+      </button>
+
+      <!-- Søk -->
+      <button class="tab" role="tab" onclick="switchTab(this)" aria-label="Søk">
+        <div class="tab-icon-wrap">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <circle cx="10" cy="10" r="6.5" stroke="currentColor" stroke-width="1.7"/>
+            <path d="M15 15 20 20" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <span class="tab-lbl">Søk</span>
+      </button>
+
+      <!-- Tastatur -->
+      <button class="tab" role="tab" onclick="switchTab(this)" aria-label="Tastatur">
+        <div class="tab-icon-wrap">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <circle cx="5"  cy="6"  r="1.6" fill="currentColor"/>
+            <circle cx="11" cy="6"  r="1.6" fill="currentColor"/>
+            <circle cx="17" cy="6"  r="1.6" fill="currentColor"/>
+            <circle cx="5"  cy="11" r="1.6" fill="currentColor"/>
+            <circle cx="11" cy="11" r="1.6" fill="currentColor"/>
+            <circle cx="17" cy="11" r="1.6" fill="currentColor"/>
+            <circle cx="5"  cy="16" r="1.6" fill="currentColor"/>
+            <circle cx="11" cy="16" r="1.6" fill="currentColor"/>
+            <circle cx="17" cy="16" r="1.6" fill="currentColor"/>
+          </svg>
+        </div>
+        <span class="tab-lbl">Tastatur</span>
+      </button>
+
+      <!-- Jobbprofil (active) -->
+      <button class="tab active" role="tab" onclick="switchTab(this)" aria-label="Jobbprofil" aria-selected="true">
+        <div class="tab-icon-wrap">
+          <span class="badge badge-green" id="job-badge" style="display:none"></span>
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <path d="M11 3a7 7 0 0 0-7 7v.5H5.5a1.5 1.5 0 0 1 1.5 1.5v3A1.5 1.5 0 0 1 5.5 16.5H4.5A1.5 1.5 0 0 1 3 15v-5a8 8 0 0 1 16 0v5a1.5 1.5 0 0 1-1.5 1.5h-1A1.5 1.5 0 0 1 15 15v-3a1.5 1.5 0 0 1 1.5-1.5H18V10a7 7 0 0 0-7-7z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <span class="tab-lbl">Jobbprofil</span>
+      </button>
+
+      <!-- Meny -->
+      <button class="tab" role="tab" onclick="switchTab(this)" aria-label="Meny">
+        <div class="tab-icon-wrap">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <path d="M3 6h16M3 11h16M3 16h16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <span class="tab-lbl">Meny</span>
+      </button>
+
+    </nav>
+
+    <div class="home-indicator">
+      <div class="home-bar"></div>
+    </div>
+  </div>
+
+  <!-- ── Number selector bottom sheet ── -->
+  <div class="sheet-backdrop" id="numSheetBackdrop" onclick="onNumBackdrop(event)">
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-header">
+        <div class="sheet-title">Velg visningsnummer</div>
+      </div>
+      <div class="sheet-divider"></div>
+      <div id="numOptions"></div>
+      <div id="numExternalRow" style="display:flex;align-items:center;padding:14px 20px;border-top:1px solid var(--c-border)">
+        <span style="flex:1;font-size:14px;color:var(--c-text)">Bruk kun for eksterne samtaler</span>
+        <label class="toggle-wrap" onclick="event.stopPropagation()">
+          <input type="checkbox" id="numExternalCheck" onchange="onExternalChange()">
+          <span class="toggle-track"></span>
+          <span class="toggle-thumb"></span>
+        </label>
+      </div>
+      <button class="sheet-btn" onclick="confirmNum()">Bekreft</button>
+    </div>
+  </div>
+
+  <!-- ── Queue bottom sheet ── -->
+  <div class="q-overlay" id="qOverlay" onclick="closeQueueSheet()">
+    <div class="q-sheet" onclick="event.stopPropagation()">
+      <div class="q-handle"></div>
+      <div class="q-head">
+        <div class="avatar" id="qSheetAvatar">
+          <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0 18C0 8.05888 8.05888 0 18 0C27.9411 0 36 8.05888 36 18C36 27.9411 27.9411 36 18 36C8.05888 36 0 27.9411 0 18Z" fill="#42F0F0"/>
+            <path d="M21.75 9C21.75 8.58579 22.0858 8.25 22.5 8.25C24.5711 8.25 26.25 9.92893 26.25 12C26.25 13.1415 25.74 14.1638 24.9355 14.8516C26.62 15.7674 27.7499 17.6281 27.7499 19.7273V24C27.7499 24.4142 27.4141 24.75 26.9999 24.75C26.5857 24.75 26.2499 24.4142 26.2499 24V19.7273C26.2499 17.4844 24.5567 15.75 22.5681 15.75C22.5611 15.75 22.5541 15.7499 22.5471 15.7497C22.5314 15.7499 22.5157 15.75 22.5 15.75C22.0858 15.75 21.75 15.4142 21.75 15C21.75 14.5858 22.0858 14.25 22.5 14.25C23.7426 14.25 24.75 13.2426 24.75 12C24.75 10.7574 23.7426 9.75 22.5 9.75C22.0858 9.75 21.75 9.41421 21.75 9Z" fill="#003333"/>
+            <path d="M18 9.75C17.5858 9.75 17.25 10.0858 17.25 10.5C17.25 10.9142 17.5858 11.25 18 11.25C19.2426 11.25 20.25 12.2574 20.25 13.5C20.25 14.7426 19.2426 15.75 18 15.75C17.5858 15.75 17.25 16.0858 17.25 16.5C17.25 16.9142 17.5858 17.25 18 17.25C18.0157 17.25 18.0314 17.2499 18.0471 17.2497C18.0541 17.2499 18.0611 17.25 18.0681 17.25C20.0567 17.25 21.7499 18.9844 21.7499 21.2273V25.5C21.7499 25.9142 22.0857 26.25 22.4999 26.25C22.9141 26.25 23.2499 25.9142 23.2499 25.5V21.2273C23.2499 19.1281 22.12 17.2674 20.4355 16.3516C21.24 15.6638 21.75 14.6415 21.75 13.5C21.75 11.4289 20.0711 9.75 18 9.75Z" fill="#003333"/>
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M15.9207 17.8641C16.7338 17.1763 17.25 16.1484 17.25 15C17.25 12.9289 15.5711 11.25 13.5 11.25C11.4289 11.25 9.75 12.9289 9.75 15C9.75 16.1484 10.2662 17.1763 11.0793 17.8641C9.3881 18.7825 8.25 20.6315 8.25 22.7273V27C8.25 27.4142 8.58579 27.75 9 27.75C9.41421 27.75 9.75 27.4142 9.75 27V22.7273C9.75 20.4954 11.4633 18.75 13.5 18.75C15.5367 18.75 17.25 20.4954 17.25 22.7273V27C17.25 27.4142 17.5858 27.75 18 27.75C18.4142 27.75 18.75 27.4142 18.75 27V22.7273C18.75 20.6315 17.6119 18.7825 15.9207 17.8641ZM11.25 15C11.25 13.7574 12.2574 12.75 13.5 12.75C14.7426 12.75 15.75 13.7574 15.75 15C15.75 16.2426 14.7426 17.25 13.5 17.25C12.2574 17.25 11.25 16.2426 11.25 15Z" fill="#003333"/>
+          </svg>
+        </div>
+        <div class="q-head-text">
+          <div class="q-head-name" id="qSheetName"></div>
+        </div>
+        <button class="q-close" onclick="closeQueueSheet()">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+      <div class="q-actions">
+        <div class="q-action">
+          <div class="q-action-label">Åpne kødetaljer</div>
+          <svg width="7" height="13" viewBox="0 0 7 13" fill="none">
+            <path d="M1 1 6 6.5 1 12" stroke="#1020F9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="q-action">
+          <div class="q-action-label">Vis operatører på køen</div>
+          <svg width="7" height="13" viewBox="0 0 7 13" fill="none">
+            <path d="M1 1 6 6.5 1 12" stroke="#1020F9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+      <div class="q-sms-row">
+        <span class="q-sms-label">SMS-varsling</span>
+        <label class="toggle-wrap" onclick="event.stopPropagation()">
+          <input type="checkbox" id="qSmsToggle" onchange="onQueueSmsChange()">
+          <span class="toggle-track"></span>
+          <span class="toggle-thumb"></span>
+        </label>
+      </div>
+      <button class="option-card" style="width:100%;border:none;justify-content:center;color:#1020F9;font-size:16px;font-weight:500;background:#EBF3FF;border-radius:14px;padding:16px;margin-bottom:16px" onclick="closeQueueSheet()">Lukk</button>
+    </div>
+  </div>
+
+</div><!-- /phone -->
+
+<script>
+  /* ── Queue bottom sheet ── */
+  const queues = [
+    { name: 'Administrasjon (123 45 678)', smsEnabled: false },
+    { name: 'Support (444 44 444)',        smsEnabled: false },
+    { name: 'Verksted (12 34 56 78)',      smsEnabled: false },
+  ];
+  let activeQueueIdx = -1;
+
+  /* ── Number selector ── */
+  const numList = [
+    'Mitt eget nummer (999 99 999)',
+    'Test1 (123 45 678)',
+    'Test2 (12 34 56 78)',
+    'Test3 (876 54 321)',
+  ];
+  let selectedNumIdx = 0;
+  let externalOnly   = false;
+
+  /* ────────────────────────────────────────────────────────────
+     Persistent state: mbn_jobbprofil_last_state
+     Shape: { queues: [{ enabled, smsEnabled }], numIdx }
+  ──────────────────────────────────────────────────────────── */
+
+  /* Save current UI state to localStorage (called while Jobbprofil is ON) */
+  function saveJobState() {
+    const state = {
+      queues: queues.map((q, i) => ({
+        enabled:    document.getElementById(`queue-toggle-${i}`).checked,
+        smsEnabled: q.smsEnabled
+      })),
+      numIdx: selectedNumIdx,
+      externalOnly: externalOnly
+    };
+    localStorage.setItem('mbn_jobbprofil_last_state', JSON.stringify(state));
+  }
+
+  /* Restore last saved state to UI (called when Jobbprofil is turned ON) */
+  function restoreJobState() {
+    let state = null;
+    try { state = JSON.parse(localStorage.getItem('mbn_jobbprofil_last_state')); } catch(e) {}
+
+    queues.forEach((q, i) => {
+      const saved      = state?.queues?.[i];
+      const enabled    = saved != null ? saved.enabled    : (i < 2);  // default: Adm + Support på
+      const smsEnabled = saved != null ? saved.smsEnabled : false;
+      document.getElementById(`queue-toggle-${i}`).checked = enabled;
+      q.smsEnabled = smsEnabled;
+      updateQueueMeta(i);
+    });
+
+    selectedNumIdx = state?.numIdx ?? 0;
+    document.getElementById('numDisplay').textContent = numList[selectedNumIdx];
+
+    externalOnly = state?.externalOnly ?? false;
+    document.getElementById('numExternalStatus').style.display =
+      (selectedNumIdx > 0 && externalOnly) ? '' : 'none';
+
+    updateJobBadge();
+  }
+
+  /* ── Jobbprofil master toggle ── */
+  function onJobToggle(cb) {
+    const statusEl = document.getElementById('job-status');
+    if (cb.checked) {
+      statusEl.textContent = 'Innlogget';
+      restoreJobState();   // gjenopprett siste aktive tilstand
+    } else {
+      statusEl.textContent = 'Avlogget';
+      // Slå av køer visuelt — lagret tilstand beholdes uendret
+      queues.forEach((q, i) => {
+        document.getElementById(`queue-toggle-${i}`).checked = false;
+        q.smsEnabled = false;
+        updateQueueMeta(i);
+      });
+      // Tilbakestill visningsnummer til default
+      selectedNumIdx = 0;
+      document.getElementById('numDisplay').textContent = numList[0];
+      document.getElementById('numExternalStatus').style.display = 'none';
+      externalOnly = false;
+      updateJobBadge();
+    }
+  }
+
+  /* ── Queue toggle (per kø) ── */
+  function onQueueToggleChange(idx) {
+    const enabled = document.getElementById(`queue-toggle-${idx}`).checked;
+    queues[idx].smsEnabled = enabled;   // SMS følger kø-pålogging
+    updateQueueMeta(idx);
+    const jobOn = document.getElementById('tog-job').checked;
+    if (jobOn) saveJobState();
+    updateJobBadge();
+  }
+
+  /* ── Green badge on Jobbprofil tab ── */
+  function updateJobBadge() {
+    const jobOn = document.getElementById('tog-job').checked;
+    const badge = document.getElementById('job-badge');
+    if (!badge) return;
+    if (!jobOn) {
+      badge.style.display = 'none';
+      localStorage.setItem('mbn_job_badge', JSON.stringify({ count: 0 }));
+      return;
+    }
+    const count = [...document.querySelectorAll('.queue-card input[type=checkbox]')].filter(c => c.checked).length;
+    badge.textContent = count;
+    badge.style.display = count > 0 ? '' : 'none';
+    localStorage.setItem('mbn_job_badge', JSON.stringify({ count }));
+  }
+
+  /* ── Apply tidsstyring state (activates Jobbprofil automatically if set up) ── */
+  function applyTidsstyringState() {
+    const sub  = document.getElementById('tids-sub');
+    const link = document.getElementById('tids-link');
+    let s = null;
+    try { s = JSON.parse(localStorage.getItem('mbn_tidsstyring')); } catch(e) {}
+
+    if (s && s.active) {
+      sub.textContent = `${s.startTime}–${s.endTime} · ${s.dayLabel}`;
+      link.style.display = 'inline-flex';
+      // Aktiver Jobbprofil automatisk og gjenopprett siste tilstand
+      const togJob = document.getElementById('tog-job');
+      if (!togJob.checked) {
+        togJob.checked = true;
+        document.getElementById('job-status').textContent = 'Innlogget';
+        restoreJobState();
+      }
+    } else {
+      sub.textContent = 'Aktiver for å tidsstyre jobbprofil';
+      link.style.display = 'none';
+    }
+  }
+
+  /* ── Tidsstyring row click ── */
+  function onTidsstyring() {
+    try {
+      const s = JSON.parse(localStorage.getItem('mbn_tidsstyring'));
+      if (s && s.active) { window.location.href = 'tidsstyring-detaljer.html'; return; }
+    } catch(e) {}
+    window.location.href = 'tidsstyring.html';
+  }
+
+  /* ── Tab switching ── */
+  function switchTab(el) {
+    document.querySelectorAll('.tab').forEach(t => {
+      t.classList.remove('active');
+      t.removeAttribute('aria-selected');
+    });
+    el.classList.add('active');
+    el.setAttribute('aria-selected', 'true');
+  }
+
+  /* ── Queue bottom sheet ── */
+  function openQueueSheet(idx) {
+    activeQueueIdx = idx;
+    const q = queues[idx];
+    document.getElementById('qSheetName').textContent = q.name;
+    document.getElementById('qSmsToggle').checked = q.smsEnabled;
+    document.getElementById('qOverlay').classList.add('open');
+  }
+
+  function onQueueSmsChange() {
+    if (activeQueueIdx < 0) return;
+    queues[activeQueueIdx].smsEnabled = document.getElementById('qSmsToggle').checked;
+    updateQueueMeta(activeQueueIdx);
+    const jobOn = document.getElementById('tog-job').checked;
+    if (jobOn) saveJobState();
+  }
+
+  function updateQueueMeta(idx) {
+    const meta = document.getElementById(`queue-meta-${idx}`);
+    if (!meta) return;
+    const sms = queues[idx].smsEnabled ? 'SMS-varsling på' : 'SMS-varsling av';
+    meta.innerHTML = `1/4 agenter <span class="meta-dot"></span> ${sms}`;
+  }
+
+  function closeQueueSheet() {
+    document.getElementById('qOverlay').classList.remove('open');
+    activeQueueIdx = -1;
+  }
+
+  /* ── Number selector sheet ── */
+  function renderNumOptions() {
+    document.getElementById('numOptions').innerHTML = numList.map((n, i) => `
+      <div class="radio-row" onclick="selectNum(${i})">
+        <div class="radio-circle${i === selectedNumIdx ? ' sel' : ''}"></div>
+        <div class="radio-body"><div class="radio-label">${n}</div></div>
+      </div>`).join('');
+  }
+
+  function openNumSheet() {
+    renderNumOptions();
+    const extCb = document.getElementById('numExternalCheck');
+    extCb.checked  = selectedNumIdx > 0 ? externalOnly : false;
+    extCb.disabled = selectedNumIdx === 0;
+    document.getElementById('numSheetBackdrop').classList.add('open');
+  }
+
+  function selectNum(idx) {
+    selectedNumIdx = idx;
+    renderNumOptions();
+    const extCb = document.getElementById('numExternalCheck');
+    if (idx > 0) {
+      externalOnly   = true;
+      extCb.checked  = true;
+      extCb.disabled = false;
+    } else {
+      externalOnly   = false;
+      extCb.checked  = false;
+      extCb.disabled = true;
+    }
+  }
+
+  function confirmNum() {
+    document.getElementById('numDisplay').textContent = numList[selectedNumIdx];
+    externalOnly = selectedNumIdx > 0
+      ? document.getElementById('numExternalCheck').checked
+      : false;
+    document.getElementById('numExternalStatus').style.display =
+      externalOnly ? '' : 'none';
+    document.getElementById('numSheetBackdrop').classList.remove('open');
+    const jobOn = document.getElementById('tog-job').checked;
+    if (jobOn) saveJobState();
+  }
+
+  function onExternalChange() {
+    externalOnly = document.getElementById('numExternalCheck').checked;
+    const jobOn = document.getElementById('tog-job').checked;
+    if (jobOn) saveJobState();
+  }
+
+  function onNumBackdrop(e) {
+    if (e.target === document.getElementById('numSheetBackdrop'))
+      document.getElementById('numSheetBackdrop').classList.remove('open');
+  }
+
+  /* ── On load ── */
+  applyTidsstyringState();
+  updateJobBadge();
+</script>
+</body>
+</html>
