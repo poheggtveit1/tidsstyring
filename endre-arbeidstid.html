@@ -417,17 +417,22 @@
   /* ─── Init ─── */
   (function init() {
     scheduleIdx = parseInt(sessionStorage.getItem('mbn_arbeidstid_idx') || '0', 10);
-    // Load from schedules array
+    // Load from schedules array, with fallback to flat structure
     try {
       const ts = JSON.parse(localStorage.getItem('mbn_tidsstyring'));
       if (ts && ts.schedules && ts.schedules[scheduleIdx]) {
         const s = ts.schedules[scheduleIdx];
-        state.startTime    = s.startTime    || state.startTime;
-        state.endTime      = s.endTime      || state.endTime;
-        state.dayLabel     = s.dayLabel     || state.dayLabel;
+        state.startTime     = s.startTime    || state.startTime;
+        state.endTime       = s.endTime      || state.endTime;
+        state.dayLabel      = s.dayLabel     || state.dayLabel;
         state.displayNumIdx = s.displayNumIdx !== undefined ? s.displayNumIdx : 0;
         state.externalOnly  = s.externalOnly  || false;
         if (s.queues) state.queues = s.queues;
+      } else if (ts && ts.startTime) {
+        // Flat structure (migration in tidsstyring-detaljer hasn't run yet)
+        state.startTime = ts.startTime;
+        state.endTime   = ts.endTime   || state.endTime;
+        state.dayLabel  = ts.dayLabel  || state.dayLabel;
       }
     } catch(e) {}
     // Draft overrides (returning from tidspunkt sub-page)
@@ -593,6 +598,12 @@
         externalOnly:  state.externalOnly,
         queues:        state.queues
       };
+      // Keep flat fields in sync so index.html always has fresh data
+      if (scheduleIdx === 0) {
+        ts.startTime = state.startTime;
+        ts.endTime   = state.endTime;
+        ts.dayLabel  = state.dayLabel;
+      }
       localStorage.setItem('mbn_tidsstyring', JSON.stringify(ts));
     } catch(e) {}
     window.location.href = 'tidsstyring-detaljer.html';
