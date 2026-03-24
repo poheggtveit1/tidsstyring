@@ -122,25 +122,44 @@
   .sheet-backdrop.open { display: flex; }
   .sheet {
     width: 100%; background: #fff; border-radius: 20px 20px 0 0;
-    padding: 12px 0 0; max-height: 80%; overflow-y: auto;
+    padding: 4px 16px 24px; max-height: 80%; overflow-y: auto;
+    display: flex; flex-direction: column; gap: 16px;
     animation: slideUp .25s ease;
   }
   @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-  .sheet-handle { width: 36px; height: 4px; background: #D1D5DB; border-radius: 2px; margin: 0 auto 16px; }
+  .sheet-handle { width: 36px; height: 5px; background: #4F5A7D; border-radius: 100px; margin: 8px auto 0; flex-shrink: 0; }
 
   .sheet-header {
-    display: flex; align-items: flex-start; justify-content: space-between;
-    padding: 0 20px 16px;
+    display: flex; align-items: center; justify-content: space-between;
   }
-  .sheet-title { font-size: 16px; font-weight: 700; color: var(--navy); line-height: 1.3; }
+  .sheet-title { font-size: 16px; font-weight: 500; color: var(--navy); }
   .sheet-subtitle { font-size: 13px; color: var(--muted); margin-top: 2px; }
   .sheet-close {
-    width: 28px; height: 28px; border-radius: 50%; background: var(--bg-grey);
-    display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;
+    width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; color: var(--navy);
   }
   .sheet-close:active { opacity: .7; }
-  .sheet-divider { height: 1px; background: var(--divider); margin: 0 20px; }
+  .sheet-divider { height: 1px; background: var(--divider); }
 
+  /* Number selector rows (Figma node 1545-37489) */
+  .num-list { display: flex; flex-direction: column; gap: 8px; }
+  #numOptions { display: contents; }
+  .num-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 16px; border-radius: 8px;
+    background: #F2F2F7; cursor: pointer;
+  }
+  .num-row.sel { background: #EBF3FF; }
+  .num-row-label { flex: 1; font-size: 14px; font-weight: 400; color: var(--navy); }
+  .num-radio {
+    width: 22px; height: 22px; border-radius: 50%;
+    border: 2px solid #C7C9D9; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .num-row.sel .num-radio { border-color: var(--blue); background: var(--blue); }
+  .num-row.sel .num-radio::after { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #fff; }
+
+  /* Queue status rows — keep unchanged */
   .radio-row {
     display: flex; align-items: flex-start; padding: 14px 20px; gap: 14px;
     cursor: pointer; user-select: none; position: relative;
@@ -182,9 +201,9 @@
   .toggle:has(input:disabled) { cursor: not-allowed; }
 
   .sheet-btn {
-    display: block; width: calc(100% - 32px); margin: 16px 16px;
-    padding: 15px; background: var(--blue); border: none; border-radius: 12px;
-    color: #fff; font-size: 16px; font-weight: 700; text-align: center;
+    display: block; width: 100%;
+    padding: 11px 16px; background: var(--blue); border: none; border-radius: 50px;
+    color: #fff; font-size: 16px; font-weight: 500; text-align: center;
     cursor: pointer; font-family: inherit;
   }
   .sheet-btn:active { opacity: .85; }
@@ -324,18 +343,22 @@
     <div class="sheet">
       <div class="sheet-handle"></div>
       <div class="sheet-header">
-        <div><div class="sheet-title">Velg visningsnummer</div></div>
+        <div class="sheet-title">Velg visningsnummer</div>
+        <div class="sheet-close" onclick="document.getElementById('numSheetBackdrop').classList.remove('open')">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M1 1l16 16M17 1L1 17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
       </div>
-      <div class="sheet-divider"></div>
-      <div id="numOptions"></div>
-      <div class="sms-row">
-        <span class="sms-label">Bruk kun for eksterne samtaler</span>
-        <label class="toggle" onclick="event.stopPropagation()">
-          <input type="checkbox" id="numExternalCheck"/>
-          <div class="toggle-track"></div>
-        </label>
+      <div class="num-list">
+        <div class="num-row">
+          <span class="num-row-label">Bruk kun for eksterne samtaler</span>
+          <label class="toggle" onclick="event.stopPropagation()">
+            <input type="checkbox" id="numExternalCheck"/>
+            <div class="toggle-track"></div>
+          </label>
+        </div>
+        <div id="numOptions"></div>
       </div>
-      <button class="sheet-btn" onclick="confirmNum()">Bekreft</button>
+      <button class="sheet-btn" onclick="confirmNum()">Lagre</button>
     </div>
   </div>
 
@@ -500,9 +523,9 @@
 
   function renderNumOptions() {
     document.getElementById('numOptions').innerHTML = DISPLAY_NUMBERS.map((n, i) => `
-      <div class="radio-row${i === selectedNumIdx ? ' sel' : ''}" onclick="selectNum(${i})">
-        <div class="radio-circle${i === selectedNumIdx ? ' sel' : ''}"></div>
-        <div class="radio-body"><div class="radio-label">${n}</div></div>
+      <div class="num-row${i === selectedNumIdx ? ' sel' : ''}" onclick="selectNum(${i})">
+        <span class="num-row-label">${n}</span>
+        <div class="num-radio"></div>
       </div>
     `).join('');
   }
