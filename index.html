@@ -262,15 +262,9 @@ label.toggle-wrap { cursor: pointer; }
   color: var(--c-muted);
   margin-top: 3px;
   display: flex;
-  align-items: center;
-  gap: 5px;
-  line-height: 1.3;
-}
-.meta-dot {
-  width: 3px; height: 3px;
-  border-radius: 50%;
-  background: var(--c-muted);
-  flex-shrink: 0;
+  flex-direction: column;
+  gap: 1px;
+  line-height: 1.4;
 }
 
 /* ── Tab bar ─────────────────────────── */
@@ -353,43 +347,45 @@ label.toggle-wrap { cursor: pointer; }
 .sheet {
   width: 100%; background: var(--c-white);
   border-radius: 20px 20px 0 0;
-  padding-bottom: 8px;
-  max-height: 80%;
-  overflow-y: auto;
+  padding: 4px 16px 24px;
+  max-height: 80%; overflow-y: auto;
+  display: flex; flex-direction: column; gap: 16px;
   animation: sheet-slideup .25s cubic-bezier(.4,0,.2,1);
 }
 @keyframes sheet-slideup { from { transform:translateY(100%) } to { transform:translateY(0) } }
 .sheet-handle {
-  width: 36px; height: 4px; border-radius: 2px;
-  background: var(--c-muted); opacity: .3;
-  margin: 12px auto 0;
+  width: 36px; height: 5px; border-radius: 100px;
+  background: #4F5A7D; margin: 8px auto 0; flex-shrink: 0;
 }
-.sheet-header { padding: 14px 20px 12px; }
-.sheet-title { font-size: 16px; font-weight: 700; color: var(--c-navy); }
-.sheet-divider { height: 1px; background: var(--c-border); }
-.radio-row {
-  display: flex; align-items: center;
-  padding: 14px 20px; gap: 14px;
-  cursor: pointer; position: relative;
+.sheet-header {
+  display: flex; align-items: center; justify-content: space-between;
 }
-.radio-row:not(:last-of-type) { border-bottom: 1px solid var(--c-border); }
-.radio-row:active { background: var(--c-bg-grey); }
-.radio-circle {
+.sheet-title { font-size: 16px; font-weight: 500; color: var(--c-navy); }
+.sheet-close {
+  width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--c-navy); flex-shrink: 0;
+}
+.num-list { display: flex; flex-direction: column; gap: 8px; }
+#numOptions { display: contents; }
+.num-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 16px; border-radius: 8px;
+  background: #F2F2F7; cursor: pointer;
+}
+.num-row.sel { background: #EBF3FF; }
+.num-row-label { flex: 1; font-size: 14px; font-weight: 400; color: var(--c-navy); }
+.num-radio {
   width: 22px; height: 22px; border-radius: 50%;
-  border: 2px solid var(--c-border);
-  flex-shrink: 0;
+  border: 2px solid #C7C9D9; flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
 }
-.radio-circle.sel { border-color: var(--c-blue); background: var(--c-blue); }
-.radio-circle.sel::after { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #fff; }
-.radio-body { flex: 1; }
-.radio-label { font-size: 15px; font-weight: 500; color: var(--c-text); }
+.num-row.sel .num-radio { border-color: var(--c-blue); background: var(--c-blue); }
+.num-row.sel .num-radio::after { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #fff; }
 .sheet-btn {
-  display: block; width: calc(100% - 32px);
-  margin: 14px 16px 16px;
-  padding: 15px; background: var(--c-blue);
-  border: none; border-radius: 12px;
-  color: #fff; font-size: 16px; font-weight: 700;
+  display: block; width: 100%;
+  padding: 11px 16px; background: var(--c-blue);
+  border: none; border-radius: 50px;
+  color: #fff; font-size: 16px; font-weight: 500;
   text-align: center; cursor: pointer; font-family: inherit;
 }
 .sheet-btn:active { opacity: .85; }
@@ -583,9 +579,8 @@ label.toggle-wrap { cursor: pointer; }
             <div class="queue-text">
               <div class="queue-name">Administrasjon <span>(123 45 678)</span></div>
               <div class="queue-meta" id="queue-meta-0">
-                1/4 agenter
-                <span class="meta-dot"></span>
-                SMS-varsling av
+                <span>1/4 operatører</span>
+                <span>SMS-varsling av</span>
               </div>
             </div>
             <label class="toggle-wrap" onclick="event.stopPropagation()">
@@ -608,9 +603,8 @@ label.toggle-wrap { cursor: pointer; }
             <div class="queue-text">
               <div class="queue-name">Support <span>(444 44 444)</span></div>
               <div class="queue-meta" id="queue-meta-1">
-                1/4 agenter
-                <span class="meta-dot"></span>
-                SMS-varsling av
+                <span>1/4 operatører</span>
+                <span>SMS-varsling av</span>
               </div>
             </div>
             <label class="toggle-wrap" onclick="event.stopPropagation()">
@@ -633,9 +627,8 @@ label.toggle-wrap { cursor: pointer; }
             <div class="queue-text">
               <div class="queue-name">Verksted <span>(12 34 56 78)</span></div>
               <div class="queue-meta" id="queue-meta-2">
-                1/4 agenter
-                <span class="meta-dot"></span>
-                SMS-varsling av
+                <span>1/4 operatører</span>
+                <span>SMS-varsling av</span>
               </div>
             </div>
             <label class="toggle-wrap" onclick="event.stopPropagation()">
@@ -729,18 +722,22 @@ label.toggle-wrap { cursor: pointer; }
       <div class="sheet-handle"></div>
       <div class="sheet-header">
         <div class="sheet-title">Velg visningsnummer</div>
+        <div class="sheet-close" onclick="document.getElementById('numSheetBackdrop').classList.remove('open')">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M1 1l16 16M17 1L1 17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
       </div>
-      <div class="sheet-divider"></div>
-      <div id="numOptions"></div>
-      <div id="numExternalRow" style="display:flex;align-items:center;padding:14px 20px;border-top:1px solid var(--c-border)">
-        <span style="flex:1;font-size:14px;color:var(--c-text)">Bruk kun for eksterne samtaler</span>
-        <label class="toggle-wrap" onclick="event.stopPropagation()">
-          <input type="checkbox" id="numExternalCheck" onchange="onExternalChange()">
-          <span class="toggle-track"></span>
-          <span class="toggle-thumb"></span>
-        </label>
+      <div class="num-list">
+        <div id="numExternalRow" class="num-row">
+          <span class="num-row-label">Bruk kun for eksterne samtaler</span>
+          <label class="toggle-wrap" onclick="event.stopPropagation()">
+            <input type="checkbox" id="numExternalCheck" onchange="onExternalChange()">
+            <span class="toggle-track"></span>
+            <span class="toggle-thumb"></span>
+          </label>
+        </div>
+        <div id="numOptions"></div>
       </div>
-      <button class="sheet-btn" onclick="confirmNum()">Bekreft</button>
+      <button class="sheet-btn" onclick="confirmNum()">Lagre</button>
     </div>
   </div>
 
@@ -984,7 +981,7 @@ label.toggle-wrap { cursor: pointer; }
     const meta = document.getElementById(`queue-meta-${idx}`);
     if (!meta) return;
     const sms = queues[idx].smsEnabled ? 'SMS-varsling på' : 'SMS-varsling av';
-    meta.innerHTML = `1/4 agenter <span class="meta-dot"></span> ${sms}`;
+    meta.innerHTML = `<span>1/4 operatører</span><span>${sms}</span>`;
   }
 
   function closeQueueSheet() {
@@ -995,9 +992,9 @@ label.toggle-wrap { cursor: pointer; }
   /* ── Number selector sheet ── */
   function renderNumOptions() {
     document.getElementById('numOptions').innerHTML = numList.map((n, i) => `
-      <div class="radio-row" onclick="selectNum(${i})">
-        <div class="radio-circle${i === selectedNumIdx ? ' sel' : ''}"></div>
-        <div class="radio-body"><div class="radio-label">${n}</div></div>
+      <div class="num-row${i === selectedNumIdx ? ' sel' : ''}" onclick="selectNum(${i})">
+        <span class="num-row-label">${n}</span>
+        <div class="num-radio"></div>
       </div>`).join('');
   }
 
