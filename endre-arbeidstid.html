@@ -602,8 +602,14 @@
   function openDeleteDialog()  { document.getElementById('deleteBackdrop').classList.add('open'); }
   function closeDeleteDialog() { document.getElementById('deleteBackdrop').classList.remove('open'); }
   function confirmDelete() {
-    localStorage.removeItem('mbn_tidsstyring');
-    window.location.href = 'index.html';
+    try {
+      const ts = JSON.parse(localStorage.getItem('mbn_tidsstyring')) || {};
+      if (ts.schedules) {
+        ts.schedules.splice(scheduleIdx, 1);
+        localStorage.setItem('mbn_tidsstyring', JSON.stringify(ts));
+      }
+    } catch(e) {}
+    window.location.href = 'tidsstyring-detaljer.html';
   }
 
   /* ─── Nav ─── */
