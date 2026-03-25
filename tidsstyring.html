@@ -834,15 +834,15 @@ body {
           </svg>
         </button>
       </div>
-      <div class="sheet-sms-row" id="sheetExternalRow" style="display:none">
-        <div class="sheet-sms-label" style="flex:1">Bruk kun for eksterne samtaler</div>
+      <div class="sheet-options" id="sheetOptions"></div>
+      <div id="sheetExternalRow" style="display:none;align-items:center;padding:4px 0;">
+        <div style="flex:1;font-size:14px;color:var(--navy)">Bruk kun for eksterne samtaler</div>
         <label class="toggle-wrap" onclick="event.stopPropagation()">
           <input type="checkbox" id="sheetExternalToggle">
           <span class="toggle-track"></span>
           <span class="toggle-thumb"></span>
         </label>
       </div>
-      <div class="sheet-options" id="sheetOptions"></div>
       <div class="sheet-sms-row" id="sheetSmsRow" style="display:none">
         <div class="sheet-sms-label" style="flex:1">SMS-varsling</div>
         <label class="toggle-wrap" onclick="event.stopPropagation()">
@@ -991,7 +991,7 @@ function openSheet(type, el, idx) {
     document.getElementById('sheetConfirmBtn').textContent = 'Lagre';
     const selIdx = displayNumbers.findIndex(n => n.selected);
     const extToggle = document.getElementById('sheetExternalToggle');
-    document.getElementById('sheetExternalRow').style.display = '';
+    document.getElementById('sheetExternalRow').style.display = 'flex';
     extToggle.checked  = selIdx > 0 ? (displayNumbers[selIdx].externalOnly ?? true) : false;
     extToggle.disabled = selIdx === 0;
     displayNumbers.forEach((n, i) => {

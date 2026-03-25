@@ -349,14 +349,14 @@
         </div>
       </div>
       <div class="num-list">
-        <div class="num-row">
-          <span class="num-row-label">Bruk kun for eksterne samtaler</span>
-          <label class="toggle" onclick="event.stopPropagation()">
-            <input type="checkbox" id="numExternalCheck"/>
-            <div class="toggle-track"></div>
-          </label>
-        </div>
         <div id="numOptions"></div>
+      </div>
+      <div style="display:flex;align-items:center;padding:4px 0;">
+        <span class="num-row-label" style="flex:1">Bruk kun for eksterne samtaler</span>
+        <label class="toggle" onclick="event.stopPropagation()">
+          <input type="checkbox" id="numExternalCheck"/>
+          <div class="toggle-track"></div>
+        </label>
       </div>
       <button class="sheet-btn" onclick="confirmNum()">Lagre</button>
     </div>
@@ -375,27 +375,31 @@
           <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 1 9 9M9 1 1 9" stroke="#293351" stroke-width="2" stroke-linecap="round"/></svg>
         </div>
       </div>
-      <div class="sheet-divider"></div>
-      <div class="radio-row" id="qr0" onclick="selectQueueOpt(0)">
-        <div class="radio-circle" id="qrc0"></div>
-        <div class="radio-body"><div class="radio-label">Ingen endring</div><div class="radio-desc">Beholder samme status som sist</div></div>
+      <div class="num-list">
+        <div class="num-row" id="qr0" onclick="selectQueueOpt(0)">
+          <div class="num-row-label">
+            <div>Ingen endring</div>
+            <div class="row-sub">Beholder samme status som sist</div>
+          </div>
+          <div class="num-radio" id="qrc0"></div>
+        </div>
+        <div class="num-row" id="qr1" onclick="selectQueueOpt(1)">
+          <span class="num-row-label">Logg på</span>
+          <div class="num-radio" id="qrc1"></div>
+        </div>
+        <div class="num-row" id="qr2" onclick="selectQueueOpt(2)">
+          <span class="num-row-label">Logg av</span>
+          <div class="num-radio" id="qrc2"></div>
+        </div>
+        <div class="num-row">
+          <span class="num-row-label">SMS-varsling</span>
+          <label class="toggle" onclick="event.stopPropagation()">
+            <input type="checkbox" id="queueSmsToggle"/>
+            <div class="toggle-track"></div>
+          </label>
+        </div>
       </div>
-      <div class="radio-row" id="qr1" onclick="selectQueueOpt(1)">
-        <div class="radio-circle" id="qrc1"></div>
-        <div class="radio-body"><div class="radio-label">Logg på</div></div>
-      </div>
-      <div class="radio-row" id="qr2" onclick="selectQueueOpt(2)">
-        <div class="radio-circle" id="qrc2"></div>
-        <div class="radio-body"><div class="radio-label">Logg av</div></div>
-      </div>
-      <div class="sms-row">
-        <span class="sms-label">SMS-varsling</span>
-        <label class="toggle" onclick="event.stopPropagation()">
-          <input type="checkbox" id="queueSmsToggle"/>
-          <div class="toggle-track"></div>
-        </label>
-      </div>
-      <button class="sheet-btn" onclick="confirmQueueSheet()">Bekreft</button>
+      <button class="sheet-btn" onclick="confirmQueueSheet()">Lagre</button>
     </div>
   </div>
 
@@ -569,16 +573,16 @@
     smsToggle.checked  = q.sms;
     smsToggle.disabled = (si === 0); // Ingen endring → deaktivert
     [0,1,2].forEach(i => {
-      document.getElementById('qr'  + i).className = 'radio-row' + (i === si ? ' sel' : '');
-      document.getElementById('qrc' + i).className = 'radio-circle' + (i === si ? ' sel' : '');
+      document.getElementById('qr'  + i).className = 'num-row' + (i === si ? ' sel' : '');
+      document.getElementById('qrc' + i).className = 'num-radio' + (i === si ? ' sel' : '');
     });
     document.getElementById('queueSheetBackdrop').classList.add('open');
   }
 
   function selectQueueOpt(idx) {
     [0,1,2].forEach(i => {
-      document.getElementById('qr'  + i).className = 'radio-row' + (i === idx ? ' sel' : '');
-      document.getElementById('qrc' + i).className = 'radio-circle' + (i === idx ? ' sel' : '');
+      document.getElementById('qr'  + i).className = 'num-row' + (i === idx ? ' sel' : '');
+      document.getElementById('qrc' + i).className = 'num-radio' + (i === idx ? ' sel' : '');
     });
     // SMS følger køvalg: Logg på → på, Logg av → av, Ingen endring → av + deaktivert
     const smsToggle = document.getElementById('queueSmsToggle');
