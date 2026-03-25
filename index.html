@@ -727,15 +727,15 @@ label.toggle-wrap { cursor: pointer; }
         </div>
       </div>
       <div class="num-list">
-        <div id="numExternalRow" class="num-row">
-          <span class="num-row-label">Bruk kun for eksterne samtaler</span>
-          <label class="toggle-wrap" onclick="event.stopPropagation()">
-            <input type="checkbox" id="numExternalCheck" onchange="onExternalChange()">
-            <span class="toggle-track"></span>
-            <span class="toggle-thumb"></span>
-          </label>
-        </div>
         <div id="numOptions"></div>
+      </div>
+      <div id="numExternalRow" style="display:flex;align-items:center;padding:4px 0;">
+        <span class="num-row-label" style="flex:1">Bruk kun for eksterne samtaler</span>
+        <label class="toggle-wrap" onclick="event.stopPropagation()">
+          <input type="checkbox" id="numExternalCheck" onchange="onExternalChange()">
+          <span class="toggle-track"></span>
+          <span class="toggle-thumb"></span>
+        </label>
       </div>
       <button class="sheet-btn" onclick="confirmNum()">Lagre</button>
     </div>
