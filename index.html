@@ -438,10 +438,9 @@ label.toggle-wrap { cursor: pointer; }
 .q-action:active { background: #E8E9EF; }
 .q-action-label { flex: 1; font-size: 14px; color: var(--c-text); }
 .q-sms-row {
-  background: var(--c-bg-grey); border-radius: 12px;
-  padding: 14px 16px;
+  padding: 8px 16px;
   display: flex; align-items: center; gap: 12px;
-  margin-bottom: 14px;
+  margin-bottom: 8px;
 }
 .q-sms-label { flex: 1; font-size: 14px; color: var(--c-text); }
 /* Toggle reuse */
@@ -728,14 +727,14 @@ label.toggle-wrap { cursor: pointer; }
       </div>
       <div class="num-list">
         <div id="numOptions"></div>
-      </div>
-      <div id="numExternalRow" style="display:flex;align-items:center;padding:4px 0;">
+        <div id="numExternalRow" style="display:flex;align-items:center;padding:8px 0;">
         <span class="num-row-label" style="flex:1">Bruk kun for eksterne samtaler</span>
         <label class="toggle-wrap" onclick="event.stopPropagation()">
           <input type="checkbox" id="numExternalCheck" onchange="onExternalChange()">
           <span class="toggle-track"></span>
           <span class="toggle-thumb"></span>
         </label>
+        </div>
       </div>
       <button class="sheet-btn" onclick="confirmNum()">Lagre</button>
     </div>
@@ -876,9 +875,24 @@ label.toggle-wrap { cursor: pointer; }
   }
 
   /* ── Queue toggle (per kø) ── */
+  function getSmsPref(idx) {
+    try {
+      const prefs = JSON.parse(localStorage.getItem('mbn_queue_sms_prefs') || '{}');
+      return prefs[idx] !== undefined ? prefs[idx] : true;
+    } catch(e) { return true; }
+  }
+
+  function saveSmsPref(idx, value) {
+    try {
+      const prefs = JSON.parse(localStorage.getItem('mbn_queue_sms_prefs') || '{}');
+      prefs[idx] = value;
+      localStorage.setItem('mbn_queue_sms_prefs', JSON.stringify(prefs));
+    } catch(e) {}
+  }
+
   function onQueueToggleChange(idx) {
     const enabled = document.getElementById(`queue-toggle-${idx}`).checked;
-    queues[idx].smsEnabled = enabled;   // SMS følger kø-pålogging
+    queues[idx].smsEnabled = enabled ? getSmsPref(idx) : false;
     updateQueueMeta(idx);
     const jobOn = document.getElementById('tog-job').checked;
     if (jobOn) saveJobState();
@@ -971,7 +985,9 @@ label.toggle-wrap { cursor: pointer; }
 
   function onQueueSmsChange() {
     if (activeQueueIdx < 0) return;
-    queues[activeQueueIdx].smsEnabled = document.getElementById('qSmsToggle').checked;
+    const val = document.getElementById('qSmsToggle').checked;
+    queues[activeQueueIdx].smsEnabled = val;
+    saveSmsPref(activeQueueIdx, val);  // husk brukerens aktive valg per kø
     updateQueueMeta(activeQueueIdx);
     const jobOn = document.getElementById('tog-job').checked;
     if (jobOn) saveJobState();
