@@ -835,7 +835,7 @@ body {
         </button>
       </div>
       <div class="sheet-options" id="sheetOptions"></div>
-      <div id="sheetExternalRow" style="display:none;align-items:center;padding:4px 0;">
+      <div id="sheetExternalRow" style="display:none;align-items:center;padding:8px 0;">
         <div style="flex:1;font-size:14px;color:var(--navy)">Bruk kun for eksterne samtaler</div>
         <label class="toggle-wrap" onclick="event.stopPropagation()">
           <input type="checkbox" id="sheetExternalToggle">
@@ -1021,7 +1021,7 @@ function openSheet(type, el, idx) {
     ];
     const iconClasses = ['', '', 'green'];
     const subs = [
-      'Beholder samme status som i forrige arbeidstid',
+      'Beholder eksisterende status',
       'Logger automatisk på kø',
       'Logger automatisk av kø',
     ];

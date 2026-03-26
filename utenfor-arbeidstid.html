@@ -216,14 +216,14 @@
         </button>
       </div>
       <div class="num-list">
-        <div class="num-row" id="numExternalRow">
+        <div id="numOptions"></div>
+        <div id="numExternalRow" style="display:flex;align-items:center;padding:8px 0;">
           <span class="num-row-label">Bruk kun for eksterne samtaler</span>
           <label class="toggle" onclick="event.stopPropagation()">
             <input type="checkbox" id="numExternalCheck"/>
             <div class="toggle-track"></div>
           </label>
         </div>
-        <div id="numOptions"></div>
       </div>
       <button class="sheet-btn" onclick="confirmNum()">Lagre</button>
     </div>
@@ -246,7 +246,7 @@
         <div class="num-row" id="qr0" onclick="selectQueueOpt(0)">
           <div class="num-row-label">
             <div>Ingen endring</div>
-            <div class="row-sub">Beholder samme status som i forrige arbeidstid</div>
+            <div class="row-sub">Beholder eksisterende status</div>
           </div>
           <div class="num-radio"></div>
         </div>
@@ -258,7 +258,7 @@
           <span class="num-row-label">Logg av</span>
           <div class="num-radio"></div>
         </div>
-        <div class="num-row">
+        <div class="num-row" style="background:transparent !important;cursor:default;padding-top:10px;padding-bottom:10px;border-radius:0">
           <span class="num-row-label">SMS-varsling</span>
           <label class="toggle" onclick="event.stopPropagation()">
             <input type="checkbox" id="queueSmsToggle"/>
