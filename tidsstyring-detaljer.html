@@ -271,6 +271,7 @@
   }
   .toggle input:checked + .toggle-track { background: var(--blue); }
   .toggle input:checked + .toggle-track::after { transform: translateX(20px); }
+  .toggle input:disabled:checked + .toggle-track { background: #8892F8; }
 
   /* Nullstill button */
   .reset-btn {
@@ -557,7 +558,7 @@
       <div class="card">
         <div class="row" onclick="editOutsideHours()">
           <div class="row-body">
-            <div class="row-label" id="utenforLabel">Alt slås av</div>
+            <div class="row-label" id="utenforLabel">AV</div>
           </div>
           <span class="row-value" style="color:var(--blue)">Endre</span>
           <svg class="row-chevron" width="7" height="13" viewBox="0 0 7 13" fill="none">
@@ -573,8 +574,18 @@
         <span class="section-label">Innstillinger</span>
       </div>
       <div class="card">
+        <!-- På- og avlogging -->
+        <div class="row" onclick="openLoginSheet()">
+          <div class="row-body">
+            <div class="row-label">Aktivering av jobbprofil</div>
+          </div>
+          <span class="row-value" id="loginValue">Automatisk</span>
+          <svg class="row-chevron" width="7" height="13" viewBox="0 0 7 13" fill="none">
+            <path d="M1 1 6 6.5 1 12" stroke="#1020F9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
         <!-- Varsel -->
-        <div class="row no-tap">
+        <div class="row no-tap" id="notifRow">
           <div class="row-body">
             <div class="row-label">Varsel</div>
             <div class="row-sub">10 minutter før arbeidstiden starter og slutter</div>
@@ -583,16 +594,6 @@
             <input type="checkbox" id="notifToggle" onchange="onNotifChange()"/>
             <div class="toggle-track"></div>
           </label>
-        </div>
-        <!-- På- og avlogging -->
-        <div class="row" onclick="openLoginSheet()">
-          <div class="row-body">
-            <div class="row-label">På- og avlogging</div>
-          </div>
-          <span class="row-value" id="loginValue">Automatisk</span>
-          <svg class="row-chevron" width="7" height="13" viewBox="0 0 7 13" fill="none">
-            <path d="M1 1 6 6.5 1 12" stroke="#1020F9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
         </div>
       </div>
     </div>
@@ -644,20 +645,20 @@
   <div class="sheet-backdrop" id="loginSheetBackdrop" onclick="closeLoginSheet(event)">
     <div class="sheet" id="loginSheet">
       <div class="sheet-handle"></div>
-      <div class="sheet-title">Hvordan ønsker du å logge på og av?</div>
+      <div class="sheet-title">Hvordan ønsker du å aktivere jobbprofil?</div>
       <div class="sheet-divider"></div>
 
       <div class="radio-row" id="radioAuto" onclick="selectLoginMode(0)">
         <div class="radio-circle selected" id="radioCircle0"></div>
         <div class="radio-body">
-          <div class="radio-label">Automatisk på- og avlogging</div>
+          <div class="radio-label">Automatisk</div>
           <div class="radio-desc">Køer, visningsnummer og SMS-varsling styres automatisk</div>
         </div>
       </div>
       <div class="radio-row" id="radioManual" onclick="selectLoginMode(1)">
         <div class="radio-circle" id="radioCircle1"></div>
         <div class="radio-body">
-          <div class="radio-label">Manuell på- og avlogging</div>
+          <div class="radio-label">Manuell</div>
           <div class="radio-desc">Du får varsel når arbeidstiden starter og slutter, og logger selv på og av i appen</div>
         </div>
       </div>
@@ -684,7 +685,7 @@
   let selectedLoginMode = 0; // 0=Automatisk, 1=Manuell
 
   const DISPLAY_NUMBERS = [
-    'Mitt eget nummer (999 99 999)',
+    'Mitt nummer (999 99 999)',
     'Test1 (123 45 678)',
     'Test2 (12 34 56 78)',
     'Test3 (876 54 321)'
@@ -697,8 +698,8 @@
     if (s.queues) {
       const loggedOn = s.queues.filter(q => q.status === 'pa').map(q => q.name.replace(/ \(.*\)$/, ''));
       if (loggedOn.length) lines.push('Pålogget: ' + loggedOn.join(', '));
-      const smsCount = s.queues.filter(q => q.sms).length;
-      if (smsCount) lines.push('SMS-varsling: ' + smsCount + (smsCount === 1 ? ' kø' : ' køer'));
+      const smsQueues = s.queues.filter(q => q.sms).map(q => q.name.replace(/ \(.*\)$/, ''));
+      if (smsQueues.length) lines.push('SMS-varsling: ' + smsQueues.join(', '));
     }
     return lines.join('<br>');
   }
@@ -769,13 +770,14 @@
 
     // Sync radio circles
     updateRadioUI();
+    updateNotifRowVisibility();
 
     // Utenfor arbeidstid label
     try {
       const uh = JSON.parse(localStorage.getItem('mbn_utenfor_arbeidstid'));
       if (uh && uh.queues) {
         const isCustom = uh.queues.some(q => q.status !== 'av' || q.sms);
-        document.getElementById('utenforLabel').textContent = isCustom ? 'Tilpasset' : 'Alt slås av';
+        document.getElementById('utenforLabel').textContent = isCustom ? 'Tilpasset' : 'AV';
       }
     } catch(e) {}
   })();
@@ -829,6 +831,17 @@
     updateRadioUI();
   }
 
+  function updateNotifRowVisibility() {
+    const isManual = selectedLoginMode === 1;
+    const toggle = document.getElementById('notifToggle');
+    if (isManual) {
+      toggle.checked = true;
+      toggle.disabled = true;
+    } else {
+      toggle.disabled = false;
+    }
+  }
+
   function updateRadioUI() {
     document.getElementById('radioCircle0').className =
       'radio-circle' + (selectedLoginMode === 0 ? ' selected' : '');
@@ -842,6 +855,7 @@
     document.getElementById('loginValue').textContent = isManual ? 'Manuell' : 'Automatisk';
     localStorage.setItem('mbn_tidsstyring', JSON.stringify(savedState));
     document.getElementById('loginSheetBackdrop').classList.remove('open');
+    updateNotifRowVisibility();
   }
 
   /* ─── Reset ─── */
