@@ -78,6 +78,7 @@
   .row-body { flex: 1; min-width: 0; }
   .row-label { font-size: 14px; font-weight: 300; color: var(--text); }
   .row-sub { font-size: 12px; font-weight: 300; color: var(--muted); margin-top: 2px; }
+  #queueCard .row-label strong { font-weight: 500; }
   .row-link { font-size: 14px; color: var(--blue); font-weight: 300; margin-left: 8px; flex-shrink: 0; }
   .row-chevron { margin-left: 6px; flex-shrink: 0; }
 
@@ -281,7 +282,7 @@
       <div class="card" id="visningsCard">
         <div class="row" onclick="openNumSheet()">
           <div class="row-body">
-            <div class="row-label" id="numLabel">Mitt eget nummer (999 99 999)</div>
+            <div class="row-label" id="numLabel">Mitt nummer (999 99 999)</div>
             <div class="row-sub" id="numExternalStatus" style="display:none">Kun for eksterne samtaler</div>
           </div>
           <span class="row-link">Endre</span>
@@ -419,7 +420,7 @@
 <script>
   /* ─── Display numbers ─── */
   const DISPLAY_NUMBERS = [
-    'Mitt eget nummer (999 99 999)',
+    'Mitt nummer (999 99 999)',
     'Test1 (123 45 678)',
     'Test2 (12 34 56 78)',
     'Test3 (876 54 321)'
@@ -496,7 +497,7 @@
       return `
         <div class="row" onclick="openQueueSheet(${i})">
           <div class="row-body">
-            <div class="row-label">${q.name}</div>
+            <div class="row-label">${q.name.replace(/^(.+?)(\s+\(.+\))$/, '<strong>$1</strong>$2')}</div>
             <div class="row-sub">${STATUS_LABEL[q.status]}</div>
             ${q.sms ? `<div class="row-sub">SMS-varsling</div>` : ''}
           </div>

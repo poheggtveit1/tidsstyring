@@ -260,6 +260,7 @@ body {
 .option-item + .option-item { border-top: 1px solid var(--border); }
 .option-text { flex: 1; }
 .option-main { font-size: 14px; font-weight: 300; color: var(--text); }
+#queueList .option-main strong { font-weight: 500; }
 .option-sub  { font-size: 12px; color: var(--muted); margin-top: 2px; }
 .option-sms  { font-size: 12px; color: var(--muted); margin-top: 2px; display: none; }
 .option-sms.on { display: block; }
@@ -309,6 +310,9 @@ body {
 .radio-text { flex: 1; }
 .radio-label { font-size: 14px; font-weight: 400; color: var(--text); line-height: 1.3; }
 .radio-desc  { font-size: 12px; color: var(--muted); margin-top: 3px; line-height: 1.4; }
+.radio-item.disabled { opacity: 0.4; pointer-events: none; }
+.step-section-label { font-size: 14px; font-weight: 600; color: var(--navy); margin-top: 20px; margin-bottom: 8px; }
+.step-info { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--blue); margin-top: 8px; }
 
 /* ── Button group ── */
 .btn-group {
@@ -414,9 +418,7 @@ body {
 }
 .sheet-option-icon.green { background: rgba(55,198,93,.12); }
 .sheet-sms-row {
-  background: #F2F2F7;
-  border-radius: 8px;
-  padding: 16px;
+  padding: 8px 16px;
   display: flex; align-items: center; gap: 12px;
 }
 .sheet-sms-label { font-size: 14px; color: var(--navy); }
@@ -503,12 +505,10 @@ body {
     <div class="step active" id="step1">
       <!-- Progress -->
       <div class="progress">
-        <div class="prog-dot current" id="p1"></div>
-        <div class="prog-dot" id="p2"></div>
-        <div class="prog-dot" id="p3"></div>
-        <div class="prog-dot" id="p4"></div>
-        <div class="prog-dot" id="p5"></div>
-        <div class="prog-dot" id="p6"></div>
+        <div class="prog-dot current"></div>
+        <div class="prog-dot"></div>
+        <div class="prog-dot"></div>
+        <div class="prog-dot"></div>
       </div>
 
       <!-- Heading -->
@@ -570,8 +570,6 @@ body {
         <div class="prog-dot current"></div>
         <div class="prog-dot"></div>
         <div class="prog-dot"></div>
-        <div class="prog-dot"></div>
-        <div class="prog-dot"></div>
       </div>
 
       <div class="step-heading">
@@ -584,7 +582,7 @@ body {
         <div class="option-row">
           <div class="option-item" onclick="openSheet('displayNumber')">
             <div class="option-text">
-              <div class="option-main" id="displayNumberValue">Mitt eget nummer (999 99 999)</div>
+              <div class="option-main" id="displayNumberValue">Mitt nummer (999 99 999)</div>
               <div class="option-sub" id="displayNumberExternalStatus" style="display:none">Kun for eksterne samtaler</div>
             </div>
             <div class="chevron">
@@ -614,20 +612,18 @@ body {
         <div class="prog-dot done"></div>
         <div class="prog-dot current"></div>
         <div class="prog-dot"></div>
-        <div class="prog-dot"></div>
-        <div class="prog-dot"></div>
       </div>
 
       <div class="step-heading">
         <div class="step-title">Hva skal skje med køene når arbeidstiden starter?</div>
-        <div class="step-desc">Valgene aktiveres automatisk når arbeidstiden starter</div>
+        <div class="step-desc">Valgene aktiveres når arbeidstiden starter</div>
       </div>
 
       <div>
         <div class="option-row" id="queueList">
           <div class="option-item" onclick="openSheet('queue', this, 0)">
             <div class="option-text">
-              <div class="option-main">Administrasjon (123 45 678)</div>
+              <div class="option-main"><strong>Administrasjon</strong> (123 45 678)</div>
               <div class="option-sub" id="queue0-val">Ingen endring</div>
               <div class="option-sms" id="queue0-sms">SMS-varsling</div>
             </div>
@@ -639,7 +635,7 @@ body {
           </div>
           <div class="option-item" onclick="openSheet('queue', this, 1)">
             <div class="option-text">
-              <div class="option-main">Support (123 45 678)</div>
+              <div class="option-main"><strong>Support</strong> (123 45 678)</div>
               <div class="option-sub" id="queue1-val">Ingen endring</div>
               <div class="option-sms" id="queue1-sms">SMS-varsling</div>
             </div>
@@ -651,7 +647,7 @@ body {
           </div>
           <div class="option-item" onclick="openSheet('queue', this, 2)">
             <div class="option-text">
-              <div class="option-main">Verksted (123 45 678)</div>
+              <div class="option-main"><strong>Verksted</strong> (123 45 678)</div>
               <div class="option-sub" id="queue2-val">Ingen endring</div>
               <div class="option-sms" id="queue2-sms">SMS-varsling</div>
             </div>
@@ -665,7 +661,7 @@ body {
       </div>
 
       <div class="btn-group">
-        <button class="btn btn-primary" onclick="goStep(4)">
+        <button class="btn btn-primary" onclick="goStep(5)">
           Fortsett
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
             <path d="M4 9h10M10 5l4 4-4 4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -675,126 +671,64 @@ body {
       </div>
     </div>
 
-    <!-- STEP 4: Utenfor arbeidstid (info) -->
-    <div class="step" id="step4">
-      <div class="progress">
-        <div class="prog-dot done"></div>
-        <div class="prog-dot done"></div>
-        <div class="prog-dot done"></div>
-        <div class="prog-dot current"></div>
-        <div class="prog-dot"></div>
-        <div class="prog-dot"></div>
-      </div>
-
-      <div class="step-heading">
-        <div class="step-title">Når arbeidstiden er over skjer følgende automatisk:</div>
-      </div>
-      <ul style="margin:16px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:8px;font-size:14px;font-weight:300;color:var(--text);line-height:1.5">
-        <li>Du logges av alle køer</li>
-        <li>SMS-varsling skrus av</li>
-        <li>Visningsnummer tilbakestilles til ditt eget nummer</li>
-      </ul>
-      <p style="margin:16px 0 0;font-size:14px;font-weight:300;color:var(--muted);line-height:1.5">Du kan endre dette senere under <strong style="font-weight:500;color:var(--text)">Utenfor arbeidstid</strong> i innstillingene for Tidsstyring.</p>
-
-      <div class="btn-group">
-        <button class="btn btn-primary" onclick="goStep(5)">
-          Fortsett
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <path d="M4 9h10M10 5l4 4-4 4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-        <button class="btn btn-secondary" onclick="goStep(3, true)">Tilbake</button>
-      </div>
-    </div>
-
-    <!-- STEP 5: Login og avlogging -->
+    <!-- STEP 5: Login og avlogging + Varsler -->
     <div class="step" id="step5">
       <div class="progress">
         <div class="prog-dot done"></div>
         <div class="prog-dot done"></div>
         <div class="prog-dot done"></div>
-        <div class="prog-dot done"></div>
         <div class="prog-dot current"></div>
-        <div class="prog-dot"></div>
       </div>
 
       <div class="step-heading">
-        <div class="step-title">Hvordan ønsker du å logge på og av?</div>
-        <div class="step-desc">På- og avlogging skjer i henhold til arbeidstiden du har satt</div>
+        <div class="step-title">Aktivering og varsling</div>
+        <div class="step-desc">Velg hvordan tidsstyring skal aktivere og deaktivere jobbprofilen din, og om du vil ha varsel før arbeidstiden starter og slutter.</div>
       </div>
 
+      <div class="step-section-label">Aktivering av jobbprofil</div>
       <div class="radio-group">
-        <div class="radio-item selected" onclick="selectRadio(this, 'login')">
+        <div class="radio-item selected" onclick="selectRadio(this, 'login'); updateLoginMode()">
           <div class="radio-circle"></div>
           <div class="radio-text">
-            <div class="radio-label">Automatisk på- og avlogging</div>
+            <div class="radio-label">Automatisk</div>
             <div class="radio-desc">Køer, visningsnummer og SMS-varsling styres automatisk</div>
           </div>
         </div>
-        <div class="radio-item" onclick="selectRadio(this, 'login')">
+        <div class="radio-item" onclick="selectRadio(this, 'login'); updateLoginMode()">
           <div class="radio-circle"></div>
           <div class="radio-text">
-            <div class="radio-label">Manuell på- og avlogging</div>
+            <div class="radio-label">Manuell</div>
             <div class="radio-desc">Du får varsel når arbeidstiden starter og slutter, og logger selv på og av i appen</div>
           </div>
         </div>
       </div>
 
-      <div class="btn-group">
-        <button class="btn btn-primary" onclick="goToStep6()">
-          Fortsett
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <path d="M4 9h10M10 5l4 4-4 4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-        <button class="btn btn-secondary" onclick="goStep(4, true)">Tilbake</button>
-      </div>
-    </div>
-
-    <!-- STEP 6: Varsler -->
-    <div class="step" id="step6">
-      <div class="progress">
-        <div class="prog-dot done"></div>
-        <div class="prog-dot done"></div>
-        <div class="prog-dot done"></div>
-        <div class="prog-dot done"></div>
-        <div class="prog-dot done"></div>
-        <div class="prog-dot current"></div>
-      </div>
-
-      <!-- Automatisk: Ja/Nei-valg for varsel -->
-      <div id="step6-auto">
-        <div class="step-heading">
-          <div class="step-title">Vil du ha varsel før arbeidstiden starter og slutter?</div>
-          <div class="step-desc">Du varsles 10 minutter før arbeidstiden starter og slutter</div>
-        </div>
-        <div class="radio-group" style="margin-top:24px">
-          <div class="radio-item selected" onclick="selectRadio(this, 'notif')">
-            <div class="radio-circle"></div>
-            <div class="radio-text">
-              <div class="radio-label">Ja</div>
-            </div>
-          </div>
-          <div class="radio-item" onclick="selectRadio(this, 'notif')">
-            <div class="radio-circle"></div>
-            <div class="radio-text">
-              <div class="radio-label">Nei</div>
-            </div>
-          </div>
+      <div id="step5-manual-info" style="display:none">
+        <div class="step-info">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7.5" stroke="var(--blue)"/><path d="M8 7v5" stroke="var(--blue)" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="4.5" r="1" fill="var(--blue)"/></svg>
+          Du må ha varsling ved manuell aktivering
         </div>
       </div>
 
-      <!-- Manuell: kun informasjon -->
-      <div id="step6-manual" style="display:none">
-        <div class="step-heading">
-          <div class="step-title">Varsel før arbeidstiden starter og slutter</div>
-          <div class="step-desc">Du vil varsles 10 minutter før arbeidstiden starter og slutter slik at du selv kan velge å slå på og av jobbprofilen manuelt fra varselet.</div>
+      <div class="step-section-label">Varsel</div>
+      <div class="radio-group" id="step5-notif-group">
+        <div class="radio-item selected" id="notifJa" onclick="selectRadio(this, 'notif')">
+          <div class="radio-circle"></div>
+          <div class="radio-text">
+            <div class="radio-label">Ja</div>
+          </div>
+        </div>
+        <div class="radio-item" id="notifNei" onclick="selectRadio(this, 'notif')">
+          <div class="radio-circle"></div>
+          <div class="radio-text">
+            <div class="radio-label">Nei</div>
+          </div>
         </div>
       </div>
 
       <div class="btn-group">
         <button class="btn btn-primary" onclick="goConfirm()">Aktiver tidsstyring</button>
-        <button class="btn btn-secondary" onclick="goStep(5, true)">Tilbake</button>
+        <button class="btn btn-secondary" onclick="goStep(3, true)">Tilbake</button>
       </div>
     </div>
 
@@ -808,7 +742,7 @@ body {
       <div class="confirm-title">Tidsstyring av jobbprofil er satt opp og klar til bruk</div>
       <div class="btn-group" style="width:100%">
         <button class="btn btn-primary" onclick="window.location.href='index.html'">Til jobbprofil</button>
-        <button class="btn btn-secondary" onclick="window.location.href='index.html'">Se innstillinger</button>
+
       </div>
     </div>
 
@@ -876,7 +810,7 @@ let currentStep = 1;
 let activeQueueIdx = -1;
 let activeSheetType = '';
 let displayNumbers = [
-  { label: 'Mitt eget nummer (999 99 999)', selected: true,  externalOnly: false },
+  { label: 'Mitt nummer (999 99 999)', selected: true,  externalOnly: false },
   { label: 'Ekstern (888 88 888)',           selected: false, externalOnly: false },
   { label: 'Sentralbord (777 77 777)',        selected: false, externalOnly: false },
   { label: 'Skjult nummer',                  selected: false, externalOnly: false },
@@ -925,30 +859,30 @@ function goConfirm() {
       return sel ? sel.textContent.trim() : 'Automatisk på- og avlogging';
     })(),
     notification: (() => {
-      const sel = document.querySelector('#step6 .radio-item.selected .radio-label');
+      const sel = document.querySelector('#step5-notif-group .radio-item.selected .radio-label');
       return sel ? sel.textContent.trim() : 'Ja';
     })(),
   };
   localStorage.setItem('mbn_tidsstyring', JSON.stringify(settings));
-
-  const from = document.getElementById(`step${currentStep}`);
-  from.classList.remove('active');
-  const to = document.getElementById('stepConfirm');
-  to.classList.add('active');
-  to.parentElement.scrollTop = 0;
-  currentStep = 7;
-  document.getElementById('topBar').style.display = 'none';
+  window.location.href = 'index.html';
 }
 
 function cancelWizard() {
   window.location.href = 'index.html';
 }
 
-function goToStep6() {
-  const isManual = document.querySelector('#step5 .radio-item:last-child').classList.contains('selected');
-  document.getElementById('step6-auto').style.display   = isManual ? 'none' : '';
-  document.getElementById('step6-manual').style.display = isManual ? ''     : 'none';
-  goStep(6);
+function updateLoginMode() {
+  const isManual = document.querySelector('#step5 .radio-item:nth-child(2)').classList.contains('selected');
+  document.getElementById('step5-manual-info').style.display = isManual ? '' : 'none';
+  const nei = document.getElementById('notifNei');
+  const ja  = document.getElementById('notifJa');
+  if (isManual) {
+    nei.classList.add('disabled');
+    nei.classList.remove('selected');
+    ja.classList.add('selected');
+  } else {
+    nei.classList.remove('disabled');
+  }
 }
 
 /* ── Day picker ── */

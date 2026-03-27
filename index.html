@@ -125,12 +125,19 @@ body {
 .panel-row + .panel-row {
   border-top: 1px solid var(--c-border);
 }
+.panel-row.sub-row {
+  padding-left: 28px;
+}
 .panel-text { flex: 1; min-width: 0; }
 .panel-label {
   font-size: 14px;
   font-weight: 400;
   color: var(--c-text);
   line-height: 1.35;
+}
+.panel-row:not(.sub-row) .panel-label {
+  font-weight: 600;
+  color: var(--c-navy);
 }
 .panel-sub {
   font-size: 12px;
@@ -509,7 +516,7 @@ label.toggle-wrap { cursor: pointer; }
         <div class="panel-row" onclick="document.getElementById('tog-job').click()">
           <div class="panel-text">
             <div class="panel-label">Jobbprofil</div>
-            <div class="panel-sub" id="job-status">Avlogget</div>
+            <div class="panel-sub" id="job-status">Slå på for å logge på køer og aktivere visningsnummer</div>
           </div>
           <label class="toggle-wrap" onclick="event.stopPropagation()">
             <input type="checkbox" id="tog-job" onchange="onJobToggle(this)">
@@ -519,7 +526,7 @@ label.toggle-wrap { cursor: pointer; }
         </div>
 
         <!-- Tidsstyring row -->
-        <div class="panel-row" onclick="onTidsstyring()">
+        <div class="panel-row sub-row" onclick="onTidsstyring()">
           <div class="panel-text">
             <div class="panel-label">Tidsstyring</div>
             <div class="panel-sub" id="tids-sub">Aktiver for å tidsstyre jobbprofil</div>
@@ -530,7 +537,12 @@ label.toggle-wrap { cursor: pointer; }
               </svg>
             </span>
           </div>
-          <div class="chevron">
+          <label class="toggle-wrap" id="tids-toggle-wrap" style="display:none" onclick="event.stopPropagation()">
+            <input type="checkbox" id="tog-tids" onchange="onTidsstyringToggle(this)">
+            <span class="toggle-track"></span>
+            <span class="toggle-thumb"></span>
+          </label>
+          <div class="chevron" id="tids-chevron">
             <svg width="7" height="13" viewBox="0 0 7 13" fill="none">
               <path d="M1 1 6 6.5 1 12" stroke="#1020F9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
@@ -546,7 +558,7 @@ label.toggle-wrap { cursor: pointer; }
         </div>
         <div class="option-card" onclick="openNumSheet()">
           <div style="flex:1">
-            <div class="option-main" id="numDisplay" style="flex:none">Mitt eget nummer (999 99 999)</div>
+            <div class="option-main" id="numDisplay" style="flex:none">Mitt nummer (999 99 999)</div>
             <div id="numExternalStatus" style="display:none;font-size:12px;color:var(--c-muted);margin-top:3px">Kun for eksterne samtaler</div>
           </div>
           <div class="chevron">
@@ -801,7 +813,7 @@ label.toggle-wrap { cursor: pointer; }
 
   /* ── Number selector ── */
   const numList = [
-    'Mitt eget nummer (999 99 999)',
+    'Mitt nummer (999 99 999)',
     'Test1 (123 45 678)',
     'Test2 (12 34 56 78)',
     'Test3 (876 54 321)',
@@ -855,10 +867,23 @@ label.toggle-wrap { cursor: pointer; }
   function onJobToggle(cb) {
     const statusEl = document.getElementById('job-status');
     if (cb.checked) {
-      statusEl.textContent = 'Innlogget';
+      statusEl.textContent = 'Slå av for å logge av alle køer og tilbakestille visningsnummer';
+      // Ta vare på køer som allerede er på, slik at de ikke logges av
+      const currentlyEnabled = queues.map((_, i) =>
+        document.getElementById(`queue-toggle-${i}`).checked
+      );
       restoreJobState();   // gjenopprett siste aktive tilstand
+      // Beholde køer som var på før restore
+      currentlyEnabled.forEach((wasEnabled, i) => {
+        if (wasEnabled && !document.getElementById(`queue-toggle-${i}`).checked) {
+          document.getElementById(`queue-toggle-${i}`).checked = true;
+          queues[i].smsEnabled = getSmsPref(i);
+          updateQueueMeta(i);
+        }
+      });
+      updateJobBadge();
     } else {
-      statusEl.textContent = 'Avlogget';
+      statusEl.textContent = 'Slå på for å logge på køer og aktivere visningsnummer';
       // Slå av køer visuelt — lagret tilstand beholdes uendret
       queues.forEach((q, i) => {
         document.getElementById(`queue-toggle-${i}`).checked = false;
@@ -933,26 +958,49 @@ label.toggle-wrap { cursor: pointer; }
   }
 
   function applyTidsstyringState() {
-    const sub  = document.getElementById('tids-sub');
-    const link = document.getElementById('tids-link');
+    const sub     = document.getElementById('tids-sub');
+    const link    = document.getElementById('tids-link');
+    const togWrap = document.getElementById('tids-toggle-wrap');
+    const togTids = document.getElementById('tog-tids');
+    const chevron = document.getElementById('tids-chevron');
     let s = null;
     try { s = JSON.parse(localStorage.getItem('mbn_tidsstyring')); } catch(e) {}
 
     if (s && s.active) {
-      const sched = (s.schedules && s.schedules[0]) || s;
-      sub.textContent = buildTidsstyringSubtext(sched);
+      const paused = !!s.paused;
+      togWrap.style.display = '';
+      chevron.style.display = 'none';
+      togTids.checked = !paused;
       link.style.display = 'inline-flex';
-      // Aktiver Jobbprofil automatisk og gjenopprett siste tilstand
-      const togJob = document.getElementById('tog-job');
-      if (!togJob.checked) {
-        togJob.checked = true;
-        document.getElementById('job-status').textContent = 'Innlogget';
-        restoreJobState();
+
+      if (paused) {
+        sub.textContent = 'Slått av';
+      } else {
+        const sched = (s.schedules && s.schedules[0]) || s;
+        sub.textContent = buildTidsstyringSubtext(sched);
+        // Aktiver Jobbprofil automatisk og gjenopprett siste tilstand
+        const togJob = document.getElementById('tog-job');
+        if (!togJob.checked) {
+          togJob.checked = true;
+          document.getElementById('job-status').textContent = 'Slå av for å logge av alle køer og tilbakestille visningsnummer';
+          restoreJobState();
+        }
       }
     } else {
+      togWrap.style.display = 'none';
+      chevron.style.display = '';
       sub.textContent = 'Aktiver for å tidsstyre jobbprofil';
       link.style.display = 'none';
     }
+  }
+
+  function onTidsstyringToggle(cb) {
+    let s = null;
+    try { s = JSON.parse(localStorage.getItem('mbn_tidsstyring')); } catch(e) {}
+    if (!s) return;
+    s.paused = !cb.checked;
+    localStorage.setItem('mbn_tidsstyring', JSON.stringify(s));
+    applyTidsstyringState();
   }
 
   /* ── Tidsstyring row click ── */
