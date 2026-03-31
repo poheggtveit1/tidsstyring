@@ -412,67 +412,65 @@
   }
   .sheet-btn:active { opacity: .85; }
 
-  /* ── Reset confirm dialog ── */
+  /* ── Reset confirm bottom sheet ── */
   .reset-backdrop {
     position: absolute;
     inset: 0;
-    background: rgba(0,11,46,.5);
+    background: rgba(0,11,46,.4);
     z-index: 200;
     display: none;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
+    align-items: flex-end;
   }
   .reset-backdrop.open { display: flex; }
   .reset-dialog {
-    background: #fff;
-    border-radius: 16px;
     width: 100%;
-    padding: 24px 20px 20px;
-    animation: fadeScale .2s ease;
-  }
-  @keyframes fadeScale {
-    from { transform: scale(.92); opacity: 0; }
-    to   { transform: scale(1); opacity: 1; }
+    background: #fff;
+    border-radius: 20px 20px 0 0;
+    padding: 12px 0 0;
+    animation: slideUp .25s ease;
   }
   .reset-title {
-    font-size: 17px;
+    font-size: 16px;
     font-weight: 700;
     color: var(--navy);
-    margin-bottom: 10px;
-    line-height: 1.3;
+    padding: 4px 20px 8px;
+    line-height: 1.35;
+    text-align: center;
   }
   .reset-body {
     font-size: 14px;
+    font-weight: 300;
     color: var(--muted);
     line-height: 1.5;
-    margin-bottom: 20px;
+    padding: 0 20px 20px;
+    text-align: center;
   }
   .reset-confirm-btn {
     display: block;
-    width: 100%;
-    padding: 14px;
+    width: calc(100% - 32px);
+    margin: 0 16px 10px;
+    padding: 15px;
     background: var(--red);
     border: none;
-    border-radius: 10px;
+    border-radius: 100px;
     color: #fff;
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 700;
     text-align: center;
     cursor: pointer;
     font-family: inherit;
-    margin-bottom: 10px;
   }
   .reset-confirm-btn:active { opacity: .85; }
   .reset-cancel-btn {
     display: block;
-    width: 100%;
-    padding: 14px;
+    width: calc(100% - 32px);
+    margin: 0 16px 24px;
+    padding: 15px;
     background: var(--bg-grey);
     border: none;
-    border-radius: 10px;
+    border-radius: 100px;
     color: var(--text);
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 600;
     text-align: center;
     cursor: pointer;
@@ -558,7 +556,7 @@
       <div class="card">
         <div class="row" onclick="editOutsideHours()">
           <div class="row-body">
-            <div class="row-label" id="utenforLabel">AV</div>
+            <div class="row-label" id="utenforLabel">Av</div>
           </div>
           <span class="row-value" style="color:var(--blue)">Endre</span>
           <svg class="row-chevron" width="7" height="13" viewBox="0 0 7 13" fill="none">
@@ -577,9 +575,9 @@
         <!-- På- og avlogging -->
         <div class="row" onclick="openLoginSheet()">
           <div class="row-body">
-            <div class="row-label">Aktivering av jobbprofil</div>
+            <div class="row-label">På- og avlogging</div>
+            <div class="row-sub" id="loginValue">Automatisk</div>
           </div>
-          <span class="row-value" id="loginValue">Automatisk</span>
           <svg class="row-chevron" width="7" height="13" viewBox="0 0 7 13" fill="none">
             <path d="M1 1 6 6.5 1 12" stroke="#1020F9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
@@ -667,11 +665,12 @@
     </div>
   </div>
 
-  <!-- ── Reset confirm dialog ── -->
-  <div class="reset-backdrop" id="resetBackdrop">
+  <!-- ── Reset confirm bottom sheet ── -->
+  <div class="reset-backdrop" id="resetBackdrop" onclick="if(event.target===this)closeResetDialog()">
     <div class="reset-dialog">
-      <div class="reset-title">Ønsker du å nullstille tidsstyring?</div>
-      <div class="reset-body">All arbeidstid og innstillinger vil tilbakestilles, og tidsstyring slås av.</div>
+      <div class="sheet-handle"></div>
+      <div class="reset-title">Nullstille tidsstyring?</div>
+      <div class="reset-body">Alle innstillinger slettes og tidsstyring deaktiveres.</div>
       <button class="reset-confirm-btn" onclick="confirmReset()">Nullstill tidsstyring</button>
       <button class="reset-cancel-btn" onclick="closeResetDialog()">Avbryt</button>
     </div>
@@ -777,7 +776,7 @@
       const uh = JSON.parse(localStorage.getItem('mbn_utenfor_arbeidstid'));
       if (uh && uh.queues) {
         const isCustom = uh.queues.some(q => q.status !== 'av' || q.sms);
-        document.getElementById('utenforLabel').textContent = isCustom ? 'Tilpasset' : 'AV';
+        document.getElementById('utenforLabel').textContent = isCustom ? 'Tilpasset' : 'Av';
       }
     } catch(e) {}
   })();
@@ -833,13 +832,7 @@
 
   function updateNotifRowVisibility() {
     const isManual = selectedLoginMode === 1;
-    const toggle = document.getElementById('notifToggle');
-    if (isManual) {
-      toggle.checked = true;
-      toggle.disabled = true;
-    } else {
-      toggle.disabled = false;
-    }
+    document.getElementById('notifRow').style.display = isManual ? 'none' : '';
   }
 
   function updateRadioUI() {
