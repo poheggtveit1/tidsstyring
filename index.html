@@ -116,7 +116,7 @@ body {
 .panel-row {
   display: flex;
   align-items: center;
-  padding: 16px;
+  padding: 12px 16px;
   gap: 14px;
   cursor: pointer;
   transition: background .15s;
@@ -125,19 +125,12 @@ body {
 .panel-row + .panel-row {
   border-top: 1px solid var(--c-border);
 }
-.panel-row.sub-row {
-  padding-left: 28px;
-}
 .panel-text { flex: 1; min-width: 0; }
 .panel-label {
   font-size: 14px;
   font-weight: 400;
-  color: var(--c-text);
-  line-height: 1.35;
-}
-.panel-row:not(.sub-row) .panel-label {
-  font-weight: 600;
   color: var(--c-navy);
+  line-height: 1.35;
 }
 .panel-sub {
   font-size: 12px;
@@ -257,7 +250,7 @@ label.toggle-wrap { cursor: pointer; }
 .queue-text { flex: 1; min-width: 0; }
 .queue-name {
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 400;
   color: var(--c-text);
 }
 .queue-name span {
@@ -502,6 +495,20 @@ label.toggle-wrap { cursor: pointer; }
         <rect x="2.5" y="2.5" width="18"  height="8"  rx="1.8" fill="#000B2E"/>
         <path d="M24.5 4.5v4a2 2 0 0 0 0-4z" fill="#000B2E" opacity=".4"/>
       </svg>
+    </div>
+  </div>
+
+  <!-- Toast notification -->
+  <div id="appToast" style="display:none; background:#D8FDDC; padding:20px; position:absolute; top:44px; left:0; right:0; z-index:200;">
+    <div style="display:flex; align-items:center; gap:12px;">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" flex-shrink="0">
+        <circle cx="11" cy="11" r="11" fill="#24A831"/>
+        <path d="M6 11l3.5 3.5L16 8" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span id="appToastMsg" style="flex:1; font-size:14px; font-weight:300; color:#114516; line-height:1.4;"></span>
+      <button onclick="closeToast()" style="background:none; border:none; cursor:pointer; padding:0; color:#114516; flex-shrink:0;">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 2l12 12M14 2L2 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </button>
     </div>
   </div>
 
@@ -865,9 +872,7 @@ label.toggle-wrap { cursor: pointer; }
 
   /* ── Jobbprofil master toggle ── */
   function onJobToggle(cb) {
-    const statusEl = document.getElementById('job-status');
     if (cb.checked) {
-      statusEl.textContent = 'Slå av for å logge av alle køer og tilbakestille visningsnummer';
       // Ta vare på køer som allerede er på, slik at de ikke logges av
       const currentlyEnabled = queues.map((_, i) =>
         document.getElementById(`queue-toggle-${i}`).checked
@@ -881,9 +886,7 @@ label.toggle-wrap { cursor: pointer; }
           updateQueueMeta(i);
         }
       });
-      updateJobBadge();
     } else {
-      statusEl.textContent = 'Slå på for å logge på køer og aktivere visningsnummer';
       // Slå av køer visuelt — lagret tilstand beholdes uendret
       queues.forEach((q, i) => {
         document.getElementById(`queue-toggle-${i}`).checked = false;
@@ -895,8 +898,9 @@ label.toggle-wrap { cursor: pointer; }
       document.getElementById('numDisplay').textContent = numList[0];
       document.getElementById('numExternalStatus').style.display = 'none';
       externalOnly = false;
-      updateJobBadge();
     }
+    updateJobStatus();
+    updateJobBadge();
   }
 
   /* ── Queue toggle (per kø) ── */
@@ -921,7 +925,22 @@ label.toggle-wrap { cursor: pointer; }
     updateQueueMeta(idx);
     const jobOn = document.getElementById('tog-job').checked;
     if (jobOn) saveJobState();
+    updateJobStatus();
     updateJobBadge();
+  }
+
+  /* ── Job status text ── */
+  function updateJobStatus() {
+    const jobOn = document.getElementById('tog-job').checked;
+    const statusEl = document.getElementById('job-status');
+    if (!jobOn) {
+      statusEl.textContent = 'Avlogget';
+      return;
+    }
+    const activeCount = queues.filter((_, i) =>
+      document.getElementById(`queue-toggle-${i}`).checked
+    ).length;
+    statusEl.textContent = `Pålogget i ${activeCount} ${activeCount === 1 ? 'kø' : 'køer'}`;
   }
 
   /* ── Green badge on Jobbprofil tab ── */
@@ -982,8 +1001,8 @@ label.toggle-wrap { cursor: pointer; }
         const togJob = document.getElementById('tog-job');
         if (!togJob.checked) {
           togJob.checked = true;
-          document.getElementById('job-status').textContent = 'Slå av for å logge av alle køer og tilbakestille visningsnummer';
           restoreJobState();
+          updateJobStatus();
         }
       }
     } else {
@@ -1108,9 +1127,31 @@ label.toggle-wrap { cursor: pointer; }
       document.getElementById('numSheetBackdrop').classList.remove('open');
   }
 
+  /* ── Toast ── */
+  let toastTimer = null;
+  function showToast(msg) {
+    document.getElementById('appToastMsg').textContent = msg;
+    const toast = document.getElementById('appToast');
+    toast.style.display = 'block';
+    document.querySelector('.scroll-body').style.paddingTop = toast.offsetHeight + 'px';
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(closeToast, 4000);
+  }
+  function closeToast() {
+    document.getElementById('appToast').style.display = 'none';
+    document.querySelector('.scroll-body').style.paddingTop = '';
+    clearTimeout(toastTimer);
+  }
+
   /* ── On load ── */
   applyTidsstyringState();
+  updateJobStatus();
   updateJobBadge();
+  const pendingToast = sessionStorage.getItem('mbn_show_toast');
+  if (pendingToast) {
+    sessionStorage.removeItem('mbn_show_toast');
+    showToast(pendingToast);
+  }
 </script>
 </body>
 </html>
