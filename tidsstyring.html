@@ -260,28 +260,38 @@ body {
 .option-item + .option-item { border-top: 1px solid var(--border); }
 .option-text { flex: 1; }
 .option-main { font-size: 14px; font-weight: 300; color: var(--text); }
-#queueList .option-main strong { font-weight: 500; }
+#queueList .option-main strong { font-weight: 400; }
 .option-sub  { font-size: 12px; color: var(--muted); margin-top: 2px; }
 .option-sms  { font-size: 12px; color: var(--muted); margin-top: 2px; display: none; }
 .option-sms.on { display: block; }
 .chevron { color: var(--blue); flex-shrink: 0; }
 
 /* ── Radio options ── */
-.radio-group { display: flex; flex-direction: column; gap: 4px; }
+.radio-group { display: flex; flex-direction: column; gap: 0; }
 .radio-item {
   background: var(--bg-grey);
-  border-radius: var(--r-card);
-  border: 1.5px solid transparent;
+  border-radius: 0;
+  border: none;
+  border-top: 1px solid rgba(79,90,125,.12);
   padding: 14px 16px;
   display: flex;
   align-items: center;
   gap: 14px;
   cursor: pointer;
-  transition: background .15s, border-color .15s;
+  transition: background .15s;
+}
+.radio-group .radio-item:first-child {
+  border-top: none;
+  border-radius: var(--r-card) var(--r-card) 0 0;
+}
+.radio-group .radio-item:last-child {
+  border-radius: 0 0 var(--r-card) var(--r-card);
+}
+.radio-group .radio-item:only-child {
+  border-radius: var(--r-card);
 }
 .radio-item.selected {
-  background: var(--blue-light);
-  border-color: var(--blue);
+  background: var(--bg-grey);
 }
 .radio-circle {
   width: 20px; height: 20px;
@@ -289,7 +299,7 @@ body {
   border: 1.5px solid rgba(79,90,125,.3);
   position: relative;
   flex-shrink: 0;
-  transition: border-color .15s;
+  transition: border-color .15s, background .15s;
   background: var(--white);
 }
 .radio-circle::after {
@@ -297,14 +307,15 @@ body {
   position: absolute;
   top: 50%; left: 50%;
   transform: translate(-50%, -50%);
-  width: 10px; height: 10px;
+  width: 8px; height: 8px;
   border-radius: 50%;
-  background: var(--text);
+  background: #fff;
   opacity: 0;
   transition: opacity .15s;
 }
 .radio-item.selected .radio-circle {
-  border-color: var(--text);
+  border-color: var(--blue);
+  background: var(--blue);
 }
 .radio-item.selected .radio-circle::after { opacity: 1; }
 .radio-text { flex: 1; }
@@ -702,18 +713,18 @@ body {
             <div class="step-section-desc">På- og avlogging skjer i henhold til arbeidstiden du har satt</div>
             <div class="radio-group">
               <div class="radio-item selected" onclick="selectRadio(this, 'login'); updateLoginMode()">
-                <div class="radio-circle"></div>
                 <div class="radio-text">
                   <div class="radio-label">Automatisk</div>
                   <div class="radio-desc">Køer, visningsnummer og SMS-varsling styres automatisk</div>
                 </div>
+                <div class="radio-circle"></div>
               </div>
               <div class="radio-item" onclick="selectRadio(this, 'login'); updateLoginMode()">
-                <div class="radio-circle"></div>
                 <div class="radio-text">
                   <div class="radio-label">Manuell</div>
                   <div class="radio-desc">Du får varsel når arbeidstiden starter og slutter, og logger selv på og av i appen</div>
                 </div>
+                <div class="radio-circle"></div>
               </div>
             </div>
           </div>
@@ -724,16 +735,16 @@ body {
             <div class="step-section-desc">Du varsles 10 minutter før arbeidstiden starter og slutter</div>
             <div class="radio-group" id="step5-notif-group">
               <div class="radio-item selected" id="notifJa" onclick="selectRadio(this, 'notif')">
-                <div class="radio-circle"></div>
                 <div class="radio-text">
                   <div class="radio-label">Ja</div>
                 </div>
+                <div class="radio-circle"></div>
               </div>
               <div class="radio-item" id="notifNei" onclick="selectRadio(this, 'notif')">
-                <div class="radio-circle"></div>
                 <div class="radio-text">
                   <div class="radio-label">Nei</div>
                 </div>
+                <div class="radio-circle"></div>
               </div>
             </div>
           </div>
@@ -817,8 +828,8 @@ body {
 function radioSVG(checked) {
   if (checked) {
     return `<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="10" cy="10" r="9" stroke="#293351" stroke-width="1.5"/>
-      <circle cx="10" cy="10" r="5" fill="#293351"/>
+      <circle cx="10" cy="10" r="9" stroke="#1020F9" stroke-width="1.5"/>
+      <circle cx="10" cy="10" r="5" fill="#1020F9"/>
     </svg>`;
   }
   return `<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">

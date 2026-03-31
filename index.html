@@ -194,7 +194,7 @@ label.toggle-wrap { cursor: pointer; }
 .section-title {
   font-size: 14px;
   font-weight: 600;
-  color: var(--c-text);
+  color: #4F5B7D;
   line-height: 1.3;
 }
 .section-desc {
@@ -378,6 +378,7 @@ label.toggle-wrap { cursor: pointer; }
   width: 22px; height: 22px; border-radius: 50%;
   border: 2px solid #C7C9D9; flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
+  background: #fff;
 }
 .num-row.sel .num-radio { border-color: var(--c-blue); background: var(--c-blue); }
 .num-row.sel .num-radio::after { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #fff; }
@@ -438,7 +439,7 @@ label.toggle-wrap { cursor: pointer; }
 .q-action:active { background: #E8E9EF; }
 .q-action-label { flex: 1; font-size: 14px; color: var(--c-text); }
 .q-sms-row {
-  padding: 8px 16px;
+  padding: 8px 16px 28px;
   display: flex; align-items: center; gap: 12px;
   margin-bottom: 8px;
 }
@@ -803,7 +804,6 @@ label.toggle-wrap { cursor: pointer; }
           <span class="toggle-thumb"></span>
         </label>
       </div>
-      <button class="option-card" style="width:100%;border:none;justify-content:center;color:#1020F9;font-size:16px;font-weight:500;background:#EBF3FF;border-radius:14px;padding:16px;margin-bottom:16px" onclick="closeQueueSheet()">Lukk</button>
     </div>
   </div>
 
@@ -940,7 +940,7 @@ label.toggle-wrap { cursor: pointer; }
     const activeCount = queues.filter((_, i) =>
       document.getElementById(`queue-toggle-${i}`).checked
     ).length;
-    statusEl.textContent = `Pålogget i ${activeCount} ${activeCount === 1 ? 'kø' : 'køer'}`;
+    statusEl.textContent = `Pålogget ${activeCount} ${activeCount === 1 ? 'kø' : 'køer'}`;
   }
 
   /* ── Green badge on Jobbprofil tab ── */
