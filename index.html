@@ -132,6 +132,9 @@ body {
   color: var(--c-navy);
   line-height: 1.35;
 }
+.panel-row:not(.sub-row) .panel-label {
+  font-weight: 600;
+}
 .panel-sub {
   font-size: 12px;
   color: var(--c-muted);
@@ -1063,8 +1066,9 @@ label.toggle-wrap { cursor: pointer; }
   function updateQueueMeta(idx) {
     const meta = document.getElementById(`queue-meta-${idx}`);
     if (!meta) return;
+    const enabled = document.getElementById(`queue-toggle-${idx}`).checked;
     const sms = queues[idx].smsEnabled ? 'SMS-varsling på' : 'SMS-varsling av';
-    meta.innerHTML = `<span>1/4 operatører</span><span>${sms}</span>`;
+    meta.innerHTML = `<span>${enabled ? 1 : 0}/4 operatører</span><span>${sms}</span>`;
   }
 
   function closeQueueSheet() {
