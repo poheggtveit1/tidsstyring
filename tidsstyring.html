@@ -506,7 +506,7 @@ body {
   <!-- Top bar (hidden on confirm) -->
   <div class="top-bar" id="topBar">
     <button class="top-bar-cancel" onclick="cancelWizard()">Avbryt</button>
-    <span class="top-bar-title">Tidsstyring av jobbprofil</span>
+    <span class="top-bar-title">Aktiver tidsstyring</span>
     <div style="min-width:56px"></div>
   </div>
 
@@ -627,54 +627,52 @@ body {
       </div>
 
       <div class="step-heading">
-        <div class="step-title">Hva skal skje med køene når arbeidstiden starter?</div>
-        <div class="step-desc">Valgene aktiveres automatisk når arbeidstiden starter</div>
+        <div class="step-title">Hvilke køer vil du logge på?</div>
+        <div class="step-desc">Valgte køer aktiveres automatisk når arbeidstiden starter</div>
       </div>
 
       <div>
         <div class="option-row" id="queueList">
-          <div class="option-item" onclick="openSheet('queue', this, 0)">
+          <div class="option-item">
             <div class="option-text">
               <div class="option-main"><strong>Administrasjon</strong> (123 45 678)</div>
-              <div class="option-sub" id="queue0-val">Ingen endring</div>
-              <div class="option-sms" id="queue0-sms">SMS-varsling</div>
             </div>
-            <div class="chevron">
-              <svg width="7" height="13" viewBox="0 0 7 13" fill="none">
-                <path d="M1 1 6 6.5 1 12" stroke="#1020F9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </div>
+            <label class="toggle-wrap" onclick="event.stopPropagation()">
+              <input type="checkbox" id="queue0-tog" checked>
+              <span class="toggle-track"></span>
+              <span class="toggle-thumb"></span>
+            </label>
           </div>
-          <div class="option-item" onclick="openSheet('queue', this, 1)">
+          <div class="option-item">
             <div class="option-text">
-              <div class="option-main"><strong>Support</strong> (123 45 678)</div>
-              <div class="option-sub" id="queue1-val">Ingen endring</div>
-              <div class="option-sms" id="queue1-sms">SMS-varsling</div>
+              <div class="option-main"><strong>Support</strong> (444 44 444)</div>
             </div>
-            <div class="chevron">
-              <svg width="7" height="13" viewBox="0 0 7 13" fill="none">
-                <path d="M1 1 6 6.5 1 12" stroke="#1020F9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </div>
+            <label class="toggle-wrap" onclick="event.stopPropagation()">
+              <input type="checkbox" id="queue1-tog" checked>
+              <span class="toggle-track"></span>
+              <span class="toggle-thumb"></span>
+            </label>
           </div>
-          <div class="option-item" onclick="openSheet('queue', this, 2)">
+          <div class="option-item">
             <div class="option-text">
-              <div class="option-main"><strong>Verksted</strong> (123 45 678)</div>
-              <div class="option-sub" id="queue2-val">Ingen endring</div>
-              <div class="option-sms" id="queue2-sms">SMS-varsling</div>
+              <div class="option-main"><strong>Verksted</strong> (12 34 56 78)</div>
             </div>
-            <div class="chevron">
-              <svg width="7" height="13" viewBox="0 0 7 13" fill="none">
-                <path d="M1 1 6 6.5 1 12" stroke="#1020F9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </div>
+            <label class="toggle-wrap" onclick="event.stopPropagation()">
+              <input type="checkbox" id="queue2-tog">
+              <span class="toggle-track"></span>
+              <span class="toggle-thumb"></span>
+            </label>
           </div>
         </div>
       </div>
 
-      <div class="step-info-block" style="margin-top:16px;">
-        <div style="font-size:14px; font-weight:500; color:var(--text); margin-bottom:4px;">Når arbeidstiden er over skjer følgende automatisk</div>
-        <div style="font-size:14px; font-weight:300; color:var(--muted);">Alle køer logges av, SMS-varsling skrus av, og visningsnummeret tilbakestilles. Dette kan endres i innstillingene.</div>
+      <div style="margin-top:4px;">
+        <div style="font-size:14px; font-weight:600; color:var(--text); margin-bottom:10px;">Etter arbeidstid skjer dette automatisk:</div>
+        <ul style="font-size:14px; font-weight:300; color:var(--muted); padding-left:18px; display:flex; flex-direction:column; gap:6px; line-height:1.45;">
+          <li>Alle køer logges av,</li>
+          <li>MBN SMS-varsling slås av,</li>
+          <li>visningsnummer tilbakestilles til ditt nummer.</li>
+        </ul>
       </div>
 
       <div class="btn-group">
@@ -688,7 +686,7 @@ body {
       </div>
     </div>
 
-    <!-- STEP 5: Innstillinger -->
+    <!-- STEP 5: Login mode -->
     <div class="step" id="step5">
       <div class="progress">
         <div class="prog-dot done"></div>
@@ -697,64 +695,25 @@ body {
         <div class="prog-dot current"></div>
       </div>
 
-      <!-- Wrapper: gap=16px between heading and sections -->
-      <div style="display:flex; flex-direction:column; gap:16px">
-        <div class="step-heading">
-          <div class="step-title">Innstillinger</div>
-          <div class="step-desc">Tilpass innstillinger for tidsstyring</div>
+      <div class="step-heading">
+        <div class="step-title">Hvordan vil du logge på og av?</div>
+        <div class="step-desc">Velg hvordan appen bruker arbeidstiden din</div>
+      </div>
+
+      <div class="radio-group">
+        <div class="radio-item selected" onclick="selectRadio(this, 'login')">
+          <div class="radio-text">
+            <div class="radio-label">Automatisk</div>
+            <div class="radio-desc">Du blir automatisk logget på og av når arbeidstiden starter og slutter</div>
+          </div>
+          <div class="radio-circle"></div>
         </div>
-
-        <!-- Options: gap=24px between sections -->
-        <div style="display:flex; flex-direction:column; gap:24px">
-
-          <!-- Section 1: Logg på/av -->
-          <div style="display:flex; flex-direction:column; gap:6px">
-            <div class="step-section-label">Hvordan ønsker du å logge på og av?</div>
-            <div class="step-section-desc">På- og avlogging skjer i henhold til arbeidstiden du har satt</div>
-            <div class="radio-group">
-              <div class="radio-item selected" onclick="selectRadio(this, 'login'); updateLoginMode()">
-                <div class="radio-text">
-                  <div class="radio-label">Automatisk</div>
-                  <div class="radio-desc">Køer, visningsnummer og SMS-varsling styres automatisk</div>
-                </div>
-                <div class="radio-circle"></div>
-              </div>
-              <div class="radio-item" onclick="selectRadio(this, 'login'); updateLoginMode()">
-                <div class="radio-text">
-                  <div class="radio-label">Manuell</div>
-                  <div class="radio-desc">Du får varsel når arbeidstiden starter og slutter, og logger selv på og av i appen</div>
-                </div>
-                <div class="radio-circle"></div>
-              </div>
-            </div>
+        <div class="radio-item" onclick="selectRadio(this, 'login')">
+          <div class="radio-text">
+            <div class="radio-label">Via påminnelse</div>
+            <div class="radio-desc">Du får en påminnelse 10 minutter før arbeidstiden starter og slutter, og logger selv på og av</div>
           </div>
-
-          <!-- Section 2a: Varsel (Automatisk mode) -->
-          <div id="step5-notif-options" style="display:flex; flex-direction:column; gap:6px">
-            <div class="step-section-label">Vil du ha varsel før arbeidstiden starter og slutter?</div>
-            <div class="step-section-desc">Du varsles 10 minutter før arbeidstiden starter og slutter</div>
-            <div class="radio-group" id="step5-notif-group">
-              <div class="radio-item selected" id="notifJa" onclick="selectRadio(this, 'notif')">
-                <div class="radio-text">
-                  <div class="radio-label">Ja</div>
-                </div>
-                <div class="radio-circle"></div>
-              </div>
-              <div class="radio-item" id="notifNei" onclick="selectRadio(this, 'notif')">
-                <div class="radio-text">
-                  <div class="radio-label">Nei</div>
-                </div>
-                <div class="radio-circle"></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Section 2b: Varsel (Manuell mode) -->
-          <div id="step5-manual-notif" style="display:none; flex-direction:column; gap:6px">
-            <div class="step-section-label">Varsel</div>
-            <div class="step-section-desc">Du varsles 10 minutter før arbeidstiden starter og slutter, slik at du kan logge på og av fra varselet.</div>
-          </div>
-
+          <div class="radio-circle"></div>
         </div>
       </div>
 
@@ -801,7 +760,7 @@ body {
         </button>
       </div>
       <div class="sheet-options" id="sheetOptions"></div>
-      <div id="sheetExternalRow" style="display:none;align-items:center;padding:8px 0;">
+      <div id="sheetExternalRow" style="display:none;align-items:center;padding:12px 0;">
         <div style="flex:1;font-size:14px;color:var(--navy)">Bruk kun for eksterne samtaler</div>
         <label class="toggle-wrap" onclick="event.stopPropagation()">
           <input type="checkbox" id="sheetExternalToggle">
@@ -848,9 +807,9 @@ let displayNumbers = [
   { label: 'Skjult nummer',                  selected: false, externalOnly: false },
 ];
 let queueStates = [
-  { name: 'Administrasjon (123 45 678)', options: ['Ingen endring', 'Logg på', 'Logg av'], selected: 0, smsEnabled: false },
-  { name: 'Support (444 44 444)',        options: ['Ingen endring', 'Logg på', 'Logg av'], selected: 0, smsEnabled: false },
-  { name: 'Verksted (12 34 56 78)',      options: ['Ingen endring', 'Logg på', 'Logg av'], selected: 0, smsEnabled: false },
+  { name: 'Administrasjon', number: '(123 45 678)' },
+  { name: 'Support',        number: '(444 44 444)' },
+  { name: 'Verksted',       number: '(12 34 56 78)' },
 ];
 
 /* ── Navigation ── */
@@ -875,10 +834,16 @@ function goConfirm() {
   const dayMap  = ['M','T','O','T','F','L','S'];
   const dayFull = ['mandag','tirsdag','onsdag','torsdag','fredag','lørdag','søndag'];
   let dayLabel  = '';
-  if (JSON.stringify(days) === JSON.stringify([0,1,2,3,4]))         dayLabel = 'alle hverdager';
-  else if (JSON.stringify(days) === JSON.stringify([0,1,2,3,4,5,6])) dayLabel = 'alle dager';
+  if (JSON.stringify(days) === JSON.stringify([0,1,2,3,4]))         dayLabel = 'Alle hverdager';
+  else if (JSON.stringify(days) === JSON.stringify([0,1,2,3,4,5,6])) dayLabel = 'Alle dager';
   else if (JSON.stringify(days) === JSON.stringify([5,6]))           dayLabel = 'helg';
   else dayLabel = days.map(i => dayFull[i]).join(', ');
+
+  const queues = queueStates.map((q, i) => ({
+    name:    q.name,
+    number:  q.number,
+    enabled: document.getElementById(`queue${i}-tog`)?.checked ?? true,
+  }));
 
   const settings = {
     active:    true,
@@ -886,13 +851,10 @@ function goConfirm() {
     endTime:   document.getElementById('endTime').value   || '16:00',
     days,
     dayLabel,
+    queues,
     loginMode: (() => {
       const sel = document.querySelector('#step5 .radio-item.selected .radio-label');
-      return sel ? sel.textContent.trim() : 'Automatisk på- og avlogging';
-    })(),
-    notification: (() => {
-      const sel = document.querySelector('#step5-notif-group .radio-item.selected .radio-label');
-      return sel ? sel.textContent.trim() : 'Ja';
+      return sel ? sel.textContent.trim() : 'Automatisk';
     })(),
   };
   localStorage.setItem('mbn_tidsstyring', JSON.stringify(settings));
@@ -904,11 +866,6 @@ function cancelWizard() {
   window.location.href = 'index.html';
 }
 
-function updateLoginMode() {
-  const isManual = document.querySelector('#step5 .radio-item:nth-child(2)').classList.contains('selected');
-  document.getElementById('step5-notif-options').style.display = isManual ? 'none' : 'flex';
-  document.getElementById('step5-manual-notif').style.display = isManual ? 'flex' : 'none';
-}
 
 /* ── Day picker ── */
 const dayNames = ['M','T','O','T','F','L','S'];
@@ -961,38 +918,6 @@ function openSheet(type, el, idx) {
       d.onclick = () => selectSheetOption(i);
       opts.appendChild(d);
     });
-  } else if (type === 'queue') {
-    const q = queueStates[idx];
-    title.textContent = 'Velg køstatus';
-    const subtitleEl = document.getElementById('sheetSubtitle');
-    subtitleEl.textContent = q.name;
-    subtitleEl.style.display = '';
-    document.getElementById('sheetSmsRow').style.display = '';
-    const smsToggle = document.getElementById('sheetSmsToggle');
-    smsToggle.checked  = q.smsEnabled;
-    smsToggle.disabled = (q.selected === 0); // deaktivert ved "Ingen endring"
-    document.getElementById('sheetConfirmBtn').textContent = 'Bekreft';
-
-    const icons = [
-      `<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1H2a1 1 0 0 0-1 1v7l2-2h4a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1z" stroke="#C70505" stroke-width="1.3" fill="none"/><circle cx="11" cy="10" r="2.5" stroke="#C70505" stroke-width="1.3" fill="none"/><path d="M11 9v1.4l.8.6" stroke="#C70505" stroke-width="1.2" stroke-linecap="round"/></svg>`,
-      `<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5 7h7M9 4l3 3-3 3" stroke="#C70505" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 2v10" stroke="#C70505" stroke-width="1.5" stroke-linecap="round"/></svg>`,
-      `<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 7H2M5 4L2 7l3 3" stroke="#37C65D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 2v10" stroke="#37C65D" stroke-width="1.5" stroke-linecap="round"/></svg>`,
-    ];
-    const iconClasses = ['', '', 'green'];
-    const subs = [
-      'Beholder eksisterende status',
-      'Logger automatisk på kø',
-      'Logger automatisk av kø',
-    ];
-    q.options.forEach((opt, i) => {
-      const d = document.createElement('div');
-      d.className = 'sheet-option' + (q.selected === i ? ' selected' : '');
-      d.innerHTML = `
-        <div class="sheet-option-text" style="flex:1">${opt}<div class="sheet-option-sub">${subs[i]}</div></div>
-        ${radioSVG(q.selected === i)}`;
-      d.onclick = () => selectSheetOption(i);
-      opts.appendChild(d);
-    });
   }
 
   overlay.classList.add('open');
@@ -1021,11 +946,6 @@ function confirmSheet() {
     document.getElementById('displayNumberValue').textContent = sel.label;
     document.getElementById('displayNumberExternalStatus').style.display =
       sel.externalOnly ? '' : 'none';
-  } else if (activeSheetType === 'queue') {
-    const q = queueStates[activeQueueIdx];
-    q.smsEnabled = document.getElementById('sheetSmsToggle').checked;
-    document.getElementById(`queue${activeQueueIdx}-val`).textContent = q.options[q.selected];
-    document.getElementById(`queue${activeQueueIdx}-sms`).classList.toggle('on', q.smsEnabled);
   }
   closeSheet();
 }

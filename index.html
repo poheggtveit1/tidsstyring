@@ -68,6 +68,7 @@ body {
 
 /* ── Status bar ──────────────────────── */
 .status-bar {
+  background: #EBF3FF;
   height: 44px;
   padding: 0 24px;
   display: flex;
@@ -101,8 +102,9 @@ body {
 }
 .scroll-body::-webkit-scrollbar { display: none; }
 
-/* ── Top section (transparent bg) ───── */
+/* ── Top section ─────────────────────── */
 .top-section {
+  background: #EBF3FF;
   padding: 10px 16px 12px;
   display: flex;
   flex-direction: column;
@@ -179,6 +181,19 @@ body {
   display: none;
   align-items: center;
   gap: 3px;
+}
+.tids-btn {
+  background: #EBF3FF;
+  border: none;
+  border-radius: 50px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--c-blue);
+  cursor: pointer;
+  font-family: inherit;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 /* ── Bottom white section ────────────── */
@@ -297,10 +312,6 @@ label.toggle-wrap { cursor: pointer; }
   overflow: hidden;
   transition: box-shadow .22s;
 }
-/* Blue active ring */
-.queue-card.queue-on .avatar-circle {
-  box-shadow: 0 0 0 2px var(--c-blue);
-}
 /* Green presence dot */
 .presence-dot {
   position: absolute;
@@ -314,7 +325,7 @@ label.toggle-wrap { cursor: pointer; }
   display: none;
 }
 .queue-card.queue-on .presence-dot {
-  display: block;
+  display: none;
 }
 
 /* ── Queue text ──────────────────────── */
@@ -525,6 +536,79 @@ label.toggle-wrap { cursor: pointer; }
   background: #D8FDDC;
   padding: 20px;
 }
+
+/* ── iOS notification banner (demo) ── */
+.ios-notif-banner {
+  position: absolute;
+  top: 52px; left: 8px; right: 8px;
+  z-index: 300;
+  transform: translateY(calc(-100% - 60px));
+  transition: transform .44s cubic-bezier(.4,0,.2,1);
+  pointer-events: none;
+}
+.ios-notif-banner.show {
+  transform: translateY(0);
+  pointer-events: auto;
+}
+.ios-notif-inner {
+  background: rgba(242,243,247,.97);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 16px;
+  padding: 12px 14px;
+  box-shadow: 0 6px 28px rgba(0,0,0,.22), 0 1px 4px rgba(0,0,0,.1);
+}
+.ios-notif-app-row {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 6px;
+}
+.ios-notif-icon {
+  width: 26px; height: 26px; border-radius: 7px; overflow: hidden; flex-shrink: 0;
+}
+.ios-notif-app-name {
+  flex: 1; font-size: 11px; font-weight: 500;
+  color: var(--c-muted); text-transform: uppercase; letter-spacing: .5px;
+}
+.ios-notif-time { font-size: 11px; color: var(--c-muted); }
+.ios-notif-title {
+  font-size: 13px; font-weight: 600; color: var(--c-text);
+  line-height: 1.35; margin-bottom: 3px;
+}
+.ios-notif-body {
+  font-size: 12px; font-weight: 300; color: var(--c-text); line-height: 1.45;
+}
+
+/* ── Dev panel ─────────────────────── */
+.dev-backdrop {
+  position: absolute; inset: 0;
+  background: rgba(0,11,46,.38);
+  z-index: 400; display: none; align-items: flex-end;
+}
+.dev-backdrop.open { display: flex; animation: sheet-fadein .2s ease; }
+.dev-sheet {
+  width: 100%; background: var(--c-white);
+  border-radius: 20px 20px 0 0;
+  padding: 4px 16px 36px;
+  display: flex; flex-direction: column; gap: 12px;
+  animation: sheet-slideup .25s cubic-bezier(.4,0,.2,1);
+}
+.dev-handle {
+  width: 36px; height: 5px; border-radius: 100px;
+  background: var(--c-muted); opacity: .3;
+  margin: 8px auto 4px; flex-shrink: 0;
+}
+.dev-title {
+  font-size: 11px; font-weight: 600; color: var(--c-muted);
+  text-transform: uppercase; letter-spacing: .8px;
+}
+.dev-btn {
+  display: block; width: 100%;
+  padding: 14px 16px; background: var(--c-bg-grey);
+  border: none; border-radius: 12px;
+  color: var(--c-text); font-size: 14px; font-weight: 400;
+  text-align: left; cursor: pointer; font-family: inherit;
+  display: flex; align-items: center; gap: 10px;
+}
+.dev-btn:active { background: #E8E9EF; }
 </style>
 </head>
 <body>
@@ -560,6 +644,24 @@ label.toggle-wrap { cursor: pointer; }
     </div>
   </div>
 
+  <!-- iOS Notification Banner (demo) -->
+  <div class="ios-notif-banner" id="iosNotifBanner">
+    <div class="ios-notif-inner">
+      <div class="ios-notif-app-row">
+        <div class="ios-notif-icon">
+          <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+            <rect width="26" height="26" rx="7" fill="#1020F9"/>
+            <text x="13" y="18.5" text-anchor="middle" font-size="14" font-weight="700" fill="white" font-family="-apple-system,sans-serif">T</text>
+          </svg>
+        </div>
+        <div class="ios-notif-app-name">Telenor MBN</div>
+        <div class="ios-notif-time">nå</div>
+      </div>
+      <div class="ios-notif-title">Arbeidstiden din slutter kl. 16:00</div>
+      <div class="ios-notif-body">Visningsnummer Support (12 34 56 78) og køene Administrasjon og Support logges av automatisk.</div>
+    </div>
+  </div>
+
   <!-- Toast notification -->
   <div id="appToast">
     <div style="display:flex; align-items:center; gap:12px;">
@@ -586,7 +688,7 @@ label.toggle-wrap { cursor: pointer; }
           <div class="jp-label">Jobbprofil</div>
           <div class="jp-status-row">
             <div class="jp-dot" id="jp-dot"></div>
-            <div class="jp-status" id="job-status">Avlogget</div>
+            <div class="jp-status" id="job-status">Logget av</div>
           </div>
         </div>
         <label class="toggle-wrap" onclick="event.stopPropagation()">
@@ -600,7 +702,7 @@ label.toggle-wrap { cursor: pointer; }
       <div class="tids-card" onclick="onTidsstyring()">
         <div class="tids-text">
           <div class="tids-label">Tidsstyring</div>
-          <div id="tids-sub" class="tids-sub">Aktiver for å tidsstyre jobbprofil</div>
+          <div id="tids-sub" class="tids-sub" style="display:none"></div>
           <span id="tids-link" class="tids-link" onclick="event.stopPropagation(); window.location.href='tidsstyring-detaljer.html'">
             Endre tidsstyring
             <svg width="6" height="10" viewBox="0 0 6 10" fill="none">
@@ -613,11 +715,7 @@ label.toggle-wrap { cursor: pointer; }
           <span class="toggle-track"></span>
           <span class="toggle-thumb"></span>
         </label>
-        <div class="chevron" id="tids-chevron">
-          <svg width="7" height="13" viewBox="0 0 7 13" fill="none">
-            <path d="M1 1 6 6.5 1 12" stroke="#1020F9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
+        <button id="tids-btn" class="tids-btn" onclick="event.stopPropagation(); onTidsstyring()">Aktiver</button>
       </div>
 
     </div><!-- /top-section -->
@@ -821,14 +919,14 @@ label.toggle-wrap { cursor: pointer; }
       </div>
       <div class="num-list">
         <div id="numOptions"></div>
-        <div id="numExternalRow" style="display:flex;align-items:center;padding:8px 0;">
-          <span class="num-row-label" style="flex:1">Bruk kun for eksterne samtaler</span>
-          <label class="toggle-wrap" onclick="event.stopPropagation()">
-            <input type="checkbox" id="numExternalCheck" onchange="onExternalChange()">
-            <span class="toggle-track"></span>
-            <span class="toggle-thumb"></span>
-          </label>
-        </div>
+      </div>
+      <div id="numExternalRow" style="display:flex;align-items:center;padding:12px 0;">
+        <span class="num-row-label" style="flex:1;font-size:14px;color:#293351;">Bruk kun for eksterne samtaler</span>
+        <label class="toggle-wrap" onclick="event.stopPropagation()">
+          <input type="checkbox" id="numExternalCheck" onchange="onExternalChange()">
+          <span class="toggle-track"></span>
+          <span class="toggle-thumb"></span>
+        </label>
       </div>
       <button class="sheet-btn" onclick="confirmNum()">Lagre</button>
     </div>
@@ -881,6 +979,27 @@ label.toggle-wrap { cursor: pointer; }
           <span class="toggle-thumb"></span>
         </label>
       </div>
+    </div>
+  </div>
+
+  <!-- ── Dev panel (hidden – tap Meny to open) ── -->
+  <div class="dev-backdrop" id="devBackdrop" onclick="closeDevPanel()">
+    <div class="dev-sheet" onclick="event.stopPropagation()">
+      <div class="dev-handle"></div>
+      <div class="dev-title">⚙ Demo-funksjoner</div>
+      <button class="dev-btn" onclick="closeDevPanel(); setTimeout(simulateTidsstyringLogoff, 350)">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" style="flex-shrink:0">
+          <path d="M9 1.5a7.5 7.5 0 1 0 0 15 7.5 7.5 0 0 0 0-15zm0 3v5.25l3 1.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+        Simuler: Tidsstyring logger av
+      </button>
+      <button class="dev-btn" onclick="closeDevPanel(); setTimeout(resetPrototype, 350)">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" style="flex-shrink:0">
+          <path d="M2 9a7 7 0 1 0 1.5-4.3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+          <path d="M2 3.5V9h5.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+        Nullstill prototype
+      </button>
     </div>
   </div>
 
@@ -943,6 +1062,11 @@ label.toggle-wrap { cursor: pointer; }
 
   /* ── Jobbprofil toggle ── */
   function onJobToggle(cb) {
+    // Clear auto-logoff visual state
+    autoLoggedOff = false;
+    const dot = document.getElementById('jp-dot');
+    dot.style.background = '';
+
     if (cb.checked) {
       const currentlyEnabled = queues.map((_, i) =>
         document.getElementById(`queue-toggle-${i}`).checked
@@ -1002,7 +1126,7 @@ label.toggle-wrap { cursor: pointer; }
     const dot     = document.getElementById('jp-dot');
     const statusEl = document.getElementById('job-status');
     if (!jobOn) {
-      statusEl.textContent = 'Avlogget';
+      statusEl.textContent = 'Logget av';
       dot.style.display = 'none';
       return;
     }
@@ -1062,19 +1186,21 @@ label.toggle-wrap { cursor: pointer; }
     const link    = document.getElementById('tids-link');
     const togWrap = document.getElementById('tids-toggle-wrap');
     const togTids = document.getElementById('tog-tids');
-    const chevron = document.getElementById('tids-chevron');
+    const btn     = document.getElementById('tids-btn');
     let s = null;
     try { s = JSON.parse(localStorage.getItem('mbn_tidsstyring')); } catch(e) {}
 
     if (s && s.active) {
       const paused = !!s.paused;
+      // Active state: show subtitle + toggle, hide "Aktiver" button
+      btn.style.display     = 'none';
       togWrap.style.display = '';
-      chevron.style.display = 'none';
-      togTids.checked = !paused;
-      link.style.display = 'inline-flex';
+      togTids.checked       = !paused;
+      link.style.display    = 'inline-flex';
+      sub.style.display     = '';
 
       if (paused) {
-        sub.textContent = 'Slått av';
+        sub.textContent = 'Pauset';
       } else {
         const sched = (s.schedules && s.schedules[0]) || s;
         sub.textContent = buildTidsstyringSubtext(sched);
@@ -1086,10 +1212,11 @@ label.toggle-wrap { cursor: pointer; }
         }
       }
     } else {
+      // Not activated: show "Aktiver" pill, hide everything else
+      btn.style.display     = '';
       togWrap.style.display = 'none';
-      chevron.style.display = '';
-      sub.textContent = 'Aktiver for å tidsstyre jobbprofil';
-      link.style.display = 'none';
+      sub.style.display     = 'none';
+      link.style.display    = 'none';
     }
   }
 
@@ -1099,6 +1226,12 @@ label.toggle-wrap { cursor: pointer; }
     if (!s) return;
     s.paused = !cb.checked;
     localStorage.setItem('mbn_tidsstyring', JSON.stringify(s));
+    // Manually pausing: clear auto-logoff state → show plain "Logget av"
+    if (!cb.checked) {
+      autoLoggedOff = false;
+      document.getElementById('jp-dot').style.background = '';
+      updateJobStatus();
+    }
     applyTidsstyringState();
   }
 
@@ -1112,12 +1245,107 @@ label.toggle-wrap { cursor: pointer; }
 
   /* ── Tab switching ── */
   function switchTab(el) {
+    if (el.getAttribute('aria-label') === 'Meny') {
+      openDevPanel();
+      return; // keep Jobbprofil as active tab
+    }
     document.querySelectorAll('.tab').forEach(t => {
       t.classList.remove('active');
       t.removeAttribute('aria-selected');
     });
     el.classList.add('active');
     el.setAttribute('aria-selected', 'true');
+  }
+
+  /* ── Dev panel ── */
+  function openDevPanel()  { document.getElementById('devBackdrop').classList.add('open'); }
+  function closeDevPanel() { document.getElementById('devBackdrop').classList.remove('open'); }
+
+  /* ── Reset prototype ── */
+  function resetPrototype() {
+    // Clear all localStorage keys used by the prototype
+    localStorage.removeItem('mbn_tidsstyring');
+    localStorage.removeItem('mbn_jobbprofil_last_state');
+    localStorage.removeItem('mbn_queue_sms_prefs');
+    localStorage.removeItem('mbn_job_badge');
+    sessionStorage.clear();
+    // Reload to a clean state
+    location.href = 'index.html?v=' + Date.now();
+  }
+
+  /* ── Tidsstyring auto-logoff simulation ── */
+  let autoLoggedOff = false;
+
+  function simulateTidsstyringLogoff() {
+    // Show iOS notification banner
+    document.getElementById('iosNotifBanner').classList.add('show');
+    // Apply the post-logout state shortly after (notification still visible)
+    setTimeout(applyAutoLogoffState, 700);
+    // Dismiss notification after 5.5 s
+    setTimeout(() => document.getElementById('iosNotifBanner').classList.remove('show'), 5500);
+  }
+
+  function applyAutoLogoffState() {
+    autoLoggedOff = true;
+
+    // Turn off job toggle (no side-effects – we set state directly)
+    document.getElementById('tog-job').checked = false;
+
+    // Turn off all queues
+    queues.forEach((q, i) => {
+      document.getElementById(`queue-toggle-${i}`).checked = false;
+      q.smsEnabled = false;
+      updateQueueMeta(i);
+    });
+
+    // Reset display number
+    selectedNumIdx = 0;
+    document.getElementById('numDisplay').textContent = numList[0];
+    document.getElementById('numExternalStatus').style.display = 'none';
+    externalOnly = false;
+
+    // Show grey dot + "Logget av automatisk"
+    const dot = document.getElementById('jp-dot');
+    dot.style.display    = 'block';
+    dot.style.background = '#7C88AB';
+    document.getElementById('job-status').textContent = 'Logget av automatisk';
+
+    updateJobBadge();
+    updateTidsstyringAutoLogoffText();
+  }
+
+  function updateTidsstyringAutoLogoffText() {
+    let s = null;
+    try { s = JSON.parse(localStorage.getItem('mbn_tidsstyring')); } catch(e) {}
+
+    const sub     = document.getElementById('tids-sub');
+    const link    = document.getElementById('tids-link');
+    const togWrap = document.getElementById('tids-toggle-wrap');
+    const togTids = document.getElementById('tog-tids');
+    const btn     = document.getElementById('tids-btn');
+
+    if (!s || !s.active) {
+      // No tidsstyring — just ensure the Aktiver button is shown
+      return;
+    }
+
+    btn.style.display     = 'none';
+    togWrap.style.display = '';
+    togTids.checked       = true;
+    link.style.display    = 'inline-flex';
+    sub.style.display     = '';
+
+    const sched     = (s.schedules && s.schedules[0]) || s;
+    const dagNavn   = ['mandag','tirsdag','onsdag','torsdag','fredag','lørdag','søndag'];
+    const startTime = sched.startTime || '08:00';
+    const days      = (sched.days && sched.days.length) ? sched.days : [0,1,2,3,4];
+    const jsDay     = new Date().getDay();
+    const today     = (jsDay + 6) % 7;
+    const sorted    = [...days].sort((a, b) => a - b);
+    let next        = sorted.find(d => d > today);
+    if (next === undefined) next = sorted[0];
+
+    sub.textContent = `Logger på ${dagNavn[next]} ${startTime}`;
   }
 
   /* ── Queue bottom sheet ── */
