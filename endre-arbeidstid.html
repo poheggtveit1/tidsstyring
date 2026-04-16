@@ -79,6 +79,8 @@
   .row-label { font-size: 14px; font-weight: 300; color: var(--text); }
   .row-sub { font-size: 12px; font-weight: 300; color: var(--muted); margin-top: 2px; }
   #queueCard .row-label strong { font-weight: 400; }
+  .row.no-tap { cursor: default; }
+  .row.no-tap:active { opacity: 1; }
   .row-link { font-size: 14px; color: var(--blue); font-weight: 300; margin-left: 8px; flex-shrink: 0; }
   .row-chevron { margin-left: 6px; flex-shrink: 0; }
 
@@ -94,12 +96,12 @@
   /* Delete button */
   .delete-btn {
     display: block; width: 100%;
-    padding: 0; height: 40px; background: #FFEAEA;
-    border: none; border-radius: 50px;
-    color: #5C0000; font-size: 16px; font-weight: 500;
+    padding: 12px 0; background: none;
+    border: none;
+    color: #C70505; font-size: 16px; font-weight: 500;
     text-align: center; cursor: pointer; font-family: inherit;
   }
-  .delete-btn:active { opacity: .7; }
+  .delete-btn:active { opacity: .6; }
 
   /* Tab bar */
   .tab-bar { flex-shrink: 0; background: #fff; border-top: 1px solid rgba(79,90,125,.1); padding-top: 4px; }
@@ -128,7 +130,7 @@
     animation: slideUp .25s ease;
   }
   @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-  .sheet-handle { width: 36px; height: 5px; background: #4F5A7D; border-radius: 100px; margin: 8px auto 0; flex-shrink: 0; }
+  .sheet-handle { width: 36px; height: 4px; background: #4F5A7D; border-radius: 100px; margin: 8px auto; flex-shrink: 0; }
 
   .sheet-header {
     display: flex; align-items: center; justify-content: space-between;
@@ -216,7 +218,7 @@
   .dialog-backdrop.open { display: flex; }
   .dialog {
     width: 100%; background: #fff; border-radius: 20px 20px 0 0;
-    padding: 12px 0 0; animation: slideUp .25s ease;
+    padding: 12px 0 24px; animation: slideUp .25s ease;
   }
   .dialog-title { font-size: 16px; font-weight: 700; color: var(--navy); padding: 4px 20px 8px; line-height: 1.35; text-align: center; }
   .dialog-body { font-size: 14px; font-weight: 300; color: var(--muted); line-height: 1.5; padding: 0 20px 20px; text-align: center; }
@@ -248,12 +250,9 @@
   </div>
 
   <div class="nav-bar">
-    <div class="nav-action" onclick="cancel()" style="display:flex;align-items:center;gap:4px">
-      <svg width="9" height="15" viewBox="0 0 9 15" fill="none"><path d="M8 1L1 7.5L8 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      Tilbake
-    </div>
+    <div class="nav-action" onclick="cancel()">Avbryt</div>
     <div class="nav-title">Endre arbeidstid</div>
-    <div class="nav-action right" style="visibility:hidden">Lagre</div>
+    <div class="nav-action right active" onclick="save()">Lagre</div>
   </div>
 
   <div class="content">
@@ -352,56 +351,15 @@
       </div>
       <div class="num-list">
         <div id="numOptions"></div>
-        <div id="numExternalRow" style="display:flex;align-items:center;padding:8px 0;">
-          <span class="num-row-label" style="flex:1">Bruk kun for eksterne samtaler</span>
-          <label class="toggle" onclick="event.stopPropagation()">
-            <input type="checkbox" id="numExternalCheck"/>
-            <div class="toggle-track"></div>
-          </label>
-        </div>
+      </div>
+      <div id="numExternalRow" style="display:flex;align-items:center;padding:12px 0;">
+        <span class="num-row-label" style="flex:1">Bruk kun for eksterne samtaler</span>
+        <label class="toggle" onclick="event.stopPropagation()">
+          <input type="checkbox" id="numExternalCheck"/>
+          <div class="toggle-track"></div>
+        </label>
       </div>
       <button class="sheet-btn" onclick="confirmNum()">Lagre</button>
-    </div>
-  </div>
-
-  <!-- ── Queue status sheet ── -->
-  <div class="sheet-backdrop" id="queueSheetBackdrop" onclick="onQueueBackdrop(event)">
-    <div class="sheet">
-      <div class="sheet-handle"></div>
-      <div class="sheet-header">
-        <div>
-          <div class="sheet-title">Køstatus ved oppstart</div>
-          <div class="sheet-subtitle" id="queueSheetSub"></div>
-        </div>
-        <div class="sheet-close" onclick="closeQueueSheet()">
-          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 1 9 9M9 1 1 9" stroke="#293351" stroke-width="2" stroke-linecap="round"/></svg>
-        </div>
-      </div>
-      <div class="num-list">
-        <div class="num-row" id="qr0" onclick="selectQueueOpt(0)">
-          <div class="num-row-label">
-            <div>Ingen endring</div>
-            <div class="row-sub">Beholder eksisterende status</div>
-          </div>
-          <div class="num-radio" id="qrc0"></div>
-        </div>
-        <div class="num-row" id="qr1" onclick="selectQueueOpt(1)">
-          <span class="num-row-label">Logg på</span>
-          <div class="num-radio" id="qrc1"></div>
-        </div>
-        <div class="num-row" id="qr2" onclick="selectQueueOpt(2)">
-          <span class="num-row-label">Logg av</span>
-          <div class="num-radio" id="qrc2"></div>
-        </div>
-        <div class="sms-row">
-          <span class="sms-label">SMS-varsling</span>
-          <label class="toggle" onclick="event.stopPropagation()">
-            <input type="checkbox" id="queueSmsToggle"/>
-            <div class="toggle-track"></div>
-          </label>
-        </div>
-      </div>
-      <button class="sheet-btn" onclick="confirmQueueSheet()">Lagre</button>
     </div>
   </div>
 
@@ -410,9 +368,9 @@
     <div class="dialog">
       <div class="sheet-handle"></div>
       <div class="dialog-title">Slette arbeidstid?</div>
-      <div class="dialog-body">Tidsstyringen deaktiveres og alle innstillinger fjernes. Dette kan ikke angres.</div>
-      <button class="dialog-btn-red" onclick="confirmDelete()">Slett arbeidstid</button>
+      <div class="dialog-body">Arbeidstiden og tilhørende innstillinger fjernes permanent.</div>
       <button class="dialog-btn-grey" onclick="closeDeleteDialog()">Avbryt</button>
+      <button class="dialog-btn-red" onclick="confirmDelete()">Slett arbeidstid</button>
     </div>
   </div>
 </div>
@@ -425,9 +383,6 @@
     'Test2 (12 34 56 78)',
     'Test3 (876 54 321)'
   ];
-  const IDX_STATUS  = ['ingen', 'pa', 'av'];
-  const STATUS_LABEL = { ingen: 'Ingen endring', pa: 'Logg på', av: 'Logg av' };
-
   /* ─── State ─── */
   let state = {
     startTime: '08:00', endTime: '16:00', dayLabel: 'Alle hverdager',
@@ -439,7 +394,6 @@
     ]
   };
 
-  let activeQueueIdx = -1;
   let selectedNumIdx = 0;
 
   let scheduleIdx = 0;
@@ -494,19 +448,26 @@
   /* ─── Render queues ─── */
   function renderQueueCard() {
     document.getElementById('queueCard').innerHTML = state.queues.map((q, i) => {
+      const checked = (q.status === 'pa' || q.enabled) ? 'checked' : '';
+      const label   = q.name.replace(/^(.+?)(\s+\(.+\))$/, '<strong>$1</strong>$2');
       return `
-        <div class="row" onclick="openQueueSheet(${i})">
+        <div class="row no-tap">
           <div class="row-body">
-            <div class="row-label">${q.name.replace(/^(.+?)(\s+\(.+\))$/, '<strong>$1</strong>$2')}</div>
-            <div class="row-sub">${STATUS_LABEL[q.status]}</div>
-            ${q.sms ? `<div class="row-sub">SMS-varsling</div>` : ''}
+            <div class="row-label">${label}</div>
           </div>
-          <svg class="row-chevron" width="7" height="13" viewBox="0 0 7 13" fill="none">
-            <path d="M1 1 6 6.5 1 12" stroke="#1020F9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          <label class="toggle" onclick="event.stopPropagation()">
+            <input type="checkbox" id="qtog-${i}" onchange="toggleQueue(${i}, this)" ${checked}>
+            <div class="toggle-track"></div>
+          </label>
         </div>
       `;
     }).join('');
+  }
+
+  function toggleQueue(idx, el) {
+    state.queues[idx].status = el.checked ? 'pa' : 'ingen';
+    state.queues[idx].sms    = el.checked;
+    persistState();
   }
 
   /* ─── Tidspunkt navigation ─── */
@@ -589,46 +550,6 @@
       document.getElementById('numSheetBackdrop').classList.remove('open');
   }
 
-  /* ─── Queue sheet ─── */
-  function openQueueSheet(idx) {
-    activeQueueIdx = idx;
-    const q = state.queues[idx];
-    document.getElementById('queueSheetSub').textContent = q.name;
-    const si = IDX_STATUS.indexOf(q.status);
-    const smsToggle = document.getElementById('queueSmsToggle');
-    smsToggle.checked  = q.sms;
-    smsToggle.disabled = (si === 0); // Ingen endring → deaktivert
-    [0,1,2].forEach(i => {
-      document.getElementById('qr'  + i).className = 'num-row' + (i === si ? ' sel' : '');
-      document.getElementById('qrc' + i).className = 'num-radio' + (i === si ? ' sel' : '');
-    });
-    document.getElementById('queueSheetBackdrop').classList.add('open');
-  }
-
-  function selectQueueOpt(idx) {
-    [0,1,2].forEach(i => {
-      document.getElementById('qr'  + i).className = 'num-row' + (i === idx ? ' sel' : '');
-      document.getElementById('qrc' + i).className = 'num-radio' + (i === idx ? ' sel' : '');
-    });
-    // SMS følger køvalg: Logg på → på, Logg av → av, Ingen endring → av + deaktivert
-    const smsToggle = document.getElementById('queueSmsToggle');
-    smsToggle.checked  = (idx === 1);
-    smsToggle.disabled = (idx === 0);
-  }
-
-  function confirmQueueSheet() {
-    let si = 0;
-    for (let i = 0; i < 3; i++) { if (document.getElementById('qrc'+i).classList.contains('sel')) { si = i; break; } }
-    state.queues[activeQueueIdx].status = IDX_STATUS[si];
-    state.queues[activeQueueIdx].sms    = document.getElementById('queueSmsToggle').checked;
-    renderQueueCard();
-    document.getElementById('queueSheetBackdrop').classList.remove('open');
-    persistState();
-  }
-
-  function closeQueueSheet() { document.getElementById('queueSheetBackdrop').classList.remove('open'); }
-  function onQueueBackdrop(e) { if (e.target === document.getElementById('queueSheetBackdrop')) closeQueueSheet(); }
-
   /* ─── Delete ─── */
   function openDeleteDialog()  { document.getElementById('deleteBackdrop').classList.add('open'); }
   function closeDeleteDialog() { document.getElementById('deleteBackdrop').classList.remove('open'); }
@@ -645,6 +566,7 @@
 
   /* ─── Nav ─── */
   function cancel() { window.location.href = 'tidsstyring-detaljer.html'; }
+  function save()   { persistState(); window.location.href = 'tidsstyring-detaljer.html'; }
 
   /* Restore Jobbprofil badge from localStorage */
   (function() {
