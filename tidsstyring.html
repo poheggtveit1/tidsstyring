@@ -633,35 +633,29 @@ body {
 
       <div>
         <div class="option-row" id="queueList">
-          <div class="option-item">
+          <div class="option-item" id="queueRow0" onclick="openQueueSheet(0)">
             <div class="option-text">
               <div class="option-main"><strong>Administrasjon</strong> (123 45 678)</div>
+              <div class="option-sub" id="queueSub0">Logg på</div>
+              <div class="option-sms on" id="queueSms0">MBN SMS-varsling</div>
             </div>
-            <label class="toggle-wrap" onclick="event.stopPropagation()">
-              <input type="checkbox" id="queue0-tog" checked>
-              <span class="toggle-track"></span>
-              <span class="toggle-thumb"></span>
-            </label>
+            <svg width="7" height="13" viewBox="0 0 7 13" fill="none"><path d="M1 1 6 6.5 1 12" stroke="#1020F9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
-          <div class="option-item">
+          <div class="option-item" id="queueRow1" onclick="openQueueSheet(1)">
             <div class="option-text">
               <div class="option-main"><strong>Support</strong> (444 44 444)</div>
+              <div class="option-sub" id="queueSub1">Logg på</div>
+              <div class="option-sms on" id="queueSms1">MBN SMS-varsling</div>
             </div>
-            <label class="toggle-wrap" onclick="event.stopPropagation()">
-              <input type="checkbox" id="queue1-tog" checked>
-              <span class="toggle-track"></span>
-              <span class="toggle-thumb"></span>
-            </label>
+            <svg width="7" height="13" viewBox="0 0 7 13" fill="none"><path d="M1 1 6 6.5 1 12" stroke="#1020F9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
-          <div class="option-item">
+          <div class="option-item" id="queueRow2" onclick="openQueueSheet(2)">
             <div class="option-text">
               <div class="option-main"><strong>Verksted</strong> (12 34 56 78)</div>
+              <div class="option-sub" id="queueSub2">Logg på</div>
+              <div class="option-sms on" id="queueSms2">MBN SMS-varsling</div>
             </div>
-            <label class="toggle-wrap" onclick="event.stopPropagation()">
-              <input type="checkbox" id="queue2-tog">
-              <span class="toggle-track"></span>
-              <span class="toggle-thumb"></span>
-            </label>
+            <svg width="7" height="13" viewBox="0 0 7 13" fill="none"><path d="M1 1 6 6.5 1 12" stroke="#1020F9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
         </div>
       </div>
@@ -696,22 +690,22 @@ body {
       </div>
 
       <div class="step-heading">
-        <div class="step-title">Hvordan vil du logge på og av?</div>
-        <div class="step-desc">Velg hvordan appen bruker arbeidstiden din</div>
+        <div class="step-title">Vil du logges på og av automatisk, eller gjøre det selv?</div>
+        <div class="step-desc">Innstillingen gjelder hver gang en arbeidstid starter og slutter</div>
       </div>
 
       <div class="radio-group">
         <div class="radio-item selected" onclick="selectRadio(this, 'login')">
           <div class="radio-text">
             <div class="radio-label">Automatisk</div>
-            <div class="radio-desc">Du blir automatisk logget på og av når arbeidstiden starter og slutter</div>
+            <div class="radio-desc">Du logges på og av når arbeidstiden starter og slutter</div>
           </div>
           <div class="radio-circle"></div>
         </div>
         <div class="radio-item" onclick="selectRadio(this, 'login')">
           <div class="radio-text">
-            <div class="radio-label">Via påminnelse</div>
-            <div class="radio-desc">Du får en påminnelse 10 minutter før arbeidstiden starter og slutter, og logger selv på og av</div>
+            <div class="radio-label">Logg på selv</div>
+            <div class="radio-desc">Du får en påminnelse 10 minutter før arbeidstiden starter og slutter</div>
           </div>
           <div class="radio-circle"></div>
         </div>
@@ -780,6 +774,46 @@ body {
     </div>
   </div>
 
+  <!-- ── Queue settings bottom sheet ── -->
+  <div class="overlay" id="queueOverlay" onclick="closeQueueSheet()">
+    <div class="sheet" onclick="event.stopPropagation()">
+      <div class="sheet-handle"></div>
+      <div class="sheet-heading">
+        <div class="sheet-title-block">
+          <div class="sheet-title" id="queueSheetTitle"></div>
+        </div>
+        <button class="sheet-close" onclick="closeQueueSheet()">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+      <div class="option-row">
+        <div class="option-item" style="padding:14px 16px;">
+          <div class="option-text">
+            <div style="font-size:14px;color:var(--text);">Logg på ved oppstart</div>
+          </div>
+          <label class="toggle-wrap" onclick="event.stopPropagation()">
+            <input type="checkbox" id="queueSheetLoginToggle" onchange="onQueueLoginToggle()">
+            <span class="toggle-track"></span>
+            <span class="toggle-thumb"></span>
+          </label>
+        </div>
+        <div class="option-item" style="padding:14px 16px;">
+          <div class="option-text">
+            <div style="font-size:14px;color:var(--text);">MBN SMS-varsling</div>
+          </div>
+          <label class="toggle-wrap" onclick="event.stopPropagation()">
+            <input type="checkbox" id="queueSheetSmsToggle">
+            <span class="toggle-track"></span>
+            <span class="toggle-thumb"></span>
+          </label>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="saveQueueSheet()">Lagre</button>
+    </div>
+  </div>
+
 </div><!-- /phone -->
 
 <script>
@@ -807,9 +841,9 @@ let displayNumbers = [
   { label: 'Skjult nummer',                  selected: false, externalOnly: false },
 ];
 let queueStates = [
-  { name: 'Administrasjon', number: '(123 45 678)' },
-  { name: 'Support',        number: '(444 44 444)' },
-  { name: 'Verksted',       number: '(12 34 56 78)' },
+  { name: 'Administrasjon', number: '(123 45 678)', enabled: true, sms: true },
+  { name: 'Support',        number: '(444 44 444)', enabled: true, sms: true },
+  { name: 'Verksted',       number: '(12 34 56 78)', enabled: true, sms: true },
 ];
 
 /* ── Navigation ── */
@@ -839,10 +873,11 @@ function goConfirm() {
   else if (JSON.stringify(days) === JSON.stringify([5,6]))           dayLabel = 'helg';
   else dayLabel = days.map(i => dayFull[i]).join(', ');
 
-  const queues = queueStates.map((q, i) => ({
+  const queues = queueStates.map(q => ({
     name:    q.name,
     number:  q.number,
-    enabled: document.getElementById(`queue${i}-tog`)?.checked ?? true,
+    enabled: q.enabled,
+    sms:     q.sms,
   }));
 
   const settings = {
@@ -956,6 +991,39 @@ function closeSheet() {
   document.getElementById('sheetSmsRow').style.display = 'none';
   document.getElementById('sheetExternalRow').style.display = 'none';
   document.getElementById('sheetConfirmBtn').textContent = 'Lagre';
+}
+
+/* ── Queue settings sheet ── */
+function openQueueSheet(idx) {
+  activeQueueIdx = idx;
+  const q = queueStates[idx];
+  document.getElementById('queueSheetTitle').textContent = q.name;
+  document.getElementById('queueSheetLoginToggle').checked = q.enabled;
+  document.getElementById('queueSheetSmsToggle').checked   = q.sms;
+  document.getElementById('queueOverlay').classList.add('open');
+}
+
+function closeQueueSheet() {
+  document.getElementById('queueOverlay').classList.remove('open');
+}
+
+function onQueueLoginToggle() {
+  // Auto-enable SMS when "Logg på ved oppstart" is turned ON
+  if (document.getElementById('queueSheetLoginToggle').checked) {
+    document.getElementById('queueSheetSmsToggle').checked = true;
+  }
+}
+
+function saveQueueSheet() {
+  const idx = activeQueueIdx;
+  queueStates[idx].enabled = document.getElementById('queueSheetLoginToggle').checked;
+  queueStates[idx].sms     = document.getElementById('queueSheetSmsToggle').checked;
+  // Update sub-label
+  document.getElementById(`queueSub${idx}`).textContent =
+    queueStates[idx].enabled ? 'Logg på' : 'Logg av';
+  // Show/hide SMS label
+  document.getElementById(`queueSms${idx}`).classList.toggle('on', queueStates[idx].sms);
+  closeQueueSheet();
 }
 </script>
 </body>

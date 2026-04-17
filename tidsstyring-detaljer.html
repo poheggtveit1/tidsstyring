@@ -506,6 +506,7 @@
           <span class="add-label">Legg til arbeidstid</span>
         </div>
       </div>
+
     </div>
 
     <!-- Innstillinger section -->
@@ -584,7 +585,7 @@
       <div class="sheet-handle"></div>
 
       <div class="sheet-header">
-        <div class="sheet-title">Hvordan vil du logge på og av?</div>
+        <div class="sheet-title">Vil du logges på og av automatisk, eller gjøre det selv?</div>
         <button class="sheet-close-btn" onclick="closeLoginSheet({target:document.getElementById('loginSheetBackdrop')})">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
             <path d="M1 1l12 12M13 1L1 13" stroke="#000A2E" stroke-width="1.8" stroke-linecap="round"/>
@@ -596,14 +597,14 @@
         <div class="login-option selected" id="loginOption0" onclick="selectLoginMode(0)">
           <div class="login-option-text">
             <div class="login-option-label">Automatisk</div>
-            <div class="login-option-desc">Du blir automatisk logget på og av når arbeidstiden starter og slutter</div>
+            <div class="login-option-desc">Du logges på og av når arbeidstiden starter og slutter</div>
           </div>
           <div class="login-radio" id="loginRadio0"></div>
         </div>
         <div class="login-option" id="loginOption1" onclick="selectLoginMode(1)">
           <div class="login-option-text">
-            <div class="login-option-label">Via påminnelse</div>
-            <div class="login-option-desc">Du får en påminnelse 10 minutter før arbeidstiden starter og slutter, og logger selv på og av</div>
+            <div class="login-option-label">Logger på selv</div>
+            <div class="login-option-desc">Du får en påminnelse 10 minutter før arbeidstiden starter og slutter</div>
           </div>
           <div class="login-radio" id="loginRadio1"></div>
         </div>
@@ -707,7 +708,7 @@
     const lm = savedState.loginMode || 'auto';
     if (lm === 'reminder' || lm === 'manual') {
       selectedLoginMode = 1;
-      document.getElementById('loginValue').textContent = 'Via påminnelse';
+      document.getElementById('loginValue').textContent = 'Logger på selv';
     } else {
       selectedLoginMode = 0;
       document.getElementById('loginValue').textContent = 'Automatisk';
@@ -792,7 +793,7 @@
   function confirmLoginMode() {
     const isReminder = selectedLoginMode === 1;
     savedState.loginMode = isReminder ? 'reminder' : 'auto';
-    document.getElementById('loginValue').textContent = isReminder ? 'Via påminnelse' : 'Automatisk';
+    document.getElementById('loginValue').textContent = isReminder ? 'Logger på selv' : 'Automatisk';
     localStorage.setItem('mbn_tidsstyring', JSON.stringify(savedState));
     document.getElementById('loginSheetBackdrop').classList.remove('open');
     updateNotifRowVisibility();
