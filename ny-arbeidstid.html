@@ -145,6 +145,7 @@
     <div class="nav-title">Ny arbeidstid</div>
     <div class="nav-action right" onclick="saveAndBack()">Lagre</div>
   </div>
+  <div id="validationError" style="display:none;background:#FEE2E2;color:#B91C1C;font-size:13px;padding:10px 16px;border-bottom:1px solid #FECACA;"></div>
 
   <div class="content">
 
@@ -166,6 +167,7 @@
 
     <div class="section">
       <div class="section-label">Visningsnummer</div>
+      <div class="section-desc">Velg aktivt visningsnummer i perioden</div>
       <div class="card">
         <div class="row" onclick="openNumSheet()">
           <div class="row-body">
@@ -181,8 +183,8 @@
     </div>
 
     <div class="section">
-      <div class="section-label">Køstatus ved oppstart</div>
-      <div class="section-desc">Settes automatisk når arbeidstiden starter</div>
+      <div class="section-label">Velg køer</div>
+      <div class="section-desc">Velg køer du ønsker å være pålogget i perioden. Køer som ikke velges vil ikke endre pålogging i perioden.</div>
       <div class="queue-cards-list" id="queueCardsContainer"></div>
     </div>
 
@@ -407,10 +409,51 @@
 
 
   function cancel() { window.location.href = 'tidsstyring-detaljer.html'; }
+  function labelToDays(label) {
+    if (label === 'Alle hverdager') return [1,2,3,4,5];
+    if (label === 'Alle dager')     return [0,1,2,3,4,5,6];
+    if (label === 'Helg')           return [0,6];
+    const map = { 'Man':1,'Tir':2,'Ons':3,'Tor':4,'Fre':5,'Lør':6,'Søn':0 };
+    return label.split(', ').map(n => map[n]).filter(d => d !== undefined);
+  }
+
+  function periodsOverlap(a, b) {
+    const aDays = new Set(labelToDays(a.dayLabel));
+    const bDays = new Set(labelToDays(b.dayLabel));
+    const sharedDay = [...aDays].some(d => bDays.has(d));
+    if (!sharedDay) return false;
+    return Math.max(a.startTime, b.startTime) < Math.min(a.endTime, b.endTime);
+  }
+
+  function showValidationError(msg) {
+    let el = document.getElementById('validationError');
+    if (!el) return;
+    el.textContent = msg;
+    el.style.display = 'block';
+  }
+
   function saveAndBack() {
+    const errorEl = document.getElementById('validationError');
+    if (errorEl) errorEl.style.display = 'none';
+
+    if (state.endTime <= state.startTime) {
+      showValidationError('Sluttid må være senere enn starttid.');
+      return;
+    }
+
     try {
       const ts = JSON.parse(localStorage.getItem('mbn_tidsstyring')) || {};
       if (!ts.schedules) ts.schedules = [];
+      const newPeriod = {
+        startTime:    state.startTime,
+        endTime:      state.endTime,
+        dayLabel:     state.dayLabel
+      };
+      const conflict = ts.schedules.some(s => periodsOverlap(newPeriod, s));
+      if (conflict) {
+        showValidationError('Tidsperioden overlapper med en eksisterende periode på samme dag.');
+        return;
+      }
       ts.schedules.push({
         startTime:    state.startTime,
         endTime:      state.endTime,

@@ -691,7 +691,7 @@ label.toggle-wrap { cursor: pointer; }
             <div class="jp-status" id="job-status">Logget av</div>
           </div>
         </div>
-        <label class="toggle-wrap" onclick="event.stopPropagation()">
+        <label class="toggle-wrap" onclick="event.stopPropagation()" style="margin-right:16px">
           <input type="checkbox" id="tog-job" onchange="onJobToggle(this)">
           <span class="toggle-track"></span>
           <span class="toggle-thumb"></span>
@@ -1043,7 +1043,7 @@ label.toggle-wrap { cursor: pointer; }
 
     queues.forEach((q, i) => {
       const saved      = state?.queues?.[i];
-      const enabled    = saved != null ? saved.enabled    : (i < 2);
+      const enabled    = saved != null ? saved.enabled    : false;
       const smsEnabled = saved != null ? saved.smsEnabled : false;
       document.getElementById(`queue-toggle-${i}`).checked = enabled;
       q.smsEnabled = smsEnabled;
@@ -1123,8 +1123,23 @@ label.toggle-wrap { cursor: pointer; }
   /* ── Job status text + green dot ── */
   function updateJobStatus() {
     const jobOn   = document.getElementById('tog-job').checked;
+    const tidsOn  = document.getElementById('tog-tids')?.checked;
     const dot     = document.getElementById('jp-dot');
     const statusEl = document.getElementById('job-status');
+
+    if (tidsOn) {
+      dot.style.display = 'block';
+      if (!jobOn) {
+        statusEl.textContent = 'Tidsstyrt: Avlogget';
+      } else {
+        const activeCount = queues.filter((_, i) =>
+          document.getElementById(`queue-toggle-${i}`).checked
+        ).length;
+        statusEl.textContent = `Tidsstyrt: Logget på ${activeCount} ${activeCount === 1 ? 'kø' : 'køer'}`;
+      }
+      return;
+    }
+
     if (!jobOn) {
       statusEl.textContent = 'Logget av';
       dot.style.display = 'none';
@@ -1200,7 +1215,7 @@ label.toggle-wrap { cursor: pointer; }
       sub.style.display     = '';
 
       if (paused) {
-        sub.textContent = 'Pauset';
+        sub.textContent = 'Av';
       } else {
         const sched = (s.schedules && s.schedules[0]) || s;
         sub.textContent = buildTidsstyringSubtext(sched);
@@ -1230,9 +1245,9 @@ label.toggle-wrap { cursor: pointer; }
     if (!cb.checked) {
       autoLoggedOff = false;
       document.getElementById('jp-dot').style.background = '';
-      updateJobStatus();
     }
     applyTidsstyringState();
+    updateJobStatus();
   }
 
   function onTidsstyring() {
