@@ -95,11 +95,6 @@
   .day-pill:active { opacity: .7; }
   .day-summary { font-size: 10px; font-weight: 300; color: var(--muted); }
 
-  .tab-bar { flex-shrink: 0; background: #fff; border-top: 1px solid var(--divider); height: 60px; display: flex; align-items: flex-start; padding-top: 6px; }
-  .tab { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; padding: 0 4px; }
-  .tab svg { opacity: .4; }
-  .tab.active svg { opacity: 1; }
-  .tab-label { font-size: 9px; font-weight: 500; color: var(--muted); }
   .tab.active .tab-label { color: var(--blue); }
   .home-indicator { flex-shrink: 0; height: 22px; display: flex; align-items: center; justify-content: center; background: #fff; }
   .home-bar { width: 120px; height: 4px; background: #000; border-radius: 2px; opacity: .18; }
@@ -164,13 +159,6 @@
 
   </div>
 
-  <div class="tab-bar">
-    <div class="tab"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="3" y="3" width="7" height="7" rx="2" fill="#293351"/><rect x="12" y="3" width="7" height="7" rx="2" fill="#293351"/><rect x="3" y="12" width="7" height="7" rx="2" fill="#293351"/><rect x="12" y="12" width="7" height="7" rx="2" fill="#293351"/></svg><span class="tab-label">Logg</span></div>
-    <div class="tab"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="10" cy="10" r="6" stroke="#293351" stroke-width="2"/><path d="M14.5 14.5 19 19" stroke="#293351" stroke-width="2" stroke-linecap="round"/></svg><span class="tab-label">Søk</span></div>
-    <div class="tab"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="2" y="4" width="18" height="14" rx="3" stroke="#293351" stroke-width="2"/><path d="M7 9h8M7 13h5" stroke="#293351" stroke-width="1.5" stroke-linecap="round"/></svg><span class="tab-label">Tastatur</span></div>
-    <div class="tab active"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="7" r="3.5" fill="#1020F9"/><path d="M4 18c0-3.866 3.134-7 7-7h0c3.866 0 7 3.134 7 7" stroke="#1020F9" stroke-width="2" stroke-linecap="round"/></svg><span class="tab-label" style="color:#1020F9">Jobbprofil</span></div>
-    <div class="tab"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M3 6h16M3 11h16M3 16h16" stroke="#293351" stroke-width="2" stroke-linecap="round"/></svg><span class="tab-label">Meny</span></div>
-  </div>
   <div class="home-indicator"><div class="home-bar"></div></div>
 </div>
 
