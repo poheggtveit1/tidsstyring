@@ -287,6 +287,7 @@
     <div class="nav-title">Endre arbeidstid</div>
     <div class="nav-action right active" onclick="save()">Lagre</div>
   </div>
+  <div id="validationError" style="display:none;background:#FEE2E2;color:#B91C1C;font-size:13px;padding:10px 16px;border-bottom:1px solid #FECACA;"></div>
 
   <div class="content">
 
@@ -629,7 +630,52 @@
 
   /* ─── Nav ─── */
   function cancel() { window.location.href = 'tidsstyring-detaljer.html'; }
-  function save()   { persistState(); window.location.href = 'tidsstyring-detaljer.html'; }
+  function labelToDays(label) {
+    if (label === 'Alle hverdager') return [1,2,3,4,5];
+    if (label === 'Alle dager')     return [0,1,2,3,4,5,6];
+    if (label === 'Helg')           return [0,6];
+    const map = { 'Man':1,'Tir':2,'Ons':3,'Tor':4,'Fre':5,'Lør':6,'Søn':0 };
+    return label.split(', ').map(n => map[n]).filter(d => d !== undefined);
+  }
+
+  function periodsOverlap(a, b) {
+    const aDays = new Set(labelToDays(a.dayLabel));
+    const bDays = new Set(labelToDays(b.dayLabel));
+    const sharedDay = [...aDays].some(d => bDays.has(d));
+    if (!sharedDay) return false;
+    return Math.max(a.startTime, b.startTime) < Math.min(a.endTime, b.endTime);
+  }
+
+  function showValidationError(msg) {
+    const el = document.getElementById('validationError');
+    if (!el) return;
+    el.textContent = msg;
+    el.style.display = 'block';
+  }
+
+  function save() {
+    const errorEl = document.getElementById('validationError');
+    if (errorEl) errorEl.style.display = 'none';
+
+    if (state.endTime <= state.startTime) {
+      showValidationError('Sluttid må være senere enn starttid.');
+      return;
+    }
+
+    try {
+      const ts = JSON.parse(localStorage.getItem('mbn_tidsstyring')) || {};
+      const schedules = ts.schedules || [];
+      const thisPeriod = { startTime: state.startTime, endTime: state.endTime, dayLabel: state.dayLabel };
+      const conflict = schedules.some((s, i) => i !== scheduleIdx && periodsOverlap(thisPeriod, s));
+      if (conflict) {
+        showValidationError('Tidsperioden overlapper med en eksisterende periode på samme dag.');
+        return;
+      }
+    } catch(e) {}
+
+    persistState();
+    window.location.href = 'tidsstyring-detaljer.html';
+  }
 
   /* Restore Jobbprofil badge from localStorage */
   (function() {

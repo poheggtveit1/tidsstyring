@@ -518,10 +518,10 @@ body {
 .step-intro { padding: 32px 24px 32px; gap: 28px; }
 .intro-illustration {
   display: flex; align-items: center; justify-content: center;
-  padding: 8px 0 4px;
+  padding: 4px 0 2px;
 }
 .intro-icon-bg {
-  width: 88px; height: 88px; border-radius: 50%;
+  width: 60px; height: 60px; border-radius: 50%;
   background: var(--blue-light);
   display: flex; align-items: center; justify-content: center;
 }
@@ -603,7 +603,7 @@ body {
       <!-- Illustration -->
       <div class="intro-illustration">
         <div class="intro-icon-bg">
-          <svg width="46" height="46" viewBox="0 0 46 46" fill="none">
+          <svg width="32" height="32" viewBox="0 0 46 46" fill="none">
             <!-- Clock face -->
             <circle cx="23" cy="26" r="13" stroke="#1020F9" stroke-width="2.4" fill="none"/>
             <path d="M23 20v6l4 3" stroke="#1020F9" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
@@ -617,8 +617,8 @@ body {
 
       <!-- Heading -->
       <div class="intro-heading">
-        <div class="intro-title">Automatiser jobbprofilen din</div>
-        <div class="intro-desc">Tidsstyringen logger på og av jobbprofilen din automatisk basert på tidsperiodene du setter opp.</div>
+        <div class="intro-title">Tidsstyr jobbprofilen din</div>
+        <div class="intro-desc">Tidsstyringen slår på og av jobbprofilen din automatisk basert på tidsperiodene du setter opp.</div>
       </div>
 
       <!-- Feature list -->
@@ -634,7 +634,7 @@ body {
           </div>
           <div class="intro-feature-text">
             <div class="intro-feature-title">Én eller flere tidsperioder</div>
-            <div class="intro-feature-desc">Legg til så mange perioder du trenger, f.eks. 08.00–11:30 og 12:00–16:00</div>
+            <div class="intro-feature-desc">Sett opp en eller flere tidsperioder i løpet av dagen der du ønsker å være pålogget kø og vise et annet nummer ved utgående anrop.</div>
           </div>
         </div>
 
@@ -646,8 +646,8 @@ body {
             </svg>
           </div>
           <div class="intro-feature-text">
-            <div class="intro-feature-title">Automatisk på og av</div>
-            <div class="intro-feature-desc">Jobbprofilen din logges på ved første periode, og av når siste periode er ferdig</div>
+            <div class="intro-feature-title">Jobbprofil på og av</div>
+            <div class="intro-feature-desc">Jobbprofil slås på ved starten av den første tidsperioden, og av ved slutten av den siste tidsperioden hver dag. Når Jobbprofil slås av vil du være avlogget alle køer.</div>
           </div>
         </div>
 
@@ -660,8 +660,8 @@ body {
             </svg>
           </div>
           <div class="intro-feature-text">
-            <div class="intro-feature-title">Køinnlogging</div>
-            <div class="intro-feature-desc">Velg hvilke køer du logges automatisk på og av ved periodens start og slutt</div>
+            <div class="intro-feature-title">Køpålogging</div>
+            <div class="intro-feature-desc">Du velger hvilke køer du vil være pålogget for hver tidsperiode. Køer du ikke velger å være pålogget vil ikke påvirkes av tidsstyringen i perioden.</div>
           </div>
         </div>
 
@@ -674,7 +674,7 @@ body {
           </div>
           <div class="intro-feature-text">
             <div class="intro-feature-title">Påminnelse</div>
-            <div class="intro-feature-desc">Få varsel 10 minutter før en periode starter og slutter</div>
+            <div class="intro-feature-desc">Du vil få varsel 10 minutter før en periode starter og slutter. Dette varselet kan du velge å slå av senere under innstillinger hvis du ikke ønsker det.</div>
           </div>
         </div>
 
@@ -801,8 +801,8 @@ body {
       </div>
 
       <div class="step-heading">
-        <div class="step-title">Hvilke køer vil du logge på?</div>
-        <div class="step-desc">Velg hvilke køer du automatisk logges på når tidsperioden starter</div>
+        <div class="step-title">Velg køer</div>
+        <div class="step-desc">Velg hvilke køer du vil være pålogget i tidsperioden.</div>
       </div>
 
       <div style="display:flex; flex-direction:column; gap:10px;">
@@ -874,8 +874,7 @@ body {
       </div>
 
       <div style="font-size:14px; font-weight:300; color:var(--muted); line-height:1.55;">
-        <strong style="font-weight:500; color:var(--text);">Etter tidsperiode skjer dette automatisk:</strong><br>
-        Alle køer logges av, MBN SMS-varsling slås av, visningsnummer tilbakestilles til ditt nummer.
+        Ved slutten av tidsperioden logges du av de valgte køene, MBN SMS-varsling slås av og visningsnummer tilbakestilles til ditt nummer. Køer du ikke har valgt vil være upåvirket av tidsstyringen i perioden.
       </div>
 
       <div class="btn-group">
