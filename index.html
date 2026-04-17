@@ -764,8 +764,8 @@ label.toggle-wrap { cursor: pointer; }
             <div class="queue-text">
               <div class="queue-name">Administrasjon <span class="queue-num">(123 45 678)</span></div>
               <div class="queue-meta" id="queue-meta-0">
-                <span>1/4 operatører</span>
-                <span>SMS-varsling av</span>
+                <span>0/4 operatører</span>
+                <span>MBN SMS-varsling av</span>
               </div>
             </div>
             <label class="toggle-wrap" onclick="event.stopPropagation()">
@@ -791,8 +791,8 @@ label.toggle-wrap { cursor: pointer; }
             <div class="queue-text">
               <div class="queue-name">Support <span class="queue-num">(444 44 444)</span></div>
               <div class="queue-meta" id="queue-meta-1">
-                <span>1/4 operatører</span>
-                <span>SMS-varsling av</span>
+                <span>0/4 operatører</span>
+                <span>MBN SMS-varsling av</span>
               </div>
             </div>
             <label class="toggle-wrap" onclick="event.stopPropagation()">
@@ -818,8 +818,8 @@ label.toggle-wrap { cursor: pointer; }
             <div class="queue-text">
               <div class="queue-name">Verksted <span class="queue-num">(12 34 56 78)</span></div>
               <div class="queue-meta" id="queue-meta-2">
-                <span>1/4 operatører</span>
-                <span>SMS-varsling av</span>
+                <span>0/4 operatører</span>
+                <span>MBN SMS-varsling av</span>
               </div>
             </div>
             <label class="toggle-wrap" onclick="event.stopPropagation()">
@@ -972,7 +972,7 @@ label.toggle-wrap { cursor: pointer; }
         </div>
       </div>
       <div class="q-sms-row">
-        <span class="q-sms-label">SMS-varsling</span>
+        <span class="q-sms-label">MBN SMS-varsling</span>
         <label class="toggle-wrap" onclick="event.stopPropagation()">
           <input type="checkbox" id="qSmsToggle" onchange="onQueueSmsChange()">
           <span class="toggle-track"></span>
@@ -1178,8 +1178,8 @@ label.toggle-wrap { cursor: pointer; }
     if (card) card.classList.toggle('queue-on', enabled);
     const sms = (enabled && queues[idx].smsEnabled)
       ? 'MBN SMS-varsling på'
-      : 'SMS-varsling av';
-    meta.innerHTML = `<span>${enabled ? '2' : '0'}/4 operatører</span><span>${sms}</span>`;
+      : 'MBN SMS-varsling av';
+    meta.innerHTML = `<span>${enabled ? '1' : '0'}/4 operatører</span><span>${sms}</span>`;
   }
 
   /* ── Tidsstyring ── */
