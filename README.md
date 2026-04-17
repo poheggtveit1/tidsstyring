@@ -33,7 +33,7 @@ python3 -m http.server 3000
 - **Tidsstyring** — Automatisk eller manuell på/avlogging basert på arbeidstid
 - **Visningsnummer** — Velg visningsnummer med valgfri «Kun for eksterne samtaler»
 - **Køstatus** — Per-kø innstilling for Ingen endring / Logg på / Logg av
-- **SMS-varsling** — Følger køpålogging automatisk, kan overstyres manuelt
+- **MBN SMS-varsling** — Følger køpålogging automatisk, kan overstyres manuelt
 - **Lokal persistering** — Innstillinger lagres i `localStorage`
 
 ## Teknologi
