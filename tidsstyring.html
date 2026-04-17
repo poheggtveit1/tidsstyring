@@ -458,6 +458,62 @@ body {
 .toggle-wrap input:disabled ~ .toggle-track ~ .toggle-thumb { opacity: .5; }
 .toggle-wrap:has(input:disabled) { cursor: not-allowed; }
 
+/* ── Queue cards (step 3) ── */
+.queue-card {
+  background: var(--bg-grey);
+  border-radius: var(--r-card);
+  overflow: hidden;
+}
+.queue-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px 10px;
+  gap: 12px;
+}
+.queue-card-info { flex: 1; }
+.queue-card-name {
+  font-size: 15px; font-weight: 400;
+  color: var(--text); line-height: 1.3;
+}
+.queue-card-number {
+  font-size: 13px; font-weight: 300;
+  color: var(--muted); margin-top: 1px;
+}
+.queue-card-sms {
+  padding: 0 16px 14px;
+  display: none;
+}
+.queue-card-sms.visible { display: block; }
+.queue-checkbox-label {
+  display: flex; align-items: center; gap: 10px;
+  cursor: pointer; user-select: none;
+}
+.queue-checkbox { display: none; }
+.queue-checkbox-box {
+  width: 20px; height: 20px; flex-shrink: 0;
+  border-radius: 5px;
+  border: 1.5px solid rgba(79,90,125,.35);
+  background: var(--white);
+  display: flex; align-items: center; justify-content: center;
+  transition: background .15s, border-color .15s;
+}
+.queue-checkbox:checked ~ .queue-checkbox-box {
+  background: var(--blue); border-color: var(--blue);
+}
+.queue-checkbox:checked ~ .queue-checkbox-box::after {
+  content: '';
+  display: block;
+  width: 11px; height: 7px;
+  border-left: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+  transform: rotate(-45deg) translate(1px, -1px);
+}
+.queue-checkbox-text {
+  font-size: 14px; font-weight: 300; color: var(--text);
+}
+.btn-primary:disabled { opacity: .4; pointer-events: none; }
+
 /* ── Home indicator (just for bottom) ── */
 .home-bar-wrap {
   height: 26px;
@@ -631,46 +687,81 @@ body {
         <div class="step-desc">Velg hvilke køer du automatisk logges på når arbeidstiden starter</div>
       </div>
 
-      <div>
-        <div class="option-row" id="queueList">
-          <div class="option-item" id="queueRow0" onclick="openQueueSheet(0)">
-            <div class="option-text">
-              <div class="option-main"><strong>Administrasjon</strong> (123 45 678)</div>
-              <div class="option-sub" id="queueSub0">Logg på</div>
-              <div class="option-sms on" id="queueSms0">MBN SMS-varsling</div>
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <!-- Queue card 0 -->
+        <div class="queue-card" id="queueCard0">
+          <div class="queue-card-top">
+            <div class="queue-card-info">
+              <div class="queue-card-name" id="queueName0">Administrasjon</div>
+              <div class="queue-card-number" id="queueNumber0">123 45 678</div>
             </div>
-            <svg width="7" height="13" viewBox="0 0 7 13" fill="none"><path d="M1 1 6 6.5 1 12" stroke="#1020F9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <label class="toggle-wrap" onclick="event.stopPropagation()">
+              <input type="checkbox" id="queueTog0" onchange="onQueueToggle(0)">
+              <span class="toggle-track"></span>
+              <span class="toggle-thumb"></span>
+            </label>
           </div>
-          <div class="option-item" id="queueRow1" onclick="openQueueSheet(1)">
-            <div class="option-text">
-              <div class="option-main"><strong>Support</strong> (444 44 444)</div>
-              <div class="option-sub" id="queueSub1">Logg på</div>
-              <div class="option-sms on" id="queueSms1">MBN SMS-varsling</div>
-            </div>
-            <svg width="7" height="13" viewBox="0 0 7 13" fill="none"><path d="M1 1 6 6.5 1 12" stroke="#1020F9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <div class="queue-card-sms visible" id="queueSmsRow0">
+            <label class="queue-checkbox-label" onclick="event.stopPropagation()">
+              <input type="checkbox" id="queueSmsTog0" class="queue-checkbox">
+              <span class="queue-checkbox-box"></span>
+              <span class="queue-checkbox-text">MBN SMS-varsling</span>
+            </label>
           </div>
-          <div class="option-item" id="queueRow2" onclick="openQueueSheet(2)">
-            <div class="option-text">
-              <div class="option-main"><strong>Verksted</strong> (12 34 56 78)</div>
-              <div class="option-sub" id="queueSub2">Logg på</div>
-              <div class="option-sms on" id="queueSms2">MBN SMS-varsling</div>
+        </div>
+
+        <!-- Queue card 1 -->
+        <div class="queue-card" id="queueCard1">
+          <div class="queue-card-top">
+            <div class="queue-card-info">
+              <div class="queue-card-name" id="queueName1">Support</div>
+              <div class="queue-card-number" id="queueNumber1">444 44 444</div>
             </div>
-            <svg width="7" height="13" viewBox="0 0 7 13" fill="none"><path d="M1 1 6 6.5 1 12" stroke="#1020F9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <label class="toggle-wrap" onclick="event.stopPropagation()">
+              <input type="checkbox" id="queueTog1" onchange="onQueueToggle(1)">
+              <span class="toggle-track"></span>
+              <span class="toggle-thumb"></span>
+            </label>
+          </div>
+          <div class="queue-card-sms visible" id="queueSmsRow1">
+            <label class="queue-checkbox-label" onclick="event.stopPropagation()">
+              <input type="checkbox" id="queueSmsTog1" class="queue-checkbox">
+              <span class="queue-checkbox-box"></span>
+              <span class="queue-checkbox-text">MBN SMS-varsling</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Queue card 2 -->
+        <div class="queue-card" id="queueCard2">
+          <div class="queue-card-top">
+            <div class="queue-card-info">
+              <div class="queue-card-name" id="queueName2">Verksted</div>
+              <div class="queue-card-number" id="queueNumber2">12 34 56 78</div>
+            </div>
+            <label class="toggle-wrap" onclick="event.stopPropagation()">
+              <input type="checkbox" id="queueTog2" onchange="onQueueToggle(2)">
+              <span class="toggle-track"></span>
+              <span class="toggle-thumb"></span>
+            </label>
+          </div>
+          <div class="queue-card-sms visible" id="queueSmsRow2">
+            <label class="queue-checkbox-label" onclick="event.stopPropagation()">
+              <input type="checkbox" id="queueSmsTog2" class="queue-checkbox">
+              <span class="queue-checkbox-box"></span>
+              <span class="queue-checkbox-text">MBN SMS-varsling</span>
+            </label>
           </div>
         </div>
       </div>
 
-      <div style="margin-top:4px;">
-        <div style="font-size:14px; font-weight:600; color:var(--text); margin-bottom:10px;">Etter arbeidstid skjer dette automatisk:</div>
-        <ul style="font-size:14px; font-weight:300; color:var(--muted); padding-left:18px; display:flex; flex-direction:column; gap:6px; line-height:1.45;">
-          <li>Alle køer logges av,</li>
-          <li>MBN SMS-varsling slås av,</li>
-          <li>visningsnummer tilbakestilles til ditt nummer.</li>
-        </ul>
+      <div style="font-size:14px; font-weight:300; color:var(--muted); line-height:1.55;">
+        <strong style="font-weight:500; color:var(--text);">Etter arbeidstid skjer dette automatisk:</strong><br>
+        Alle køer logges av, MBN SMS-varsling slås av, visningsnummer tilbakestilles til ditt nummer.
       </div>
 
       <div class="btn-group">
-        <button class="btn btn-primary" onclick="goStep(5)">
+        <button class="btn btn-primary" id="step3Fortsett" onclick="goStep(5)">
           Fortsett
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
             <path d="M4 9h10M10 5l4 4-4 4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -774,45 +865,6 @@ body {
     </div>
   </div>
 
-  <!-- ── Queue settings bottom sheet ── -->
-  <div class="overlay" id="queueOverlay" onclick="closeQueueSheet()">
-    <div class="sheet" onclick="event.stopPropagation()">
-      <div class="sheet-handle"></div>
-      <div class="sheet-heading">
-        <div class="sheet-title-block">
-          <div class="sheet-title" id="queueSheetTitle"></div>
-        </div>
-        <button class="sheet-close" onclick="closeQueueSheet()">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-            <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-          </svg>
-        </button>
-      </div>
-      <div class="option-row">
-        <div class="option-item" style="padding:14px 16px;">
-          <div class="option-text">
-            <div style="font-size:14px;color:var(--text);">Logg på ved oppstart</div>
-          </div>
-          <label class="toggle-wrap" onclick="event.stopPropagation()">
-            <input type="checkbox" id="queueSheetLoginToggle" onchange="onQueueLoginToggle()">
-            <span class="toggle-track"></span>
-            <span class="toggle-thumb"></span>
-          </label>
-        </div>
-        <div class="option-item" style="padding:14px 16px;">
-          <div class="option-text">
-            <div style="font-size:14px;color:var(--text);">MBN SMS-varsling</div>
-          </div>
-          <label class="toggle-wrap" onclick="event.stopPropagation()">
-            <input type="checkbox" id="queueSheetSmsToggle">
-            <span class="toggle-track"></span>
-            <span class="toggle-thumb"></span>
-          </label>
-        </div>
-      </div>
-      <button class="btn btn-primary" onclick="saveQueueSheet()">Lagre</button>
-    </div>
-  </div>
 
 </div><!-- /phone -->
 
@@ -832,7 +884,6 @@ function radioSVG(checked) {
 
 /* ── State ── */
 let currentStep = 1;
-let activeQueueIdx = -1;
 let activeSheetType = '';
 let displayNumbers = [
   { label: 'Mitt nummer (999 99 999)', selected: true,  externalOnly: false },
@@ -841,9 +892,9 @@ let displayNumbers = [
   { label: 'Skjult nummer',                  selected: false, externalOnly: false },
 ];
 let queueStates = [
-  { name: 'Administrasjon', number: '(123 45 678)', enabled: true, sms: true },
-  { name: 'Support',        number: '(444 44 444)', enabled: true, sms: true },
-  { name: 'Verksted',       number: '(12 34 56 78)', enabled: true, sms: true },
+  { name: 'Administrasjon', number: '123 45 678', enabled: false, sms: false },
+  { name: 'Support',        number: '444 44 444', enabled: false, sms: false },
+  { name: 'Verksted',       number: '12 34 56 78', enabled: false, sms: false },
 ];
 
 /* ── Navigation ── */
@@ -860,6 +911,7 @@ function goStep(n, back = false) {
   currentStep = n;
 
   document.getElementById('topBar').style.display = '';
+  if (n === 3) initStep3();
 }
 
 function goConfirm() {
@@ -873,11 +925,11 @@ function goConfirm() {
   else if (JSON.stringify(days) === JSON.stringify([5,6]))           dayLabel = 'helg';
   else dayLabel = days.map(i => dayFull[i]).join(', ');
 
-  const queues = queueStates.map(q => ({
+  const queues = queueStates.map((q, i) => ({
     name:    q.name,
     number:  q.number,
-    enabled: q.enabled,
-    sms:     q.sms,
+    enabled: document.getElementById(`queueTog${i}`)?.checked ?? q.enabled,
+    sms:     document.getElementById(`queueSmsTog${i}`)?.checked ?? q.sms,
   }));
 
   const settings = {
@@ -993,37 +1045,33 @@ function closeSheet() {
   document.getElementById('sheetConfirmBtn').textContent = 'Lagre';
 }
 
-/* ── Queue settings sheet ── */
-function openQueueSheet(idx) {
-  activeQueueIdx = idx;
-  const q = queueStates[idx];
-  document.getElementById('queueSheetTitle').textContent = q.name;
-  document.getElementById('queueSheetLoginToggle').checked = q.enabled;
-  document.getElementById('queueSheetSmsToggle').checked   = q.sms;
-  document.getElementById('queueOverlay').classList.add('open');
-}
-
-function closeQueueSheet() {
-  document.getElementById('queueOverlay').classList.remove('open');
-}
-
-function onQueueLoginToggle() {
-  // Auto-enable SMS when "Logg på ved oppstart" is turned ON
-  if (document.getElementById('queueSheetLoginToggle').checked) {
-    document.getElementById('queueSheetSmsToggle').checked = true;
+/* ── Queue card toggles (step 3) ── */
+function onQueueToggle(idx) {
+  const enabled = document.getElementById(`queueTog${idx}`).checked;
+  queueStates[idx].enabled = enabled;
+  const smsRow = document.getElementById(`queueSmsRow${idx}`);
+  const smsTog = document.getElementById(`queueSmsTog${idx}`);
+  if (enabled) {
+    smsTog.checked = true;
+    queueStates[idx].sms = true;
+  } else {
+    smsTog.checked = false;
+    queueStates[idx].sms = false;
   }
+  updateStep3Fortsett();
 }
 
-function saveQueueSheet() {
-  const idx = activeQueueIdx;
-  queueStates[idx].enabled = document.getElementById('queueSheetLoginToggle').checked;
-  queueStates[idx].sms     = document.getElementById('queueSheetSmsToggle').checked;
-  // Update sub-label
-  document.getElementById(`queueSub${idx}`).textContent =
-    queueStates[idx].enabled ? 'Logg på' : 'Logg av';
-  // Show/hide SMS label
-  document.getElementById(`queueSms${idx}`).classList.toggle('on', queueStates[idx].sms);
-  closeQueueSheet();
+function updateStep3Fortsett() {
+  const anyOn = queueStates.some(q => q.enabled);
+  document.getElementById('step3Fortsett').disabled = !anyOn;
+}
+
+function initStep3() {
+  queueStates.forEach((q, i) => {
+    document.getElementById(`queueTog${i}`).checked = q.enabled;
+    document.getElementById(`queueSmsTog${i}`).checked = q.sms;
+  });
+  updateStep3Fortsett();
 }
 </script>
 </body>
