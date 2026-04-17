@@ -487,12 +487,12 @@
   <!-- Content -->
   <div class="content">
 
-    <!-- Arbeidstid section -->
+    <!-- Tidsperioder section -->
     <div class="section">
       <div class="section-header">
-        <span class="section-label">Arbeidstid</span>
+        <span class="section-label">Tidsperioder</span>
       </div>
-      <div class="section-desc">Arbeidstiden styrer når tidsstyringen skal være aktiv</div>
+      <div class="section-desc">Tidsperiodene styrer når tidsstyringen skal være aktiv</div>
       <div class="card">
         <!-- Schedule entries (dynamic) -->
         <div id="schedulesList"></div>
@@ -529,7 +529,7 @@
         <div class="row no-tap" id="notifRow">
           <div class="row-body">
             <div class="row-label">Påminnelse om arbeidstid</div>
-            <div class="row-sub">Få varsel 10 minutter før arbeidstiden starter og slutter</div>
+            <div class="row-sub">Få varsel 10 minutter før en tidsperiode starter og slutter</div>
           </div>
           <label class="toggle" onclick="event.stopPropagation()">
             <input type="checkbox" id="notifToggle" onchange="onNotifChange()"/>
@@ -777,7 +777,7 @@
       toggle.disabled   = true;
     } else {
       label.textContent = 'Påminnelse om arbeidstid';
-      sub.textContent   = 'Få varsel 10 minutter før arbeidstiden starter og slutter';
+      sub.textContent   = 'Få varsel 10 minutter før en tidsperiode starter og slutter';
       toggle.disabled   = false;
       toggle.checked    = savedState.notification !== false;
     }

@@ -514,6 +514,34 @@ body {
 }
 .btn-primary:disabled { opacity: .4; pointer-events: none; }
 
+/* ── Intro screen ── */
+.step-intro { padding: 32px 24px 32px; gap: 28px; }
+.intro-illustration {
+  display: flex; align-items: center; justify-content: center;
+  padding: 8px 0 4px;
+}
+.intro-icon-bg {
+  width: 88px; height: 88px; border-radius: 50%;
+  background: var(--blue-light);
+  display: flex; align-items: center; justify-content: center;
+}
+.intro-heading { display: flex; flex-direction: column; gap: 8px; }
+.intro-title { font-size: 22px; font-weight: 600; color: var(--navy); line-height: 1.25; }
+.intro-desc { font-size: 14px; font-weight: 300; color: var(--muted); line-height: 1.55; }
+.intro-features { display: flex; flex-direction: column; gap: 16px; }
+.intro-feature { display: flex; align-items: flex-start; gap: 14px; }
+.intro-feature-icon {
+  width: 38px; height: 38px; border-radius: 11px;
+  background: var(--blue-light); color: var(--blue);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.intro-feature-icon.green { background: rgba(55,198,93,.12); color: #2DAE52; }
+.intro-feature-icon.amber { background: rgba(255,150,0,.1);  color: #E07800; }
+.intro-feature-text { flex: 1; }
+.intro-feature-title { font-size: 14px; font-weight: 500; color: var(--text); line-height: 1.3; }
+.intro-feature-desc  { font-size: 13px; font-weight: 300; color: var(--muted); margin-top: 2px; line-height: 1.4; }
+
 /* ── Home indicator (just for bottom) ── */
 .home-bar-wrap {
   height: 26px;
@@ -569,8 +597,98 @@ body {
   <!-- ── Scrollable area ── -->
   <div class="screen">
 
+    <!-- STEP INTRO: Introduksjon -->
+    <div class="step step-intro active" id="stepIntro">
+
+      <!-- Illustration -->
+      <div class="intro-illustration">
+        <div class="intro-icon-bg">
+          <svg width="46" height="46" viewBox="0 0 46 46" fill="none">
+            <!-- Clock face -->
+            <circle cx="23" cy="26" r="13" stroke="#1020F9" stroke-width="2.4" fill="none"/>
+            <path d="M23 20v6l4 3" stroke="#1020F9" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- Calendar top bar -->
+            <rect x="12" y="10" width="22" height="3" rx="1.5" fill="#1020F9" opacity=".18"/>
+            <circle cx="17" cy="11.5" r="2.5" fill="#1020F9" opacity=".6"/>
+            <circle cx="29" cy="11.5" r="2.5" fill="#1020F9" opacity=".6"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Heading -->
+      <div class="intro-heading">
+        <div class="intro-title">Automatiser jobbprofilen din</div>
+        <div class="intro-desc">Tidsstyringen logger på og av jobbprofilen din automatisk basert på tidsperiodene du setter opp.</div>
+      </div>
+
+      <!-- Feature list -->
+      <div class="intro-features">
+
+        <div class="intro-feature">
+          <div class="intro-feature-icon">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <rect x="2" y="4"  width="16" height="3" rx="1.5" fill="currentColor" opacity=".35"/>
+              <rect x="2" y="9"  width="16" height="3" rx="1.5" fill="currentColor" opacity=".65"/>
+              <rect x="2" y="14" width="16" height="3" rx="1.5" fill="currentColor"/>
+            </svg>
+          </div>
+          <div class="intro-feature-text">
+            <div class="intro-feature-title">Én eller flere tidsperioder</div>
+            <div class="intro-feature-desc">Legg til så mange perioder du trenger, f.eks. 08.00–11:30 og 12:00–16:00</div>
+          </div>
+        </div>
+
+        <div class="intro-feature">
+          <div class="intro-feature-icon green">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M10 2v6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+              <path d="M6.5 4.8A8 8 0 1 0 13.5 4.8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+            </svg>
+          </div>
+          <div class="intro-feature-text">
+            <div class="intro-feature-title">Automatisk på og av</div>
+            <div class="intro-feature-desc">Jobbprofilen din logges på ved første periode, og av når siste periode er ferdig</div>
+          </div>
+        </div>
+
+        <div class="intro-feature">
+          <div class="intro-feature-icon">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M3 10a7 7 0 0 1 14 0" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
+              <rect x="1.5" y="10" width="3" height="5.5" rx="1.5" fill="currentColor"/>
+              <rect x="15.5" y="10" width="3" height="5.5" rx="1.5" fill="currentColor"/>
+            </svg>
+          </div>
+          <div class="intro-feature-text">
+            <div class="intro-feature-title">Køinnlogging</div>
+            <div class="intro-feature-desc">Velg hvilke køer du logges automatisk på og av ved periodens start og slutt</div>
+          </div>
+        </div>
+
+        <div class="intro-feature">
+          <div class="intro-feature-icon amber">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M10 2a5.5 5.5 0 0 0-5.5 5.5v3.5L3 14h14l-1.5-3V7.5A5.5 5.5 0 0 0 10 2z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" fill="none"/>
+              <path d="M8 14a2 2 0 0 0 4 0" stroke="currentColor" stroke-width="1.8" fill="none"/>
+            </svg>
+          </div>
+          <div class="intro-feature-text">
+            <div class="intro-feature-title">Påminnelse</div>
+            <div class="intro-feature-desc">Få varsel 10 minutter før en periode starter og slutter</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- CTA -->
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="startWizard()">Kom i gang →</button>
+      </div>
+
+    </div>
+
     <!-- STEP 1: Når jobber du? -->
-    <div class="step active" id="step1">
+    <div class="step" id="step1">
       <!-- Progress -->
       <div class="progress">
         <div class="prog-dot current"></div>
@@ -581,8 +699,8 @@ body {
 
       <!-- Heading -->
       <div class="step-heading">
-        <div class="step-title">Når jobber du?</div>
-        <div class="step-desc">Arbeidstiden styrer når du er pålogget køer og hvilket nummer som vises. Du kan legge til flere tidspunkt senere.</div>
+        <div class="step-title">Sett opp din første tidsperiode</div>
+        <div class="step-desc">Tidsperioden styrer når du logges på og av køer og hvilket visningsnummer som brukes. Du kan legge til flere tidsperioder under Innstillinger.</div>
       </div>
 
       <!-- Time picker -->
@@ -642,7 +760,7 @@ body {
 
       <div class="step-heading">
         <div class="step-title">Hvilket nummer skal vises?</div>
-        <div class="step-desc">Velg hvilket nummer som vises når arbeidstiden er aktiv</div>
+        <div class="step-desc">Velg hvilket nummer som vises når tidsperioden er aktiv</div>
       </div>
 
       <div>
@@ -684,7 +802,7 @@ body {
 
       <div class="step-heading">
         <div class="step-title">Hvilke køer vil du logge på?</div>
-        <div class="step-desc">Velg hvilke køer du automatisk logges på når arbeidstiden starter</div>
+        <div class="step-desc">Velg hvilke køer du automatisk logges på når tidsperioden starter</div>
       </div>
 
       <div style="display:flex; flex-direction:column; gap:10px;">
@@ -756,7 +874,7 @@ body {
       </div>
 
       <div style="font-size:14px; font-weight:300; color:var(--muted); line-height:1.55;">
-        <strong style="font-weight:500; color:var(--text);">Etter arbeidstid skjer dette automatisk:</strong><br>
+        <strong style="font-weight:500; color:var(--text);">Etter tidsperiode skjer dette automatisk:</strong><br>
         Alle køer logges av, MBN SMS-varsling slås av, visningsnummer tilbakestilles til ditt nummer.
       </div>
 
@@ -782,21 +900,21 @@ body {
 
       <div class="step-heading">
         <div class="step-title">Vil du logges på og av automatisk, eller gjøre det selv?</div>
-        <div class="step-desc">Innstillingen gjelder hver gang en arbeidstid starter og slutter</div>
+        <div class="step-desc">Innstillingen gjelder hver gang en tidsperiode starter og slutter</div>
       </div>
 
       <div class="radio-group">
         <div class="radio-item selected" onclick="selectRadio(this, 'login')">
           <div class="radio-text">
             <div class="radio-label">Automatisk</div>
-            <div class="radio-desc">Du logges på og av når arbeidstiden starter og slutter</div>
+            <div class="radio-desc">Du logges på og av når tidsperioden starter og slutter</div>
           </div>
           <div class="radio-circle"></div>
         </div>
         <div class="radio-item" onclick="selectRadio(this, 'login')">
           <div class="radio-text">
             <div class="radio-label">Logg på selv</div>
-            <div class="radio-desc">Du får en påminnelse 10 minutter før arbeidstiden starter og slutter</div>
+            <div class="radio-desc">Du får en påminnelse 10 minutter før tidsperioden starter og slutter</div>
           </div>
           <div class="radio-circle"></div>
         </div>
@@ -947,6 +1065,14 @@ function goConfirm() {
   localStorage.setItem('mbn_tidsstyring', JSON.stringify(settings));
   sessionStorage.setItem('mbn_show_toast', 'Tidsstyring er aktivert og klar til bruk');
   window.location.href = 'index.html';
+}
+
+function startWizard() {
+  document.getElementById('stepIntro').classList.remove('active');
+  const s1 = document.getElementById('step1');
+  s1.classList.add('active');
+  s1.parentElement.scrollTop = 0;
+  currentStep = 1;
 }
 
 function cancelWizard() {
