@@ -657,8 +657,8 @@ label.toggle-wrap { cursor: pointer; }
         <div class="ios-notif-app-name">Telenor MBN</div>
         <div class="ios-notif-time">nå</div>
       </div>
-      <div class="ios-notif-title">Arbeidstiden din slutter kl. 16:00</div>
-      <div class="ios-notif-body">Visningsnummer Support (12 34 56 78) og køene Administrasjon og Support logges av automatisk.</div>
+      <div class="ios-notif-title" id="iosNotifTitle">Arbeidstiden din slutter kl. 16:00</div>
+      <div class="ios-notif-body" id="iosNotifBody">Visningsnummer Support (12 34 56 78) og køene Administrasjon og Support logges av automatisk.</div>
     </div>
   </div>
 
@@ -987,6 +987,12 @@ label.toggle-wrap { cursor: pointer; }
     <div class="dev-sheet" onclick="event.stopPropagation()">
       <div class="dev-handle"></div>
       <div class="dev-title">⚙ Demo-funksjoner</div>
+      <button class="dev-btn" onclick="closeDevPanel(); setTimeout(simulateTidsstyringLogon, 350)">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" style="flex-shrink:0">
+          <path d="M9 1.5a7.5 7.5 0 1 0 0 15 7.5 7.5 0 0 0 0-15zm0 3v5.25l3 1.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+        Simuler: Tidsstyring logger på
+      </button>
       <button class="dev-btn" onclick="closeDevPanel(); setTimeout(simulateTidsstyringLogoff, 350)">
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none" style="flex-shrink:0">
           <path d="M9 1.5a7.5 7.5 0 1 0 0 15 7.5 7.5 0 0 0 0-15zm0 3v5.25l3 1.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
@@ -1188,12 +1194,27 @@ label.toggle-wrap { cursor: pointer; }
     const endTime   = sched.endTime   || '16:00';
     const startTime = sched.startTime || '08:00';
     const days      = (sched.days && sched.days.length) ? sched.days : [0,1,2,3,4];
-    const jsDay     = new Date().getDay();
+    const now       = new Date();
+    const jsDay     = now.getDay();
     const today     = (jsDay + 6) % 7;
+    const nowTime   = now.toTimeString().slice(0, 5);
     const sorted    = [...days].sort((a, b) => a - b);
-    let   next      = sorted.find(d => d > today);
-    if (next === undefined) next = sorted[0];
-    return `Aktiv til ${endTime} · Neste: ${dagNavn[next]} ${startTime}`;
+
+    const inPeriod  = days.includes(today) && nowTime >= startTime && nowTime < endTime;
+
+    if (inPeriod) {
+      let next = sorted.find(d => d > today);
+      if (next === undefined) next = sorted[0];
+      return `Aktiv til ${endTime} · Neste: ${dagNavn[next]} ${startTime}`;
+    } else {
+      // Before start on an active day → next start is today
+      if (days.includes(today) && nowTime < startTime) {
+        return `Neste: i dag ${startTime}`;
+      }
+      let next = sorted.find(d => d > today);
+      if (next === undefined) next = sorted[0];
+      return `Neste: ${dagNavn[next]} ${startTime}`;
+    }
   }
 
   function applyTidsstyringState() {
@@ -1291,13 +1312,75 @@ label.toggle-wrap { cursor: pointer; }
   /* ── Tidsstyring auto-logoff simulation ── */
   let autoLoggedOff = false;
 
+  function simulateTidsstyringLogon() {
+    let s = null;
+    try { s = JSON.parse(localStorage.getItem('mbn_tidsstyring')); } catch(e) {}
+
+    // Prefer top-level queues (clean names matching UI) over schedules[0].queues
+    const topQueues  = (s && s.queues) || [];
+    const sched      = (s && s.schedules && s.schedules[0]) || {};
+    const activeQueues = topQueues.filter(q => q.enabled === true || q.selected === 1);
+    const dispIdx    = sched.displayNumIdx ?? s?.displayNumIdx ?? 0;
+    const dispNum    = numList[dispIdx] || numList[0];
+    const startTime  = s?.startTime || '08:00';
+
+    // Build notification text
+    const queueNames = activeQueues.map(q => q.name);
+    let queueText = '';
+    if (queueNames.length === 1)      queueText = `Køen ${queueNames[0]} logges på.`;
+    else if (queueNames.length > 1)   queueText = `Køene ${queueNames.slice(0,-1).join(', ')} og ${queueNames.at(-1)} logges på.`;
+    const numText = dispIdx > 0 ? ` Visningsnummer settes til ${dispNum}.` : '';
+
+    document.getElementById('iosNotifTitle').textContent = `Arbeidstiden din starter kl. ${startTime}`;
+    document.getElementById('iosNotifBody').textContent  = (queueText + numText).trim() || 'Jobbprofil slås på automatisk.';
+
+    // Show banner
+    document.getElementById('iosNotifBanner').classList.add('show');
+    // Apply logon state shortly after
+    setTimeout(() => applyAutoLogonState(activeQueues, dispIdx), 700);
+    // Dismiss after 8 s
+    setTimeout(() => document.getElementById('iosNotifBanner').classList.remove('show'), 8000);
+  }
+
+  function applyAutoLogonState(activeQueues, dispIdx) {
+    // Turn on Jobbprofil
+    document.getElementById('tog-job').checked = true;
+
+    // Log on active queues (match by name)
+    queues.forEach((q, i) => {
+      const schedQ      = activeQueues.find(sq => sq.name === q.name);
+      const shouldEnable = !!schedQ;
+      document.getElementById(`queue-toggle-${i}`).checked = shouldEnable;
+      q.smsEnabled = shouldEnable && (schedQ?.sms !== false);
+      updateQueueMeta(i);
+    });
+
+    // Set display number
+    selectedNumIdx = dispIdx;
+    document.getElementById('numDisplay').textContent = numList[dispIdx] || numList[0];
+    externalOnly = dispIdx > 0;
+    document.getElementById('numExternalStatus').style.display = (dispIdx > 0) ? '' : 'none';
+
+    updateJobStatus();
+    updateJobBadge();
+  }
+
   function simulateTidsstyringLogoff() {
+    let s = null;
+    try { s = JSON.parse(localStorage.getItem('mbn_tidsstyring')); } catch(e) {}
+    const sched = (s && s.schedules && s.schedules[0]) || s || {};
+    const endTime = sched.endTime || (s && s.endTime) || '16:00';
+
+    // Restore static logoff notification text
+    document.getElementById('iosNotifTitle').textContent = `Arbeidstiden din slutter kl. ${endTime}`;
+    document.getElementById('iosNotifBody').textContent  = 'Visningsnummer og køer logges av automatisk.';
+
     // Show iOS notification banner
     document.getElementById('iosNotifBanner').classList.add('show');
     // Apply the post-logout state shortly after (notification still visible)
     setTimeout(applyAutoLogoffState, 700);
-    // Dismiss notification after 5.5 s
-    setTimeout(() => document.getElementById('iosNotifBanner').classList.remove('show'), 5500);
+    // Dismiss notification after 8 s
+    setTimeout(() => document.getElementById('iosNotifBanner').classList.remove('show'), 8000);
   }
 
   function applyAutoLogoffState() {

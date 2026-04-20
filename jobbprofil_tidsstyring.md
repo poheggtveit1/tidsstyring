@@ -121,6 +121,17 @@ Manuelle endringer brukeren gjør i løpet av en tidsperiode (køpålogging, MBN
 
 Dersom brukeren manuelt slår av Jobbprofil mens en tidsperiode er aktiv, avsluttes gjeldende tidsperiode. Neste planlagte tidsperiode vil slå på Jobbprofil igjen ved sin starttid som normalt.
 
+### 2.7 Visuell status for Tidsstyring
+
+Statusteksten under Tidsstyring-bryteren på forsiden varierer avhengig av tilstand:
+
+| Tilstand | Statustekst |
+|---|---|
+| Tidsstyring på, innenfor aktiv periode | Aktiv til [sluttid] · Neste: [dag] [starttid] |
+| Tidsstyring på, utenfor aktiv periode (neste periode er en annen dag) | Neste: [dag] [starttid] |
+| Tidsstyring på, utenfor aktiv periode (neste periode starter i dag) | Neste: i dag [starttid] |
+| Tidsstyring slått av manuelt | Av |
+
 ---
 
 ## 3. Konfigurasjon – brukergrensesnitt
@@ -150,7 +161,7 @@ Første gang brukeren aktiverer Tidsstyring, gjennomgår brukeren en veiviser me
 
 1. **Arbeidstid** – Velg starttid, sluttid og ukedager for arbeidsøkten.
 2. **Visningsnummer** – Velg hvilket nummer som skal vises i arbeidsøkten.
-3. **Køer** – Velg hvilke køer som skal aktiveres i arbeidsøkten. MBN SMS-varsling settes automatisk på for valgte køer, og kan endres manuelt i etterkant.
-4. **Aktivering** – Velg mellom «Automatisk» (logges på og av uten å gjøre noe) og «Logg på selv» (varsles 10 minutter før perioden starter og slutter).
+3. **Køer** – Velg hvilke køer som skal aktiveres i arbeidsøkten. MBN SMS-varsling settes automatisk på for valgte køer, og kan endres manuelt i etterkant. Ved slutten av tidsperioden logges valgte køer av, MBN SMS-varsling slås av og visningsnummer tilbakestilles. Køer som ikke er valgt vil være upåvirket.
+4. **Aktivering av jobbprofil** – Velg mellom «Automatisk» (logges på og av uten å gjøre noe) og «Logg på selv» (varsles 10 minutter før perioden starter og slutter). Varsling kan slås av under innstillinger i etterkant.
 
 Etter gjennomført veiviser er Tidsstyring aktiv og konfigurert. Brukeren kan endre alle innstillinger via «Endre tidsstyring».
