@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
-<title>Endre arbeidstid</title>
+<title>Endre tidsperiode</title>
 <style>
   :root {
     --blue:    #1020F9;
@@ -284,7 +284,7 @@
 
   <div class="nav-bar">
     <div class="nav-action" onclick="cancel()">Avbryt</div>
-    <div class="nav-title">Endre arbeidstid</div>
+    <div class="nav-title">Endre tidsperiode</div>
     <div class="nav-action right active" onclick="save()">Lagre</div>
   </div>
   <div id="validationError" style="display:none;background:#FEE2E2;color:#B91C1C;font-size:13px;padding:10px 16px;border-bottom:1px solid #FECACA;"></div>
@@ -311,6 +311,7 @@
     <!-- Visningsnummer -->
     <div class="section">
       <div class="section-label">Visningsnummer</div>
+      <div class="section-desc">Velg aktivt visningsnummer i perioden</div>
       <div class="card" id="visningsCard">
         <div class="row" onclick="openNumSheet()">
           <div class="row-body">
@@ -327,8 +328,8 @@
 
     <!-- Køstatus ved oppstart -->
     <div class="section">
-      <div class="section-label">Køstatus ved oppstart</div>
-      <div class="section-desc">Settes automatisk når arbeidstiden starter</div>
+      <div class="section-label">Velg køer</div>
+      <div class="section-desc">Velg køer du ønsker å være pålogget i perioden. Køer du ikke velger vil ikke påvirkes.</div>
       <div class="queue-cards-list" id="queueCardsContainer"></div>
     </div>
 
