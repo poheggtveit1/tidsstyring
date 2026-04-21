@@ -33,7 +33,7 @@ Når Jobbprofil slås på:
 
 Når Jobbprofil slås av:
 
-- Lagrer gjeldende køstatus (pålogget/ikke-pålogget og MBN SMS-varsling på/av per kø) og gjeldende visningsnummer, slik at dette kan gjenopprettes neste gang Jobbprofil slås på.
+- Lagrer gjeldende køstatus (pålogget/ikke-pålogget og MBN SMS-varsling på/av per kø) og gjeldende visningsnummer, slik at dette kan gjenopprettes neste gang Jobbprofil slås på. Tilstanden lagres uavhengig av om den ble satt manuelt av brukeren eller automatisk av Tidsstyringen.
 - Logger brukeren av alle køer.
 - Slår av MBN SMS-varsling på alle køer.
 - Tilbakestiller visningsnummer til brukerens eget nummer.
@@ -161,7 +161,7 @@ Når to tidsperioder følger direkte etter hverandre (sluttid for periode A = st
 
 Manuelle endringer brukeren gjør i løpet av en tidsperiode (køpålogging, MBN SMS-varsling, visningsnummer) gjelder frem til neste planlagte hendelse i Tidsstyringen, hvor Tidsstyringen igjen tar kontroll.
 
-Dersom brukeren manuelt slår av Jobbprofil mens en tidsperiode er aktiv, avsluttes gjeldende tidsperiode. Neste planlagte tidsperiode vil slå på Jobbprofil igjen ved sin starttid som normalt.
+Dersom brukeren manuelt slår av Jobbprofil mens en tidsperiode er aktiv, avsluttes gjeldende tidsperiode. Tilstanden som var aktiv da Jobbprofil ble slått av – inkludert eventuelle innstillinger satt av Tidsstyringen – lagres og gjenopprettes dersom brukeren manuelt slår på Jobbprofil igjen. Neste planlagte tidsperiode vil slå på Jobbprofil igjen ved sin starttid som normalt.
 
 ### 2.7 Visuell status for Tidsstyring
 

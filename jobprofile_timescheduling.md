@@ -33,7 +33,7 @@ When Job Profile is turned on:
 
 When Job Profile is turned off:
 
-- Saves the current queue status (logged in/logged out and MBN SMS notification on/off per queue) and the current display number, so that they can be restored the next time Job Profile is turned on.
+- Saves the current queue status (logged in/logged out and MBN SMS notification on/off per queue) and the current display number, so that they can be restored the next time Job Profile is turned on. The state is saved regardless of whether it was set manually by the user or automatically by Time Scheduling.
 - Logs the user out of all queues.
 - Turns off MBN SMS notification for all queues.
 - Resets the display number to the user's own number.
@@ -161,7 +161,7 @@ When two time periods follow directly after each other (end time of period A = s
 
 Manual changes made by the user during a time period (queue login, MBN SMS notification, display number) apply until the next scheduled event in Time Scheduling, at which point Time Scheduling resumes control.
 
-If the user manually turns off Job Profile while a time period is active, the current time period is ended. The next scheduled time period will turn Job Profile back on at its start time as normal.
+If the user manually turns off Job Profile while a time period is active, the current time period is ended. The state that was active at the time of the manual turn-off — including any settings applied by Time Scheduling — is saved and will be restored if the user manually turns Job Profile back on. The next scheduled time period will turn Job Profile back on at its start time as normal.
 
 ### 2.7 Visual Status for Time Scheduling
 
