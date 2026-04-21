@@ -60,6 +60,9 @@ The status text below the Job Profile toggle varies depending on state:
 | On | Off | 🟢 Time-scheduled: Logged out |
 | Off | On | 🟢 Logged in to n queue(s) |
 | Off | Off | Logged out |
+| – | Off (automatic) | ⚫ Logged out automatically |
+
+The last row applies after Time Scheduling has automatically logged the user out. A grey status indicator is shown instead of green, and the text reads "Logged out automatically".
 
 ---
 
@@ -99,7 +102,46 @@ The user chooses how Time Scheduling activates Job Profile:
 | Mode | Behaviour |
 |---|---|
 | **Automatic** | Job Profile is turned on and off automatically in accordance with the defined time periods |
-| **Log in yourself** | The user is notified 10 minutes before the work session starts and ends, and logs in and out themselves via the notification |
+| **Log in yourself** | The user is notified 10 minutes before a time period starts and ends, and logs in and out themselves via the notification |
+
+#### 2.3.1 Notification Banner
+
+When Time Scheduling executes or announces a scheduled event, an iOS-style notification banner appears at the top of the screen. The banner contains the app name ("Telenor MBN"), a timestamp ("now"), a title, body text, and two action buttons.
+
+**Title** varies depending on the event type:
+
+| Event | Title |
+|---|---|
+| First time period of the day starts (Job Profile turns on) | "Your Job Profile is turning on at HH:MM" |
+| Last time period of the day ends (Job Profile turns off) | "Your Job Profile is turning off at HH:MM" |
+| Transition between two time periods mid-day | "Your Job Profile is changing at HH:MM" |
+
+**Body text** describes what will happen:
+- Queues being logged in to: "Queue X is being logged in." / "Queues X and Y are being logged in."
+- Queues being logged out of: "Queue X is being logged out." / "Queues X and Y are being logged out."
+- Display number being set: "Display number is being set to X."
+- Display number changing between periods: "Display number is changing to X."
+- Display number being reset: "Display number is being reset to your own number."
+- When logging out completely: "Display number and queues are being logged out automatically."
+- If no specific changes are described, generic text is used.
+
+**Action buttons – "Automatic" mode:**
+
+| Button | Label | Action |
+|---|---|---|
+| 1 | Postpone 10 min | Cancels automatic execution and dismisses the banner; displays "The change is being postponed 10 minutes" |
+| 2 | Do not execute | Cancels automatic execution and dismisses the banner |
+
+If no button is pressed within 8 seconds, the action is executed automatically and the banner is dismissed.
+
+**Action buttons – "Log in yourself" mode:**
+
+| Button | Label | Action |
+|---|---|---|
+| 1 (primary, bold) | Execute | Executes the action and dismisses the banner |
+| 2 | Postpone 10 min | Dismisses the banner without executing; displays "The change is being postponed 10 minutes" |
+
+The banner is automatically dismissed without action after 15 seconds if the user does not interact with it.
 
 ### 2.4 Job Profile and Time Scheduling
 
@@ -123,14 +165,43 @@ If the user manually turns off Job Profile while a time period is active, the cu
 
 ### 2.7 Visual Status for Time Scheduling
 
-The status text below the Time Scheduling toggle on the home screen varies depending on state:
+The status text below the Time Scheduling toggle always shows "Next:" followed by up to two upcoming scheduled events. The system looks up to 14 days ahead to find the next event.
+
+Each event is formatted as:
+
+> **[Day] at [HH:MM] [Type]**
+
+- **Day**: "Today", "Tomorrow", or the full capitalised weekday name (e.g. "Monday", "Friday")
+- **HH:MM**: The scheduled time
+- **Type**: See the table below
+
+| Event type | Type label | Description |
+|---|---|---|
+| First time period of the day starts | On | Job Profile turns on |
+| Last time period of the day ends | Off | Job Profile turns off |
+| Transition between periods mid-day | Change | Settings update, Job Profile remains on |
+
+When two events are shown, they are stacked vertically and aligned below the "Next:" label.
 
 | State | Status Text |
 |---|---|
-| Time Scheduling on, within active period | Active until [end time] · Next: [day] [start time] |
-| Time Scheduling on, outside active period (next period is another day) | Next: [day] [start time] |
-| Time Scheduling on, outside active period (next period starts today) | Next: today [start time] |
+| Time Scheduling on, 2 or more upcoming events | Next: [event 1] / [event 2] (vertically stacked) |
+| Time Scheduling on, exactly one upcoming event | Next: [event] |
+| Time Scheduling on, no events in the next 14 days | Next: – |
 | Time Scheduling turned off manually | Off |
+
+### 2.8 State on App Launch
+
+When the app opens and Time Scheduling is active (not paused), the app checks whether the current time falls within a configured time period for the current weekday.
+
+**If the current time is within an active period:**
+- Job Profile is turned on.
+- The period's configured queues are enabled with MBN SMS notification.
+- The period's configured display number is set.
+- Queues not included in the period are unaffected.
+
+**If the current time is not within any period:**
+- The last saved Job Profile state is restored (the same behaviour as manual Job Profile activation).
 
 ---
 

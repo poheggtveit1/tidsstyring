@@ -1011,6 +1011,12 @@ label.toggle-wrap { cursor: pointer; }
         </svg>
         Simuler: Tidsstyring logger på
       </button>
+      <button class="dev-btn" onclick="closeDevPanel(); setTimeout(simulateTidsstyringEndre, 350)">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" style="flex-shrink:0">
+          <path d="M9 1.5a7.5 7.5 0 1 0 0 15 7.5 7.5 0 0 0 0-15zm0 3v5.25l3 1.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+        Simuler: Tidsstyring endrer periode
+      </button>
       <button class="dev-btn" onclick="closeDevPanel(); setTimeout(simulateTidsstyringLogoff, 350)">
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none" style="flex-shrink:0">
           <path d="M9 1.5a7.5 7.5 0 1 0 0 15 7.5 7.5 0 0 0 0-15zm0 3v5.25l3 1.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
@@ -1506,7 +1512,7 @@ label.toggle-wrap { cursor: pointer; }
     const numText = dispIdx > 0 ? ` Visningsnummer settes til ${dispNum}.` : '';
 
     showNotifBanner(
-      `Arbeidstiden din starter kl. ${startTime}`,
+      `Jobbprofilen din slås på kl. ${startTime}`,
       (queueText + numText).trim() || 'Jobbprofil slås på automatisk.',
       () => applyAutoLogonState(activeQueues, dispIdx)
     );
@@ -1529,14 +1535,77 @@ label.toggle-wrap { cursor: pointer; }
     updateJobBadge();
   }
 
+  function simulateTidsstyringEndre() {
+    let s = null;
+    try { s = JSON.parse(localStorage.getItem('mbn_tidsstyring')); } catch(e) {}
+
+    const allSchedules = (s && s.schedules && s.schedules.length >= 2) ? s.schedules : null;
+    const fromSched    = allSchedules ? allSchedules[0] : null;
+    const toSched      = allSchedules ? allSchedules[1] : null;
+    const topQueues    = (s && s.queues) || [];
+
+    const changeTime = toSched?.startTime || fromSched?.endTime || s?.endTime || '12:00';
+
+    let bodyText = '';
+    if (toSched) {
+      const toQueues   = toSched.queues   || [];
+      const fromQueues = fromSched?.queues || [];
+      const added = [], removed = [];
+
+      topQueues.forEach(q => {
+        const fromQ      = fromQueues.find(x => x.name === q.name || x.name?.startsWith(q.name));
+        const toQ        = toQueues.find(x => x.name === q.name || x.name?.startsWith(q.name));
+        const wasActive  = fromQ ? (fromQ.enabled === true || fromQ.selected === 1) : false;
+        const willActive = toQ   ? (toQ.enabled   === true || toQ.selected   === 1) : false;
+        if (!wasActive && willActive) added.push(q.name);
+        if (wasActive && !willActive) removed.push(q.name);
+      });
+
+      const parts = [];
+      if (added.length === 1)   parts.push(`Køen ${added[0]} logges på.`);
+      else if (added.length > 1) parts.push(`Køene ${added.slice(0,-1).join(', ')} og ${added.at(-1)} logges på.`);
+      if (removed.length === 1)   parts.push(`Køen ${removed[0]} logges av.`);
+      else if (removed.length > 1) parts.push(`Køene ${removed.slice(0,-1).join(', ')} og ${removed.at(-1)} logges av.`);
+
+      const fromDispIdx = fromSched?.displayNumIdx ?? 0;
+      const toDispIdx   = toSched?.displayNumIdx   ?? 0;
+      if (fromDispIdx !== toDispIdx) {
+        parts.push(toDispIdx > 0
+          ? `Visningsnummer endres til ${numList[toDispIdx]}.`
+          : 'Visningsnummer tilbakestilles til ditt nummer.');
+      }
+
+      bodyText = parts.join(' ') || 'Innstillingene for tidsperioden endres.';
+    } else {
+      bodyText = 'Innstillingene for tidsperioden endres.';
+    }
+
+    const actionFn = toSched
+      ? () => applyAutoLogonState(
+          topQueues.filter(q => {
+            const tq = (toSched.queues || []).find(x => x.name === q.name || x.name?.startsWith(q.name));
+            return tq && (tq.enabled === true || tq.selected === 1);
+          }),
+          toSched.displayNumIdx ?? 0
+        )
+      : null;
+
+    showNotifBanner(
+      `Jobbprofilen din endres kl. ${changeTime}`,
+      bodyText,
+      actionFn
+    );
+  }
+
   function simulateTidsstyringLogoff() {
     let s = null;
     try { s = JSON.parse(localStorage.getItem('mbn_tidsstyring')); } catch(e) {}
-    const sched   = (s && s.schedules && s.schedules[0]) || s || {};
-    const endTime = sched.endTime || (s && s.endTime) || '16:00';
+    const allSchedules = (s && s.schedules && s.schedules.length) ? s.schedules : null;
+    const lastSched    = allSchedules ? allSchedules.at(-1) : (s || {});
+    const endTime      = lastSched.endTime || s?.endTime || '16:00';
 
     showNotifBanner(
-      `Arbeidstiden din slutter kl. ${endTime}`,
+      `Jobbprofilen din slås av kl. ${endTime}`,
       'Visningsnummer og køer logges av automatisk.',
       applyAutoLogoffState
     );
