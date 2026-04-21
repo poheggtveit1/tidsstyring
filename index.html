@@ -576,6 +576,20 @@ label.toggle-wrap { cursor: pointer; }
 .ios-notif-body {
   font-size: 12px; font-weight: 300; color: var(--c-text); line-height: 1.45;
 }
+.ios-notif-actions {
+  display: flex;
+  border-top: 0.5px solid rgba(0,0,0,.15);
+  margin-top: 10px;
+}
+.ios-notif-action {
+  flex: 1; padding: 9px 4px;
+  font-size: 13px; font-weight: 400; color: #007AFF;
+  text-align: center; background: none; border: none; cursor: pointer;
+}
+.ios-notif-action + .ios-notif-action {
+  border-left: 0.5px solid rgba(0,0,0,.15);
+}
+.ios-notif-action.primary { font-weight: 600; }
 
 /* ── Dev panel ─────────────────────── */
 .dev-backdrop {
@@ -659,6 +673,10 @@ label.toggle-wrap { cursor: pointer; }
       </div>
       <div class="ios-notif-title" id="iosNotifTitle">Arbeidstiden din slutter kl. 16:00</div>
       <div class="ios-notif-body" id="iosNotifBody">Visningsnummer Support (12 34 56 78) og køene Administrasjon og Support logges av automatisk.</div>
+      <div class="ios-notif-actions">
+        <button class="ios-notif-action" id="iosNotifBtn1"></button>
+        <button class="ios-notif-action" id="iosNotifBtn2"></button>
+      </div>
     </div>
   </div>
 
@@ -1188,33 +1206,136 @@ label.toggle-wrap { cursor: pointer; }
     meta.innerHTML = `<span>${enabled ? '1' : '0'}/4 operatører</span><span>${sms}</span>`;
   }
 
-  /* ── Tidsstyring ── */
-  function buildTidsstyringSubtext(sched) {
-    const dagNavn   = ['mandag','tirsdag','onsdag','torsdag','fredag','lørdag','søndag'];
-    const endTime   = sched.endTime   || '16:00';
-    const startTime = sched.startTime || '08:00';
-    const days      = (sched.days && sched.days.length) ? sched.days : [0,1,2,3,4];
-    const now       = new Date();
-    const jsDay     = now.getDay();
-    const today     = (jsDay + 6) % 7;
-    const nowTime   = now.toTimeString().slice(0, 5);
-    const sorted    = [...days].sort((a, b) => a - b);
+  /* ── Tidsstyring – shared helpers ── */
 
-    const inPeriod  = days.includes(today) && nowTime >= startTime && nowTime < endTime;
+  // Convert a schedule's dayLabel or days array → weekday index array (0=Mon)
+  function getSchedDays(sc) {
+    if (sc.days && sc.days.length) return sc.days;
+    const label = (sc.dayLabel || '').toLowerCase();
+    if (label === 'alle hverdager') return [0,1,2,3,4];
+    if (label === 'alle dager')     return [0,1,2,3,4,5,6];
+    if (label === 'helg')           return [5,6];
+    const nm = {
+      'mandag':0,'tirsdag':1,'onsdag':2,'torsdag':3,'fredag':4,'lørdag':5,'søndag':6,
+      'man':0,'tir':1,'ons':2,'tor':3,'fre':4,'lør':5,'søn':6
+    };
+    return label.split(', ').map(n => nm[n.trim()]).filter(d => d !== undefined);
+  }
 
-    if (inPeriod) {
-      let next = sorted.find(d => d > today);
-      if (next === undefined) next = sorted[0];
-      return `Aktiv til ${endTime} · Neste: ${dagNavn[next]} ${startTime}`;
-    } else {
-      // Before start on an active day → next start is today
-      if (days.includes(today) && nowTime < startTime) {
-        return `Neste: i dag ${startTime}`;
+  // Return the schedule period currently active (or null if none)
+  function getCurrentPeriod(s) {
+    const allSchedules = (s.schedules && s.schedules.length) ? s.schedules : [s];
+    const now     = new Date();
+    const wd      = (now.getDay() + 6) % 7;
+    const nowTime = now.toTimeString().slice(0, 5);
+    for (const sc of allSchedules) {
+      if (!getSchedDays(sc).includes(wd)) continue;
+      if (nowTime >= (sc.startTime || '00:00') && nowTime < (sc.endTime || '24:00')) {
+        return sc;
       }
-      let next = sorted.find(d => d > today);
-      if (next === undefined) next = sorted[0];
-      return `Neste: ${dagNavn[next]} ${startTime}`;
     }
+    return null;
+  }
+
+  // Apply a period's queue and display-number settings to the UI
+  function applyPeriodState(period) {
+    document.getElementById('tog-job').checked = true;
+    const periodQueues = period.queues || [];
+    queues.forEach((q, i) => {
+      // Handle both clean names ("Administrasjon") and "Name (number)" format
+      const pq = periodQueues.find(pq =>
+        pq.name === q.name || pq.name.startsWith(q.name)
+      );
+      const shouldEnable = pq ? (pq.enabled === true || pq.selected === 1) : false;
+      document.getElementById(`queue-toggle-${i}`).checked = shouldEnable;
+      q.smsEnabled = shouldEnable && (pq?.sms !== false);
+      updateQueueMeta(i);
+    });
+    const dispIdx = period.displayNumIdx ?? 0;
+    selectedNumIdx = dispIdx;
+    document.getElementById('numDisplay').textContent = numList[dispIdx] || numList[0];
+    externalOnly = dispIdx > 0;
+    document.getElementById('numExternalStatus').style.display = (dispIdx > 0) ? '' : 'none';
+    updateJobStatus();
+    updateJobBadge();
+  }
+
+  function buildTidsstyringSubtext(s) {
+    const dagNavn = ['mandag','tirsdag','onsdag','torsdag','fredag','lørdag','søndag'];
+
+    const allSchedules = (s.schedules && s.schedules.length) ? s.schedules : [s];
+    const now = new Date();
+    const events = [];
+
+    for (let offset = 0; offset < 14; offset++) {
+      const date = new Date(now);
+      date.setDate(date.getDate() + offset);
+      date.setHours(0, 0, 0, 0);
+      const wd = (date.getDay() + 6) % 7; // 0=Mon
+
+      const dayPeriods = allSchedules
+        .filter(sc => getSchedDays(sc).includes(wd))
+        .sort((a, b) => (a.startTime || '').localeCompare(b.startTime || ''));
+      if (!dayPeriods.length) continue;
+
+      const add = (time, type) => {
+        const dt = new Date(date);
+        const [h, m] = (time || '00:00').split(':').map(Number);
+        dt.setHours(h, m, 0, 0);
+        if (dt > now) events.push({ dt, type, time });
+      };
+
+      // First period start → På
+      add(dayPeriods[0].startTime || '08:00', 'På');
+
+      // Boundaries between periods
+      for (let i = 0; i < dayPeriods.length - 1; i++) {
+        const endT  = dayPeriods[i].endTime       || '16:00';
+        const nextT = dayPeriods[i + 1].startTime || '08:00';
+        if (endT === nextT) {
+          add(endT, 'Endring');           // adjacent: one shared event
+        } else {
+          add(endT, 'Endring');           // end of non-last period
+          add(nextT, 'Endring');          // start of non-first period
+        }
+      }
+
+      // Last period end → Av
+      add(dayPeriods[dayPeriods.length - 1].endTime || '16:00', 'Av');
+    }
+
+    // Sort and deduplicate (keep first at each timestamp)
+    events.sort((a, b) => a.dt - b.dt);
+    const seen = new Set();
+    const unique = events.filter(ev => {
+      const k = ev.dt.getTime();
+      if (seen.has(k)) return false;
+      seen.add(k); return true;
+    });
+
+    const next2 = unique.slice(0, 2);
+    if (!next2.length) return 'Neste: –';
+
+    const todayMid    = new Date(now); todayMid.setHours(0,0,0,0);
+    const tomorrowMid = new Date(todayMid); tomorrowMid.setDate(tomorrowMid.getDate() + 1);
+
+    function fmt(ev) {
+      const evMid = new Date(ev.dt); evMid.setHours(0,0,0,0);
+      let day;
+      if (evMid.getTime() === todayMid.getTime())        day = 'I dag';
+      else if (evMid.getTime() === tomorrowMid.getTime()) day = 'I morgen';
+      else {
+        const w = (ev.dt.getDay() + 6) % 7;
+        day = dagNavn[w].charAt(0).toUpperCase() + dagNavn[w].slice(1);
+      }
+      return `${day} kl. ${ev.time} ${ev.type}`;
+    }
+
+    if (next2.length === 1) return `Neste:  ${fmt(next2[0])}`;
+    return `<span style="display:flex;gap:5px;align-items:flex-start">`
+         + `<span style="flex-shrink:0;white-space:nowrap">Neste:</span>`
+         + `<span>${fmt(next2[0])}<br>${fmt(next2[1])}</span>`
+         + `</span>`;
   }
 
   function applyTidsstyringState() {
@@ -1236,13 +1357,14 @@ label.toggle-wrap { cursor: pointer; }
       sub.style.display     = '';
 
       if (paused) {
-        sub.textContent = 'Av';
+        sub.innerHTML = 'Av';
       } else {
-        const sched = (s.schedules && s.schedules[0]) || s;
-        sub.textContent = buildTidsstyringSubtext(sched);
-        const togJob = document.getElementById('tog-job');
-        if (!togJob.checked) {
-          togJob.checked = true;
+        sub.innerHTML = buildTidsstyringSubtext(s);
+        const activePeriod = getCurrentPeriod(s);
+        if (activePeriod) {
+          applyPeriodState(activePeriod);
+        } else {
+          document.getElementById('tog-job').checked = true;
           restoreJobState();
           updateJobStatus();
         }
@@ -1309,58 +1431,100 @@ label.toggle-wrap { cursor: pointer; }
     location.href = 'index.html?v=' + Date.now();
   }
 
-  /* ── Tidsstyring auto-logoff simulation ── */
+  /* ── Notification banner helpers ── */
   let autoLoggedOff = false;
+  let _notifActionFn = null;
+  let _notifTimerIds = [];
+
+  function _clearNotifTimers() {
+    _notifTimerIds.forEach(clearTimeout);
+    _notifTimerIds = [];
+  }
+
+  function dismissNotifBanner() {
+    _clearNotifTimers();
+    document.getElementById('iosNotifBanner').classList.remove('show');
+    _notifActionFn = null;
+  }
+
+  function showNotifBanner(title, body, actionFn) {
+    _clearNotifTimers();
+    _notifActionFn = actionFn;
+
+    document.getElementById('iosNotifTitle').textContent = title;
+    document.getElementById('iosNotifBody').textContent  = body;
+
+    let s = null;
+    try { s = JSON.parse(localStorage.getItem('mbn_tidsstyring')); } catch(e) {}
+    const lm = s?.loginMode || 'auto';
+    const isReminder = (lm === 'reminder' || lm === 'manual' || lm === 'Logg på selv');
+
+    const btn1 = document.getElementById('iosNotifBtn1');
+    const btn2 = document.getElementById('iosNotifBtn2');
+
+    if (isReminder) {
+      // "Logg på selv": user must manually trigger the action
+      btn1.textContent = 'Utfør';
+      btn1.className   = 'ios-notif-action primary';
+      btn1.onclick     = () => { if (_notifActionFn) _notifActionFn(); dismissNotifBanner(); };
+      btn2.textContent = 'Utsett 10 min';
+      btn2.className   = 'ios-notif-action';
+      btn2.onclick     = () => { dismissNotifBanner(); showToast('Endringen utsettes 10 minutter'); };
+      _notifTimerIds.push(setTimeout(dismissNotifBanner, 15000));
+    } else {
+      // "Automatisk": action runs automatically, user can postpone or cancel
+      btn1.textContent = 'Utsett 10 min';
+      btn1.className   = 'ios-notif-action';
+      btn1.onclick     = () => { _clearNotifTimers(); dismissNotifBanner(); showToast('Endringen utsettes 10 minutter'); };
+      btn2.textContent = 'Ikke utfør';
+      btn2.className   = 'ios-notif-action';
+      btn2.onclick     = () => { _clearNotifTimers(); dismissNotifBanner(); };
+      // Auto-apply + dismiss after 8 s
+      _notifTimerIds.push(setTimeout(() => { if (_notifActionFn) _notifActionFn(); dismissNotifBanner(); }, 8000));
+    }
+
+    document.getElementById('iosNotifBanner').classList.add('show');
+  }
+
+  /* ── Simulation functions ── */
 
   function simulateTidsstyringLogon() {
     let s = null;
     try { s = JSON.parse(localStorage.getItem('mbn_tidsstyring')); } catch(e) {}
 
-    // Prefer top-level queues (clean names matching UI) over schedules[0].queues
-    const topQueues  = (s && s.queues) || [];
-    const sched      = (s && s.schedules && s.schedules[0]) || {};
+    const topQueues    = (s && s.queues) || [];
+    const sched        = (s && s.schedules && s.schedules[0]) || {};
     const activeQueues = topQueues.filter(q => q.enabled === true || q.selected === 1);
-    const dispIdx    = sched.displayNumIdx ?? s?.displayNumIdx ?? 0;
-    const dispNum    = numList[dispIdx] || numList[0];
-    const startTime  = s?.startTime || '08:00';
+    const dispIdx      = sched.displayNumIdx ?? s?.displayNumIdx ?? 0;
+    const dispNum      = numList[dispIdx] || numList[0];
+    const startTime    = s?.startTime || '08:00';
 
-    // Build notification text
     const queueNames = activeQueues.map(q => q.name);
     let queueText = '';
-    if (queueNames.length === 1)      queueText = `Køen ${queueNames[0]} logges på.`;
-    else if (queueNames.length > 1)   queueText = `Køene ${queueNames.slice(0,-1).join(', ')} og ${queueNames.at(-1)} logges på.`;
+    if (queueNames.length === 1)    queueText = `Køen ${queueNames[0]} logges på.`;
+    else if (queueNames.length > 1) queueText = `Køene ${queueNames.slice(0,-1).join(', ')} og ${queueNames.at(-1)} logges på.`;
     const numText = dispIdx > 0 ? ` Visningsnummer settes til ${dispNum}.` : '';
 
-    document.getElementById('iosNotifTitle').textContent = `Arbeidstiden din starter kl. ${startTime}`;
-    document.getElementById('iosNotifBody').textContent  = (queueText + numText).trim() || 'Jobbprofil slås på automatisk.';
-
-    // Show banner
-    document.getElementById('iosNotifBanner').classList.add('show');
-    // Apply logon state shortly after
-    setTimeout(() => applyAutoLogonState(activeQueues, dispIdx), 700);
-    // Dismiss after 8 s
-    setTimeout(() => document.getElementById('iosNotifBanner').classList.remove('show'), 8000);
+    showNotifBanner(
+      `Arbeidstiden din starter kl. ${startTime}`,
+      (queueText + numText).trim() || 'Jobbprofil slås på automatisk.',
+      () => applyAutoLogonState(activeQueues, dispIdx)
+    );
   }
 
   function applyAutoLogonState(activeQueues, dispIdx) {
-    // Turn on Jobbprofil
     document.getElementById('tog-job').checked = true;
-
-    // Log on active queues (match by name)
     queues.forEach((q, i) => {
-      const schedQ      = activeQueues.find(sq => sq.name === q.name);
+      const schedQ       = activeQueues.find(sq => sq.name === q.name);
       const shouldEnable = !!schedQ;
       document.getElementById(`queue-toggle-${i}`).checked = shouldEnable;
       q.smsEnabled = shouldEnable && (schedQ?.sms !== false);
       updateQueueMeta(i);
     });
-
-    // Set display number
     selectedNumIdx = dispIdx;
     document.getElementById('numDisplay').textContent = numList[dispIdx] || numList[0];
     externalOnly = dispIdx > 0;
     document.getElementById('numExternalStatus').style.display = (dispIdx > 0) ? '' : 'none';
-
     updateJobStatus();
     updateJobBadge();
   }
@@ -1368,19 +1532,14 @@ label.toggle-wrap { cursor: pointer; }
   function simulateTidsstyringLogoff() {
     let s = null;
     try { s = JSON.parse(localStorage.getItem('mbn_tidsstyring')); } catch(e) {}
-    const sched = (s && s.schedules && s.schedules[0]) || s || {};
+    const sched   = (s && s.schedules && s.schedules[0]) || s || {};
     const endTime = sched.endTime || (s && s.endTime) || '16:00';
 
-    // Restore static logoff notification text
-    document.getElementById('iosNotifTitle').textContent = `Arbeidstiden din slutter kl. ${endTime}`;
-    document.getElementById('iosNotifBody').textContent  = 'Visningsnummer og køer logges av automatisk.';
-
-    // Show iOS notification banner
-    document.getElementById('iosNotifBanner').classList.add('show');
-    // Apply the post-logout state shortly after (notification still visible)
-    setTimeout(applyAutoLogoffState, 700);
-    // Dismiss notification after 8 s
-    setTimeout(() => document.getElementById('iosNotifBanner').classList.remove('show'), 8000);
+    showNotifBanner(
+      `Arbeidstiden din slutter kl. ${endTime}`,
+      'Visningsnummer og køer logges av automatisk.',
+      applyAutoLogoffState
+    );
   }
 
   function applyAutoLogoffState() {
@@ -1433,17 +1592,7 @@ label.toggle-wrap { cursor: pointer; }
     link.style.display    = 'inline-flex';
     sub.style.display     = '';
 
-    const sched     = (s.schedules && s.schedules[0]) || s;
-    const dagNavn   = ['mandag','tirsdag','onsdag','torsdag','fredag','lørdag','søndag'];
-    const startTime = sched.startTime || '08:00';
-    const days      = (sched.days && sched.days.length) ? sched.days : [0,1,2,3,4];
-    const jsDay     = new Date().getDay();
-    const today     = (jsDay + 6) % 7;
-    const sorted    = [...days].sort((a, b) => a - b);
-    let next        = sorted.find(d => d > today);
-    if (next === undefined) next = sorted[0];
-
-    sub.textContent = `Logger på ${dagNavn[next]} ${startTime}`;
+    sub.innerHTML = buildTidsstyringSubtext(s);
   }
 
   /* ── Queue bottom sheet ── */
