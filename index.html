@@ -1246,18 +1246,29 @@ label.toggle-wrap { cursor: pointer; }
     return null;
   }
 
-  // Apply a period's queue and display-number settings to the UI
+  // Apply a period's queue and display-number settings to the UI.
+  // Queues the user is already logged in to are never logged out —
+  // Time Scheduling only adds logins, never forces logoffs of active queues.
   function applyPeriodState(period) {
     document.getElementById('tog-job').checked = true;
     const periodQueues = period.queues || [];
     queues.forEach((q, i) => {
+      const toggle = document.getElementById(`queue-toggle-${i}`);
+      const alreadyEnabled = toggle.checked;
       // Handle both clean names ("Administrasjon") and "Name (number)" format
       const pq = periodQueues.find(pq =>
         pq.name === q.name || pq.name.startsWith(q.name)
       );
       const shouldEnable = pq ? (pq.enabled === true || pq.selected === 1) : false;
-      document.getElementById(`queue-toggle-${i}`).checked = shouldEnable;
-      q.smsEnabled = shouldEnable && (pq?.sms !== false);
+      // Never log out a queue the user is already logged in to
+      const newEnabled = shouldEnable || alreadyEnabled;
+      toggle.checked = newEnabled;
+      if (shouldEnable) {
+        // Period explicitly activates this queue → apply period's SMS setting
+        q.smsEnabled = pq?.sms !== false;
+      }
+      // If alreadyEnabled && !shouldEnable: leave q.smsEnabled unchanged
+      if (!newEnabled) q.smsEnabled = false;
       updateQueueMeta(i);
     });
     const dispIdx = period.displayNumIdx ?? 0;
@@ -1524,10 +1535,17 @@ label.toggle-wrap { cursor: pointer; }
   function applyAutoLogonState(activeQueues, dispIdx) {
     document.getElementById('tog-job').checked = true;
     queues.forEach((q, i) => {
+      const toggle       = document.getElementById(`queue-toggle-${i}`);
+      const alreadyEnabled = toggle.checked;
       const schedQ       = activeQueues.find(sq => sq.name === q.name);
       const shouldEnable = !!schedQ;
-      document.getElementById(`queue-toggle-${i}`).checked = shouldEnable;
-      q.smsEnabled = shouldEnable && (schedQ?.sms !== false);
+      // Never log out a queue the user is already logged in to
+      const newEnabled   = shouldEnable || alreadyEnabled;
+      toggle.checked = newEnabled;
+      if (shouldEnable) {
+        q.smsEnabled = schedQ?.sms !== false;
+      }
+      if (!newEnabled) q.smsEnabled = false;
       updateQueueMeta(i);
     });
     selectedNumIdx = dispIdx;
