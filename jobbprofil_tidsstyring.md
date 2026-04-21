@@ -148,6 +148,7 @@ Banneret lukkes automatisk uten handling etter 15 sekunder dersom brukeren ikke 
 - Jobbprofil slås **på** ved starten av første tidsperiode for dagen, dersom den ikke allerede er aktiv.
 - Jobbprofil slås **av** ved slutten av siste tidsperiode for dagen, dersom den ikke allerede er inaktiv.
 - Dette sikrer at brukeren alltid logges av alle køer ved slutten av arbeidsdagen, og ikke ved eventuelle hull mellom tidsperioder i løpet av dagen.
+- Tidsstyringen logger **aldri** av køer som brukeren allerede er pålogget, verken ved aktivering av en tidsperiode eller ved overgang mellom perioder. Tidsstyringen legger kun til pålogginger for køer konfigurert som «Aktiv» i perioden. Køer som er aktive men ikke inkludert i perioden, forblir pålogget med uendret MBN SMS-varslingsinnstilling.
 
 ### 2.5 Overganger mellom tilstøtende tidsperioder
 

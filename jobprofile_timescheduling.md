@@ -148,6 +148,7 @@ The banner is automatically dismissed without action after 15 seconds if the use
 - Job Profile is turned **on** at the start of the first time period of the day, if it is not already active.
 - Job Profile is turned **off** at the end of the last time period of the day, if it is not already inactive.
 - This ensures that the user is always logged out of all queues at the end of the working day, and not during any gaps between time periods during the day.
+- Time Scheduling **never** logs out queues the user is already logged in to, neither when activating a time period nor when transitioning between periods. Time Scheduling only adds logins for queues configured as "Active" in the period. Queues that are active but not included in the period remain logged in with their existing MBN SMS notification setting unchanged.
 
 ### 2.5 Transitions Between Adjacent Time Periods
 
