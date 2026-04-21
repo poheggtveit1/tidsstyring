@@ -60,6 +60,9 @@ Statusteksten under Jobbprofil-bryteren varierer avhengig av tilstand:
 | På | Av | 🟢 Tidsstyrt: Avlogget |
 | Av | På | 🟢 Logget på n køer |
 | Av | Av | Logget av |
+| – | Av (automatisk) | ⚫ Logget av automatisk |
+
+Den siste raden gjelder etter at Tidsstyring har logget av brukeren automatisk. En grå statusindikator vises i stedet for grønn, og teksten er «Logget av automatisk».
 
 ---
 
@@ -92,14 +95,53 @@ For hver kø i tidsperioden velges én av følgende innstillinger:
 - MBN SMS-varsling for køer satt til «Aktiv» er som standard på, men kan endres manuelt av brukeren i løpet av tidsperioden, uavhengig av standardinnstillingen.
 - Køer som ikke er valgt i tidsperioden (dvs. «Ingen endring») beholder sin eksisterende køstatus gjennom hele perioden – Tidsstyringen gjør ingen endringer for disse.
 
-### 2.3 Aktivering av jobbprofil
+### 2.3 Aktivering av Jobbprofil
 
 Brukeren velger hvordan Tidsstyringen aktiverer Jobbprofil:
 
 | Modus | Oppførsel |
 |---|---|
 | **Automatisk** | Jobbprofilen slås på og av automatisk i henhold til definerte tidsperioder |
-| **Logg på selv** | Brukeren varsles 10 minutter før arbeidsøkten starter og slutter, og logger selv på og av via varselet |
+| **Logg på selv** | Brukeren varsles 10 minutter før en tidsperiode starter og slutter, og logger selv på og av via varselet |
+
+#### 2.3.1 Varslingsbannet
+
+Når Tidsstyring utfører eller varsler om en planlagt hendelse, vises et iOS-stilisert varselsbanner øverst på skjermen. Banneret inneholder appnavnet («Telenor MBN»), et tidsstempel («nå»), en tittel, en brødtekst og to handlingsknapper.
+
+**Tittel** varierer avhengig av hendelsestype:
+
+| Hendelse | Tittel |
+|---|---|
+| Første tidsperiode for dagen starter (Jobbprofil slås på) | «Jobbprofilen din slås på kl. HH:MM» |
+| Siste tidsperiode for dagen slutter (Jobbprofil slås av) | «Jobbprofilen din slås av kl. HH:MM» |
+| Overgang mellom to tidsperioder midt i dagen | «Jobbprofilen din endres kl. HH:MM» |
+
+**Brødtekst** beskriver hva som skjer:
+- Køer som logges på: «Køen X logges på.» / «Køene X og Y logges på.»
+- Køer som logges av: «Køen X logges av.» / «Køene X og Y logges av.»
+- Visningsnummer som settes: «Visningsnummer settes til X.»
+- Visningsnummer som endres mellom perioder: «Visningsnummer endres til X.»
+- Visningsnummer som tilbakestilles: «Visningsnummer tilbakestilles til ditt nummer.»
+- Ved full avlogging: «Visningsnummer og køer logges av automatisk.»
+- Dersom ingen konkrete endringer beskrives, brukes generisk tekst.
+
+**Handlingsknapper – modus «Automatisk»:**
+
+| Knapp | Tekst | Handling |
+|---|---|---|
+| 1 | Utsett 10 min | Avbryter automatisk utføring og lukker banneret; viser melding «Endringen utsettes 10 minutter» |
+| 2 | Ikke utfør | Avbryter automatisk utføring og lukker banneret |
+
+Dersom ingen knapp trykkes innen 8 sekunder, utføres handlingen automatisk og banneret lukkes.
+
+**Handlingsknapper – modus «Logg på selv»:**
+
+| Knapp | Tekst | Handling |
+|---|---|---|
+| 1 (primær, uthevet) | Utfør | Utfører handlingen og lukker banneret |
+| 2 | Utsett 10 min | Lukker banneret uten å utføre; viser melding «Endringen utsettes 10 minutter» |
+
+Banneret lukkes automatisk uten handling etter 15 sekunder dersom brukeren ikke interagerer.
 
 ### 2.4 Jobbprofil og Tidsstyring
 
@@ -123,14 +165,43 @@ Dersom brukeren manuelt slår av Jobbprofil mens en tidsperiode er aktiv, avslut
 
 ### 2.7 Visuell status for Tidsstyring
 
-Statusteksten under Tidsstyring-bryteren på forsiden varierer avhengig av tilstand:
+Statusteksten under Tidsstyring-bryteren viser alltid «Neste:» etterfulgt av de neste inntil to planlagte hendelsene fremover i tid. Systemet søker opptil 14 dager frem i tid for å finne neste hendelse.
+
+Hver hendelse formateres som:
+
+> **[Dag] kl. [HH:MM] [Type]**
+
+- **Dag**: «I dag» (gjeldende dag), «I morgen» (neste dag), eller fullt ukedagnavn med stor forbokstav (f.eks. «Mandag», «Fredag»)
+- **HH:MM**: Planlagt klokkeslett
+- **Type**: Se tabellen nedenfor
+
+| Hendelsestype | Type-etikett | Beskrivelse |
+|---|---|---|
+| Første tidsperiode for dagen starter | På | Jobbprofil slås på |
+| Siste tidsperiode for dagen slutter | Av | Jobbprofil slås av |
+| Overgang mellom perioder midt i dagen | Endring | Innstillinger oppdateres, Jobbprofil forblir på |
+
+Dersom to hendelser vises, stables de vertikalt og justeres mot «Neste:»-etiketten.
 
 | Tilstand | Statustekst |
 |---|---|
-| Tidsstyring på, innenfor aktiv periode | Aktiv til [sluttid] · Neste: [dag] [starttid] |
-| Tidsstyring på, utenfor aktiv periode (neste periode er en annen dag) | Neste: [dag] [starttid] |
-| Tidsstyring på, utenfor aktiv periode (neste periode starter i dag) | Neste: i dag [starttid] |
-| Tidsstyring slått av manuelt | Av |
+| Tidsstyring på, 2 eller flere kommende hendelser | Neste: [hendelse 1] / [hendelse 2] (vertikalt stablet) |
+| Tidsstyring på, én kommende hendelse | Neste: [hendelse] |
+| Tidsstyring på, ingen hendelser neste 14 dager | Neste: – |
+| Tidsstyring satt av manuelt | Av |
+
+### 2.8 Tilstand ved oppstart
+
+Når appen åpnes og Tidsstyring er aktiv (ikke satt på pause), sjekker appen om gjeldende klokkeslett faller innenfor en konfigurert tidsperiode for dagens ukedag.
+
+**Dersom gjeldende tidspunkt er innenfor en aktiv periode:**
+- Jobbprofil slås på.
+- Periodens konfigurerte køer aktiveres med MBN SMS-varsling.
+- Periodens konfigurerte visningsnummer settes.
+- Køer som ikke er inkludert i perioden, påvirkes ikke.
+
+**Dersom gjeldende tidspunkt ikke er innenfor noen periode:**
+- Siste lagrede Jobbprofil-tilstand gjenopprettes (samme som ved manuell aktivering av Jobbprofil).
 
 ---
 
