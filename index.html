@@ -1110,6 +1110,9 @@ label.toggle-wrap { cursor: pointer; }
         }
       });
     } else {
+      // Save current state before logging off, so it can be restored next time
+      // (regardless of whether the current state was set manually or by Time Scheduling)
+      saveJobState();
       queues.forEach((q, i) => {
         document.getElementById(`queue-toggle-${i}`).checked = false;
         q.smsEnabled = false;
