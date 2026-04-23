@@ -1334,12 +1334,12 @@ label.toggle-wrap { cursor: pointer; }
     });
 
     const next2 = unique.slice(0, 2);
-    if (!next2.length) return 'Neste: –';
+    if (!next2.length) return '–';
 
     const todayMid    = new Date(now); todayMid.setHours(0,0,0,0);
     const tomorrowMid = new Date(todayMid); tomorrowMid.setDate(tomorrowMid.getDate() + 1);
 
-    function fmt(ev) {
+    function fmtDay(ev) {
       const evMid = new Date(ev.dt); evMid.setHours(0,0,0,0);
       let day;
       if (evMid.getTime() === todayMid.getTime())        day = 'I dag';
@@ -1348,14 +1348,13 @@ label.toggle-wrap { cursor: pointer; }
         const w = (ev.dt.getDay() + 6) % 7;
         day = dagNavn[w].charAt(0).toUpperCase() + dagNavn[w].slice(1);
       }
-      return `${day} kl. ${ev.time} ${ev.type}`;
+      return `${day} kl. ${ev.time}`;
     }
 
-    if (next2.length === 1) return `Neste:  ${fmt(next2[0])}`;
-    return `<span style="display:flex;gap:5px;align-items:flex-start">`
-         + `<span style="flex-shrink:0;white-space:nowrap">Neste:</span>`
-         + `<span>${fmt(next2[0])}<br>${fmt(next2[1])}</span>`
-         + `</span>`;
+    const rows = next2.map(ev =>
+      `<span style="white-space:nowrap">${fmtDay(ev)}</span><span>${ev.type}</span>`
+    ).join('');
+    return `<span style="display:grid;grid-template-columns:auto auto;column-gap:8px;row-gap:2px;align-items:baseline">${rows}</span>`;
   }
 
   function applyTidsstyringState() {
