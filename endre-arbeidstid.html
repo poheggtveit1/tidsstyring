@@ -211,6 +211,7 @@
     display: flex; align-items: center; justify-content: space-between;
     padding: 0 16px; height: 44px;
     border-top: 1px solid var(--divider);
+    cursor: pointer; user-select: none;
   }
   .queue-cb-label { font-size: 14px; font-weight: 300; color: var(--text); }
   .cb-wrap {
@@ -495,20 +496,20 @@
         <div class="queue-card" id="eqCard${i}">
           <div class="queue-card-header">${q.name} (${numClean})</div>
           <div class="queue-card-body">
-            <div class="queue-cb-row">
+            <label class="queue-cb-row">
               <span class="queue-cb-label">Logg på</span>
-              <label class="cb-wrap" onclick="event.stopPropagation()">
+              <span class="cb-wrap">
                 <input type="checkbox" id="eqTog${i}" ${q.enabled ? 'checked' : ''} onchange="onQueueCardToggle(${i})">
                 <span class="cb-box"></span>
-              </label>
-            </div>
-            <div class="queue-cb-row">
+              </span>
+            </label>
+            <label class="queue-cb-row">
               <span class="queue-cb-label">MBN SMS-varsling</span>
-              <label class="cb-wrap" onclick="event.stopPropagation()">
+              <span class="cb-wrap">
                 <input type="checkbox" id="eqSmsTog${i}" ${q.sms ? 'checked' : ''} onchange="onQueueSmsChange(${i})">
                 <span class="cb-box"></span>
-              </label>
-            </div>
+              </span>
+            </label>
           </div>
         </div>`;
     }).join('');

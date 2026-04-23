@@ -479,6 +479,7 @@ body {
   display: flex; align-items: center; justify-content: space-between;
   padding: 0 16px; height: 44px;
   border-top: 1px solid var(--border);
+  cursor: pointer; user-select: none;
 }
 .queue-cb-label {
   font-size: 14px; font-weight: 300; color: var(--text);
@@ -802,20 +803,20 @@ body {
         <div class="queue-card" id="queueCard0" role="group" aria-labelledby="queueHeader0">
           <div class="queue-card-header" id="queueHeader0">Administrasjon (123 45 678)</div>
           <div class="queue-card-body">
-            <div class="queue-cb-row">
+            <label class="queue-cb-row">
               <span class="queue-cb-label" id="qcbL0-0">Logg på</span>
-              <label class="cb-wrap" onclick="event.stopPropagation()">
+              <span class="cb-wrap">
                 <input type="checkbox" id="queueTog0" aria-labelledby="queueHeader0 qcbL0-0" onchange="onQueueToggle(0)">
                 <span class="cb-box"></span>
-              </label>
-            </div>
-            <div class="queue-cb-row">
+              </span>
+            </label>
+            <label class="queue-cb-row">
               <span class="queue-cb-label" id="qcbL0-1">MBN SMS-varsling</span>
-              <label class="cb-wrap" onclick="event.stopPropagation()">
+              <span class="cb-wrap">
                 <input type="checkbox" id="queueSmsTog0" aria-labelledby="queueHeader0 qcbL0-1">
                 <span class="cb-box"></span>
-              </label>
-            </div>
+              </span>
+            </label>
           </div>
         </div>
 
@@ -823,20 +824,20 @@ body {
         <div class="queue-card" id="queueCard1" role="group" aria-labelledby="queueHeader1">
           <div class="queue-card-header" id="queueHeader1">Support (444 44 444)</div>
           <div class="queue-card-body">
-            <div class="queue-cb-row">
+            <label class="queue-cb-row">
               <span class="queue-cb-label" id="qcbL1-0">Logg på</span>
-              <label class="cb-wrap" onclick="event.stopPropagation()">
+              <span class="cb-wrap">
                 <input type="checkbox" id="queueTog1" aria-labelledby="queueHeader1 qcbL1-0" onchange="onQueueToggle(1)">
                 <span class="cb-box"></span>
-              </label>
-            </div>
-            <div class="queue-cb-row">
+              </span>
+            </label>
+            <label class="queue-cb-row">
               <span class="queue-cb-label" id="qcbL1-1">MBN SMS-varsling</span>
-              <label class="cb-wrap" onclick="event.stopPropagation()">
+              <span class="cb-wrap">
                 <input type="checkbox" id="queueSmsTog1" aria-labelledby="queueHeader1 qcbL1-1">
                 <span class="cb-box"></span>
-              </label>
-            </div>
+              </span>
+            </label>
           </div>
         </div>
 
@@ -844,20 +845,20 @@ body {
         <div class="queue-card" id="queueCard2" role="group" aria-labelledby="queueHeader2">
           <div class="queue-card-header" id="queueHeader2">Verksted (12 34 56 78)</div>
           <div class="queue-card-body">
-            <div class="queue-cb-row">
+            <label class="queue-cb-row">
               <span class="queue-cb-label" id="qcbL2-0">Logg på</span>
-              <label class="cb-wrap" onclick="event.stopPropagation()">
+              <span class="cb-wrap">
                 <input type="checkbox" id="queueTog2" aria-labelledby="queueHeader2 qcbL2-0" onchange="onQueueToggle(2)">
                 <span class="cb-box"></span>
-              </label>
-            </div>
-            <div class="queue-cb-row">
+              </span>
+            </label>
+            <label class="queue-cb-row">
               <span class="queue-cb-label" id="qcbL2-1">MBN SMS-varsling</span>
-              <label class="cb-wrap" onclick="event.stopPropagation()">
+              <span class="cb-wrap">
                 <input type="checkbox" id="queueSmsTog2" aria-labelledby="queueHeader2 qcbL2-1">
                 <span class="cb-box"></span>
-              </label>
-            </div>
+              </span>
+            </label>
           </div>
         </div>
       </div>
