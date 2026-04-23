@@ -1352,9 +1352,9 @@ label.toggle-wrap { cursor: pointer; }
     }
 
     const rows = next2.map(ev =>
-      `<span style="white-space:nowrap">${fmtDay(ev)}</span><span>${ev.type}</span>`
+      `<span style="display:flex;gap:4px;white-space:nowrap"><span>${fmtDay(ev)}</span><span>${ev.type}</span></span>`
     ).join('');
-    return `<span style="display:grid;grid-template-columns:auto auto;column-gap:4px;row-gap:2px;align-items:baseline">${rows}</span>`;
+    return `<span style="display:flex;flex-direction:column;gap:2px">${rows}</span>`;
   }
 
   function applyTidsstyringState() {
