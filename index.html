@@ -1354,7 +1354,7 @@ label.toggle-wrap { cursor: pointer; }
     const rows = next2.map(ev =>
       `<span style="white-space:nowrap">${fmtDay(ev)}</span><span>${ev.type}</span>`
     ).join('');
-    return `<span style="display:grid;grid-template-columns:auto auto;column-gap:8px;row-gap:2px;align-items:baseline">${rows}</span>`;
+    return `<span style="display:grid;grid-template-columns:auto auto;column-gap:4px;row-gap:2px;align-items:baseline">${rows}</span>`;
   }
 
   function applyTidsstyringState() {
