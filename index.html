@@ -1348,13 +1348,13 @@ label.toggle-wrap { cursor: pointer; }
         const w = (ev.dt.getDay() + 6) % 7;
         day = dagNavn[w].charAt(0).toUpperCase() + dagNavn[w].slice(1);
       }
-      return `${day} kl. ${ev.time}`;
+      return `${day} kl. ${ev.time}:`;
     }
 
     const rows = next2.map(ev =>
-      `<span style="display:flex;gap:4px;white-space:nowrap"><span>${fmtDay(ev)}</span><span>${ev.type}</span></span>`
+      `<span style="white-space:nowrap">${fmtDay(ev)}</span><span>${ev.type}</span>`
     ).join('');
-    return `<span style="display:flex;flex-direction:column;gap:2px">${rows}</span>`;
+    return `<span style="display:grid;grid-template-columns:auto auto;column-gap:6px;row-gap:2px;align-items:baseline">${rows}</span>`;
   }
 
   function applyTidsstyringState() {
