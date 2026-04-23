@@ -682,7 +682,7 @@ body {
     <!-- STEP 1: Når jobber du? -->
     <div class="step" id="step1">
       <!-- Progress -->
-      <div class="progress">
+      <div class="progress" role="status" aria-label="Steg 1 av 4">
         <div class="prog-dot current"></div>
         <div class="prog-dot"></div>
         <div class="prog-dot"></div>
@@ -691,7 +691,7 @@ body {
 
       <!-- Heading -->
       <div class="step-heading">
-        <div class="step-title">Sett opp første tidsperiode</div>
+        <h2 class="step-title">Sett opp første tidsperiode</h2>
         <div class="step-desc">Tidsperioden styrer når du logges på og av køer og hvilket visningsnummer som brukes. Du kan legge til flere tidsperioder under Innstillinger.</div>
       </div>
 
@@ -743,7 +743,7 @@ body {
 
     <!-- STEP 2: Visningsnummer -->
     <div class="step" id="step2">
-      <div class="progress">
+      <div class="progress" role="status" aria-label="Steg 2 av 4">
         <div class="prog-dot done"></div>
         <div class="prog-dot current"></div>
         <div class="prog-dot"></div>
@@ -751,7 +751,7 @@ body {
       </div>
 
       <div class="step-heading">
-        <div class="step-title">Hvilket nummer skal vises?</div>
+        <h2 class="step-title">Hvilket nummer skal vises?</h2>
         <div class="step-desc">Velg hvilket nummer som vises når tidsperioden er aktiv</div>
       </div>
 
@@ -785,7 +785,7 @@ body {
 
     <!-- STEP 3: Køer -->
     <div class="step" id="step3">
-      <div class="progress">
+      <div class="progress" role="status" aria-label="Steg 3 av 4">
         <div class="prog-dot done"></div>
         <div class="prog-dot done"></div>
         <div class="prog-dot current"></div>
@@ -793,26 +793,26 @@ body {
       </div>
 
       <div class="step-heading">
-        <div class="step-title">Hvilke køer vil du logge på?</div>
+        <h2 class="step-title">Hvilke køer vil du logge på?</h2>
         <div class="step-desc">Køer som ikke velges påvirkes ikke av tidsstyringen</div>
       </div>
 
       <div style="display:flex; flex-direction:column; gap:6px;">
         <!-- Queue card 0 -->
-        <div class="queue-card" id="queueCard0">
+        <div class="queue-card" id="queueCard0" role="group" aria-labelledby="queueHeader0">
           <div class="queue-card-header" id="queueHeader0">Administrasjon (123 45 678)</div>
           <div class="queue-card-body">
             <div class="queue-cb-row">
-              <span class="queue-cb-label">Logg på</span>
+              <span class="queue-cb-label" id="qcbL0-0">Logg på</span>
               <label class="cb-wrap" onclick="event.stopPropagation()">
-                <input type="checkbox" id="queueTog0" onchange="onQueueToggle(0)">
+                <input type="checkbox" id="queueTog0" aria-labelledby="queueHeader0 qcbL0-0" onchange="onQueueToggle(0)">
                 <span class="cb-box"></span>
               </label>
             </div>
             <div class="queue-cb-row">
-              <span class="queue-cb-label">MBN SMS-varsling</span>
+              <span class="queue-cb-label" id="qcbL0-1">MBN SMS-varsling</span>
               <label class="cb-wrap" onclick="event.stopPropagation()">
-                <input type="checkbox" id="queueSmsTog0">
+                <input type="checkbox" id="queueSmsTog0" aria-labelledby="queueHeader0 qcbL0-1">
                 <span class="cb-box"></span>
               </label>
             </div>
@@ -820,20 +820,20 @@ body {
         </div>
 
         <!-- Queue card 1 -->
-        <div class="queue-card" id="queueCard1">
+        <div class="queue-card" id="queueCard1" role="group" aria-labelledby="queueHeader1">
           <div class="queue-card-header" id="queueHeader1">Support (444 44 444)</div>
           <div class="queue-card-body">
             <div class="queue-cb-row">
-              <span class="queue-cb-label">Logg på</span>
+              <span class="queue-cb-label" id="qcbL1-0">Logg på</span>
               <label class="cb-wrap" onclick="event.stopPropagation()">
-                <input type="checkbox" id="queueTog1" onchange="onQueueToggle(1)">
+                <input type="checkbox" id="queueTog1" aria-labelledby="queueHeader1 qcbL1-0" onchange="onQueueToggle(1)">
                 <span class="cb-box"></span>
               </label>
             </div>
             <div class="queue-cb-row">
-              <span class="queue-cb-label">MBN SMS-varsling</span>
+              <span class="queue-cb-label" id="qcbL1-1">MBN SMS-varsling</span>
               <label class="cb-wrap" onclick="event.stopPropagation()">
-                <input type="checkbox" id="queueSmsTog1">
+                <input type="checkbox" id="queueSmsTog1" aria-labelledby="queueHeader1 qcbL1-1">
                 <span class="cb-box"></span>
               </label>
             </div>
@@ -841,20 +841,20 @@ body {
         </div>
 
         <!-- Queue card 2 -->
-        <div class="queue-card" id="queueCard2">
+        <div class="queue-card" id="queueCard2" role="group" aria-labelledby="queueHeader2">
           <div class="queue-card-header" id="queueHeader2">Verksted (12 34 56 78)</div>
           <div class="queue-card-body">
             <div class="queue-cb-row">
-              <span class="queue-cb-label">Logg på</span>
+              <span class="queue-cb-label" id="qcbL2-0">Logg på</span>
               <label class="cb-wrap" onclick="event.stopPropagation()">
-                <input type="checkbox" id="queueTog2" onchange="onQueueToggle(2)">
+                <input type="checkbox" id="queueTog2" aria-labelledby="queueHeader2 qcbL2-0" onchange="onQueueToggle(2)">
                 <span class="cb-box"></span>
               </label>
             </div>
             <div class="queue-cb-row">
-              <span class="queue-cb-label">MBN SMS-varsling</span>
+              <span class="queue-cb-label" id="qcbL2-1">MBN SMS-varsling</span>
               <label class="cb-wrap" onclick="event.stopPropagation()">
-                <input type="checkbox" id="queueSmsTog2">
+                <input type="checkbox" id="queueSmsTog2" aria-labelledby="queueHeader2 qcbL2-1">
                 <span class="cb-box"></span>
               </label>
             </div>
@@ -868,7 +868,8 @@ body {
       </div>
 
       <div class="btn-group">
-        <button class="btn btn-primary" id="step3Fortsett" onclick="goStep(5)">
+        <p id="step3Error" role="alert" style="display:none; font-size:13px; color:var(--red); text-align:center; margin:0 0 4px;">Velg minst én kø for å fortsette</p>
+        <button class="btn btn-primary" id="step3Fortsett" onclick="tryGoStep5()">
           Fortsett
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
             <path d="M4 9h10M10 5l4 4-4 4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -880,7 +881,7 @@ body {
 
     <!-- STEP 5: Login mode -->
     <div class="step" id="step5">
-      <div class="progress">
+      <div class="progress" role="status" aria-label="Steg 4 av 4">
         <div class="prog-dot done"></div>
         <div class="prog-dot done"></div>
         <div class="prog-dot done"></div>
@@ -888,7 +889,7 @@ body {
       </div>
 
       <div class="step-heading">
-        <div class="step-title">Vil du logges på og av automatisk, eller gjøre det selv?</div>
+        <h2 class="step-title">Vil du logges på og av automatisk, eller gjøre det selv?</h2>
         <div class="step-desc">Innstillingen gjelder hver gang en tidsperiode starter og slutter</div>
       </div>
 
@@ -1016,6 +1017,10 @@ function goStep(n, back = false) {
   to.classList.add('active');
   to.parentElement.scrollTop = 0;
   currentStep = n;
+
+  // Move focus to step heading for screen readers
+  const heading = to.querySelector('h2');
+  if (heading) { heading.setAttribute('tabindex', '-1'); heading.focus(); }
 
   document.getElementById('topBar').style.display = '';
   if (n === 3) initStep3();
@@ -1176,9 +1181,19 @@ function onQueueToggle(idx) {
   updateStep3Fortsett();
 }
 
-function updateStep3Fortsett() {
+function tryGoStep5() {
   const anyOn = queueStates.some(q => q.enabled);
-  document.getElementById('step3Fortsett').disabled = !anyOn;
+  const err = document.getElementById('step3Error');
+  if (!anyOn) { err.style.display = ''; return; }
+  err.style.display = 'none';
+  goStep(5);
+}
+
+function updateStep3Fortsett() {
+  // Button is always enabled; hide the error message once a queue is toggled on
+  const anyOn = queueStates.some(q => q.enabled);
+  const err = document.getElementById('step3Error');
+  if (anyOn && err) err.style.display = 'none';
 }
 
 function initStep3() {
