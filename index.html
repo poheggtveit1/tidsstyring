@@ -1163,7 +1163,7 @@ label.toggle-wrap { cursor: pointer; }
     if (tidsOn) {
       dot.style.display = 'block';
       if (!jobOn) {
-        statusEl.textContent = 'Tidsstyrt: Avlogget';
+        statusEl.textContent = 'Tidsstyrt: Logget av';
       } else {
         const activeCount = queues.filter((_, i) =>
           document.getElementById(`queue-toggle-${i}`).checked
