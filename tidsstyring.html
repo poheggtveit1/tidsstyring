@@ -458,59 +458,46 @@ body {
 .toggle-wrap input:disabled ~ .toggle-track ~ .toggle-thumb { opacity: .5; }
 .toggle-wrap:has(input:disabled) { cursor: not-allowed; }
 
-/* ── Queue cards (step 3) ── */
+/* ── Queue cards (step 3 — Figma design) ── */
 .queue-card {
   background: var(--bg-grey);
   border-radius: var(--r-card);
   overflow: hidden;
 }
-.queue-card-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+.queue-card-header {
   padding: 14px 16px 10px;
-  gap: 12px;
+  font-size: 14px; font-weight: 500;
+  color: var(--muted); line-height: 1.3;
 }
-.queue-card-info { flex: 1; }
-.queue-card-name {
-  font-size: 15px; font-weight: 400;
-  color: var(--text); line-height: 1.3;
+.queue-card-body { display: flex; flex-direction: column; }
+.queue-cb-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 16px; height: 44px;
+  border-top: 1px solid var(--border);
 }
-.queue-card-number {
-  font-size: 13px; font-weight: 300;
-  color: var(--muted); margin-top: 1px;
+.queue-cb-label {
+  font-size: 14px; font-weight: 300; color: var(--text);
 }
-.queue-card-sms {
-  padding: 0 16px 14px;
-  display: none;
+/* Custom checkbox (right-aligned) */
+.cb-wrap {
+  position: relative; width: 24px; height: 24px;
+  flex-shrink: 0; cursor: pointer; display: inline-flex;
+  align-items: center; justify-content: center;
 }
-.queue-card-sms.visible { display: block; }
-.queue-checkbox-label {
-  display: flex; align-items: center; gap: 10px;
-  cursor: pointer; user-select: none;
-}
-.queue-checkbox { display: none; }
-.queue-checkbox-box {
-  width: 20px; height: 20px; flex-shrink: 0;
-  border-radius: 5px;
+.cb-wrap input { position: absolute; opacity: 0; width: 0; height: 0; }
+.cb-box {
+  position: absolute; inset: 0; border-radius: 6px;
   border: 1.5px solid rgba(79,90,125,.35);
   background: var(--white);
-  display: flex; align-items: center; justify-content: center;
   transition: background .15s, border-color .15s;
 }
-.queue-checkbox:checked ~ .queue-checkbox-box {
-  background: var(--blue); border-color: var(--blue);
-}
-.queue-checkbox:checked ~ .queue-checkbox-box::after {
+.cb-wrap input:checked ~ .cb-box { background: var(--blue); border-color: var(--blue); }
+.cb-wrap input:checked ~ .cb-box::after {
   content: '';
-  display: block;
+  position: absolute; top: 50%; left: 50%;
   width: 11px; height: 7px;
-  border-left: 2px solid #fff;
-  border-bottom: 2px solid #fff;
-  transform: rotate(-45deg) translate(1px, -1px);
-}
-.queue-checkbox-text {
-  font-size: 14px; font-weight: 300; color: var(--text);
+  border-left: 2px solid #fff; border-bottom: 2px solid #fff;
+  transform: translate(-50%, -60%) rotate(-45deg);
 }
 .btn-primary:disabled { opacity: .4; pointer-events: none; }
 
@@ -801,80 +788,78 @@ body {
       </div>
 
       <div class="step-heading">
-        <div class="step-title">Velg køer</div>
-        <div class="step-desc">Velg hvilke køer du vil være pålogget i tidsperioden.</div>
+        <div class="step-title">Hvilke køer vil du logge på?</div>
+        <div class="step-desc">Køer som ikke velges påvirkes ikke av tidsstyringen</div>
       </div>
 
       <div style="display:flex; flex-direction:column; gap:10px;">
         <!-- Queue card 0 -->
         <div class="queue-card" id="queueCard0">
-          <div class="queue-card-top">
-            <div class="queue-card-info">
-              <div class="queue-card-name" id="queueName0">Administrasjon</div>
-              <div class="queue-card-number" id="queueNumber0">123 45 678</div>
+          <div class="queue-card-header" id="queueHeader0">Administrasjon (123 45 678)</div>
+          <div class="queue-card-body">
+            <div class="queue-cb-row">
+              <span class="queue-cb-label">Logg på</span>
+              <label class="cb-wrap" onclick="event.stopPropagation()">
+                <input type="checkbox" id="queueTog0" onchange="onQueueToggle(0)">
+                <span class="cb-box"></span>
+              </label>
             </div>
-            <label class="toggle-wrap" onclick="event.stopPropagation()">
-              <input type="checkbox" id="queueTog0" onchange="onQueueToggle(0)">
-              <span class="toggle-track"></span>
-              <span class="toggle-thumb"></span>
-            </label>
-          </div>
-          <div class="queue-card-sms visible" id="queueSmsRow0">
-            <label class="queue-checkbox-label" onclick="event.stopPropagation()">
-              <input type="checkbox" id="queueSmsTog0" class="queue-checkbox">
-              <span class="queue-checkbox-box"></span>
-              <span class="queue-checkbox-text">MBN SMS-varsling</span>
-            </label>
+            <div class="queue-cb-row">
+              <span class="queue-cb-label">MBN SMS-varsling</span>
+              <label class="cb-wrap" onclick="event.stopPropagation()">
+                <input type="checkbox" id="queueSmsTog0">
+                <span class="cb-box"></span>
+              </label>
+            </div>
           </div>
         </div>
 
         <!-- Queue card 1 -->
         <div class="queue-card" id="queueCard1">
-          <div class="queue-card-top">
-            <div class="queue-card-info">
-              <div class="queue-card-name" id="queueName1">Support</div>
-              <div class="queue-card-number" id="queueNumber1">444 44 444</div>
+          <div class="queue-card-header" id="queueHeader1">Support (444 44 444)</div>
+          <div class="queue-card-body">
+            <div class="queue-cb-row">
+              <span class="queue-cb-label">Logg på</span>
+              <label class="cb-wrap" onclick="event.stopPropagation()">
+                <input type="checkbox" id="queueTog1" onchange="onQueueToggle(1)">
+                <span class="cb-box"></span>
+              </label>
             </div>
-            <label class="toggle-wrap" onclick="event.stopPropagation()">
-              <input type="checkbox" id="queueTog1" onchange="onQueueToggle(1)">
-              <span class="toggle-track"></span>
-              <span class="toggle-thumb"></span>
-            </label>
-          </div>
-          <div class="queue-card-sms visible" id="queueSmsRow1">
-            <label class="queue-checkbox-label" onclick="event.stopPropagation()">
-              <input type="checkbox" id="queueSmsTog1" class="queue-checkbox">
-              <span class="queue-checkbox-box"></span>
-              <span class="queue-checkbox-text">MBN SMS-varsling</span>
-            </label>
+            <div class="queue-cb-row">
+              <span class="queue-cb-label">MBN SMS-varsling</span>
+              <label class="cb-wrap" onclick="event.stopPropagation()">
+                <input type="checkbox" id="queueSmsTog1">
+                <span class="cb-box"></span>
+              </label>
+            </div>
           </div>
         </div>
 
         <!-- Queue card 2 -->
         <div class="queue-card" id="queueCard2">
-          <div class="queue-card-top">
-            <div class="queue-card-info">
-              <div class="queue-card-name" id="queueName2">Verksted</div>
-              <div class="queue-card-number" id="queueNumber2">12 34 56 78</div>
+          <div class="queue-card-header" id="queueHeader2">Verksted (12 34 56 78)</div>
+          <div class="queue-card-body">
+            <div class="queue-cb-row">
+              <span class="queue-cb-label">Logg på</span>
+              <label class="cb-wrap" onclick="event.stopPropagation()">
+                <input type="checkbox" id="queueTog2" onchange="onQueueToggle(2)">
+                <span class="cb-box"></span>
+              </label>
             </div>
-            <label class="toggle-wrap" onclick="event.stopPropagation()">
-              <input type="checkbox" id="queueTog2" onchange="onQueueToggle(2)">
-              <span class="toggle-track"></span>
-              <span class="toggle-thumb"></span>
-            </label>
-          </div>
-          <div class="queue-card-sms visible" id="queueSmsRow2">
-            <label class="queue-checkbox-label" onclick="event.stopPropagation()">
-              <input type="checkbox" id="queueSmsTog2" class="queue-checkbox">
-              <span class="queue-checkbox-box"></span>
-              <span class="queue-checkbox-text">MBN SMS-varsling</span>
-            </label>
+            <div class="queue-cb-row">
+              <span class="queue-cb-label">MBN SMS-varsling</span>
+              <label class="cb-wrap" onclick="event.stopPropagation()">
+                <input type="checkbox" id="queueSmsTog2">
+                <span class="cb-box"></span>
+              </label>
+            </div>
           </div>
         </div>
       </div>
 
-      <div style="font-size:14px; font-weight:300; color:var(--muted); line-height:1.55;">
-        Ved slutten av tidsperioden logges du av de valgte køene, MBN SMS-varsling slås av og visningsnummer tilbakestilles til ditt nummer. Køer du ikke har valgt vil være upåvirket av tidsstyringen i perioden.
+      <div style="display:flex; flex-direction:column; gap:4px;">
+        <div style="font-size:14px; font-weight:500; color:var(--muted);">Ved slutten av tidsperioden</div>
+        <div style="font-size:14px; font-weight:300; color:var(--muted); line-height:1.55;">Du logges av de valgte køene, MBN SMS-varsling slås av og visningsnummer tilbakestilles til ditt nummer.</div>
       </div>
 
       <div class="btn-group">
