@@ -519,8 +519,8 @@ body {
   display: flex; align-items: center; justify-content: center;
 }
 .intro-heading { display: flex; flex-direction: column; gap: 8px; }
-.intro-title { font-size: 22px; font-weight: 600; color: var(--navy); line-height: 1.25; }
-.intro-desc { font-size: 14px; font-weight: 300; color: var(--muted); line-height: 1.55; }
+.intro-title { font-size: 18px; font-weight: 500; color: var(--navy); line-height: 1.3; }
+.intro-desc { font-size: 16px; font-weight: 300; color: var(--muted); line-height: 1.55; }
 .intro-features { display: flex; flex-direction: column; gap: 16px; }
 .intro-feature { display: flex; align-items: flex-start; gap: 14px; }
 .intro-feature-icon {
@@ -593,25 +593,10 @@ body {
     <!-- STEP INTRO: Introduksjon -->
     <div class="step step-intro active" id="stepIntro">
 
-      <!-- Illustration -->
-      <div class="intro-illustration">
-        <div class="intro-icon-bg">
-          <svg width="32" height="32" viewBox="0 0 46 46" fill="none">
-            <!-- Clock face -->
-            <circle cx="23" cy="26" r="13" stroke="#1020F9" stroke-width="2.4" fill="none"/>
-            <path d="M23 20v6l4 3" stroke="#1020F9" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
-            <!-- Calendar top bar -->
-            <rect x="12" y="10" width="22" height="3" rx="1.5" fill="#1020F9" opacity=".18"/>
-            <circle cx="17" cy="11.5" r="2.5" fill="#1020F9" opacity=".6"/>
-            <circle cx="29" cy="11.5" r="2.5" fill="#1020F9" opacity=".6"/>
-          </svg>
-        </div>
-      </div>
-
       <!-- Heading -->
       <div class="intro-heading">
         <div class="intro-title">Tidsstyr jobbprofilen din</div>
-        <div class="intro-desc">Tidsstyr jobbprofilen din automatisk basert på tidsperiodene du setter opp.</div>
+        <div class="intro-desc">Sett opp når du skal være tilgjengelig, så logger tidsstyringen deg på og av valgte køer og viser alternativt visningsnummer.</div>
       </div>
 
       <!-- Feature list -->
@@ -619,33 +604,40 @@ body {
 
         <div class="intro-feature">
           <div class="intro-feature-icon">
+            <!-- Calendar -->
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <rect x="2" y="4"  width="16" height="3" rx="1.5" fill="currentColor" opacity=".35"/>
-              <rect x="2" y="9"  width="16" height="3" rx="1.5" fill="currentColor" opacity=".65"/>
-              <rect x="2" y="14" width="16" height="3" rx="1.5" fill="currentColor"/>
+              <rect x="3" y="4.5" width="14" height="13" rx="2" stroke="currentColor" stroke-width="1.7" fill="none"/>
+              <path d="M3 9h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M7 2.5v4M13 2.5v4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+              <rect x="5.5" y="11.5" width="3" height="3" rx=".6" fill="currentColor" opacity=".55"/>
+              <rect x="11.5" y="11.5" width="3" height="3" rx=".6" fill="currentColor" opacity=".55"/>
             </svg>
           </div>
           <div class="intro-feature-text">
-            <div class="intro-feature-title">En eller flere tidsperioder</div>
-            <div class="intro-feature-desc">Sett opp en eller flere tidsperioder der du ønsker å være pålogget kø og vise et alternativt visningsnummer.</div>
+            <div class="intro-feature-title">Tidsperioder</div>
+            <div class="intro-feature-desc">Velg dager og tidspunkt. Du kan sette opp så mange perioder du trenger.</div>
           </div>
         </div>
 
         <div class="intro-feature">
           <div class="intro-feature-icon green">
+            <!-- Wand / automatic -->
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <path d="M10 2v6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
-              <path d="M6.5 4.8A8 8 0 1 0 13.5 4.8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+              <path d="M3 17L12 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              <path d="M12 4v3M15.5 7.5h-3M14 3l-2 2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+              <circle cx="12" cy="8" r="1.5" fill="currentColor"/>
+              <path d="M5.5 5h1M5.5 9H7M8 6.5v1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" opacity=".5"/>
             </svg>
           </div>
           <div class="intro-feature-text">
-            <div class="intro-feature-title">Jobbprofil på og av</div>
-            <div class="intro-feature-desc">Jobbprofil slås på ved starten av den første tidsperioden og av ved slutten av den siste tidsperioden hver dag. Når jobbprofil slås av, vil du logges av alle køer.</div>
+            <div class="intro-feature-title">Automatisk aktivering</div>
+            <div class="intro-feature-desc">Jobbprofil slås på ved starten av den første tidsperioden og av ved slutten av den siste tidsperioden hver dag. Køer og visningsnummer aktiveres tilsvarende.</div>
           </div>
         </div>
 
         <div class="intro-feature">
           <div class="intro-feature-icon">
+            <!-- Queue / headphones -->
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
               <path d="M3 10a7 7 0 0 1 14 0" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
               <rect x="1.5" y="10" width="3" height="5.5" rx="1.5" fill="currentColor"/>
@@ -654,12 +646,13 @@ body {
           </div>
           <div class="intro-feature-text">
             <div class="intro-feature-title">Køpålogging</div>
-            <div class="intro-feature-desc">Du velger hvilke køer du vil være pålogget for hver tidsperiode. Køer du ikke velger vil ikke påvirkes av tidsstyringen i perioden.</div>
+            <div class="intro-feature-desc">Du velger selv hvilke køer du vil være pålogget i hver tidsperiode. Køer du ikke velger påvirkes ikke av tidsstyringen.</div>
           </div>
         </div>
 
         <div class="intro-feature">
           <div class="intro-feature-icon amber">
+            <!-- Bell -->
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
               <path d="M10 2a5.5 5.5 0 0 0-5.5 5.5v3.5L3 14h14l-1.5-3V7.5A5.5 5.5 0 0 0 10 2z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" fill="none"/>
               <path d="M8 14a2 2 0 0 0 4 0" stroke="currentColor" stroke-width="1.8" fill="none"/>
@@ -667,7 +660,7 @@ body {
           </div>
           <div class="intro-feature-text">
             <div class="intro-feature-title">Påminnelse</div>
-            <div class="intro-feature-desc">Du vil få varsel 10 minutter før en periode starter og slutter. Dette kan du velge å slå av senere under innstillinger hvis du ikke ønsker det.</div>
+            <div class="intro-feature-desc">Du får varsel 10 minutter før hver periode starter og slutter. Du kan slå av påminnelsen under Innstillinger.</div>
           </div>
         </div>
 
@@ -675,7 +668,7 @@ body {
 
       <!-- CTA -->
       <div class="btn-group">
-        <button class="btn btn-primary" onclick="startWizard()">Kom i gang →</button>
+        <button class="btn btn-primary" onclick="startWizard()">Kom i gang</button>
       </div>
 
     </div>
