@@ -332,7 +332,12 @@ body {
   flex-direction: column;
   gap: 8px;
   margin-top: auto;
-  padding-top: 16px;
+  position: sticky;
+  bottom: 0;
+  background: linear-gradient(to bottom, rgba(255,255,255,0) 0, var(--white) 28px);
+  padding-top: 32px;
+  padding-bottom: 8px;
+  z-index: 2;
 }
 .btn {
   width: 100%;
@@ -458,59 +463,47 @@ body {
 .toggle-wrap input:disabled ~ .toggle-track ~ .toggle-thumb { opacity: .5; }
 .toggle-wrap:has(input:disabled) { cursor: not-allowed; }
 
-/* ── Queue cards (step 3) ── */
+/* ── Queue cards (step 3 — Figma design) ── */
 .queue-card {
   background: var(--bg-grey);
   border-radius: var(--r-card);
   overflow: hidden;
 }
-.queue-card-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+.queue-card-header {
   padding: 14px 16px 10px;
-  gap: 12px;
+  font-size: 14px; font-weight: 500;
+  color: var(--muted); line-height: 1.3;
 }
-.queue-card-info { flex: 1; }
-.queue-card-name {
-  font-size: 15px; font-weight: 400;
-  color: var(--text); line-height: 1.3;
-}
-.queue-card-number {
-  font-size: 13px; font-weight: 300;
-  color: var(--muted); margin-top: 1px;
-}
-.queue-card-sms {
-  padding: 0 16px 14px;
-  display: none;
-}
-.queue-card-sms.visible { display: block; }
-.queue-checkbox-label {
-  display: flex; align-items: center; gap: 10px;
+.queue-card-body { display: flex; flex-direction: column; }
+.queue-cb-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 16px; height: 44px;
+  border-top: 1px solid var(--border);
   cursor: pointer; user-select: none;
 }
-.queue-checkbox { display: none; }
-.queue-checkbox-box {
-  width: 20px; height: 20px; flex-shrink: 0;
-  border-radius: 5px;
+.queue-cb-label {
+  font-size: 14px; font-weight: 300; color: var(--text);
+}
+/* Custom checkbox (right-aligned) */
+.cb-wrap {
+  position: relative; width: 24px; height: 24px;
+  flex-shrink: 0; cursor: pointer; display: inline-flex;
+  align-items: center; justify-content: center;
+}
+.cb-wrap input { position: absolute; opacity: 0; width: 0; height: 0; }
+.cb-box {
+  position: absolute; inset: 0; border-radius: 6px;
   border: 1.5px solid rgba(79,90,125,.35);
   background: var(--white);
-  display: flex; align-items: center; justify-content: center;
   transition: background .15s, border-color .15s;
 }
-.queue-checkbox:checked ~ .queue-checkbox-box {
-  background: var(--blue); border-color: var(--blue);
-}
-.queue-checkbox:checked ~ .queue-checkbox-box::after {
+.cb-wrap input:checked ~ .cb-box { background: var(--blue); border-color: var(--blue); }
+.cb-wrap input:checked ~ .cb-box::after {
   content: '';
-  display: block;
+  position: absolute; top: 50%; left: 50%;
   width: 11px; height: 7px;
-  border-left: 2px solid #fff;
-  border-bottom: 2px solid #fff;
-  transform: rotate(-45deg) translate(1px, -1px);
-}
-.queue-checkbox-text {
-  font-size: 14px; font-weight: 300; color: var(--text);
+  border-left: 2px solid #fff; border-bottom: 2px solid #fff;
+  transform: translate(-50%, -60%) rotate(-45deg);
 }
 .btn-primary:disabled { opacity: .4; pointer-events: none; }
 
@@ -526,8 +519,8 @@ body {
   display: flex; align-items: center; justify-content: center;
 }
 .intro-heading { display: flex; flex-direction: column; gap: 8px; }
-.intro-title { font-size: 22px; font-weight: 600; color: var(--navy); line-height: 1.25; }
-.intro-desc { font-size: 14px; font-weight: 300; color: var(--muted); line-height: 1.55; }
+.intro-title { font-size: 18px; font-weight: 500; color: var(--navy); line-height: 1.3; }
+.intro-desc { font-size: 16px; font-weight: 300; color: var(--muted); line-height: 1.55; }
 .intro-features { display: flex; flex-direction: column; gap: 16px; }
 .intro-feature { display: flex; align-items: flex-start; gap: 14px; }
 .intro-feature-icon {
@@ -600,25 +593,10 @@ body {
     <!-- STEP INTRO: Introduksjon -->
     <div class="step step-intro active" id="stepIntro">
 
-      <!-- Illustration -->
-      <div class="intro-illustration">
-        <div class="intro-icon-bg">
-          <svg width="32" height="32" viewBox="0 0 46 46" fill="none">
-            <!-- Clock face -->
-            <circle cx="23" cy="26" r="13" stroke="#1020F9" stroke-width="2.4" fill="none"/>
-            <path d="M23 20v6l4 3" stroke="#1020F9" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
-            <!-- Calendar top bar -->
-            <rect x="12" y="10" width="22" height="3" rx="1.5" fill="#1020F9" opacity=".18"/>
-            <circle cx="17" cy="11.5" r="2.5" fill="#1020F9" opacity=".6"/>
-            <circle cx="29" cy="11.5" r="2.5" fill="#1020F9" opacity=".6"/>
-          </svg>
-        </div>
-      </div>
-
       <!-- Heading -->
       <div class="intro-heading">
         <div class="intro-title">Tidsstyr jobbprofilen din</div>
-        <div class="intro-desc">Tidsstyr jobbprofilen din automatisk basert på tidsperiodene du setter opp.</div>
+        <div class="intro-desc">Sett opp når du skal være tilgjengelig, så logger tidsstyringen deg på og av valgte køer og viser alternativt visningsnummer.</div>
       </div>
 
       <!-- Feature list -->
@@ -626,55 +604,66 @@ body {
 
         <div class="intro-feature">
           <div class="intro-feature-icon">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <rect x="2" y="4"  width="16" height="3" rx="1.5" fill="currentColor" opacity=".35"/>
-              <rect x="2" y="9"  width="16" height="3" rx="1.5" fill="currentColor" opacity=".65"/>
-              <rect x="2" y="14" width="16" height="3" rx="1.5" fill="currentColor"/>
+            <!-- Calendar (Figma) -->
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M11 13C11 13.5523 10.5523 14 10 14C9.44772 14 9 13.5523 9 13C9 12.4477 9.44772 12 10 12C10.5523 12 11 12.4477 11 13Z" fill="#293351"/>
+              <path d="M10 19C10.5523 19 11 18.5523 11 18C11 17.4477 10.5523 17 10 17C9.44772 17 9 17.4477 9 18C9 18.5523 9.44772 19 10 19Z" fill="#293351"/>
+              <path d="M7 13C7 13.5523 6.55228 14 6 14C5.44772 14 5 13.5523 5 13C5 12.4477 5.44772 12 6 12C6.55228 12 7 12.4477 7 13Z" fill="#293351"/>
+              <path d="M6 19C6.55228 19 7 18.5523 7 18C7 17.4477 6.55228 17 6 17C5.44772 17 5 17.4477 5 18C5 18.5523 5.44772 19 6 19Z" fill="#293351"/>
+              <path d="M15 13C15 13.5523 14.5523 14 14 14C13.4477 14 13 13.5523 13 13C13 12.4477 13.4477 12 14 12C14.5523 12 15 12.4477 15 13Z" fill="#293351"/>
+              <path d="M14 19C14.5523 19 15 18.5523 15 18C15 17.4477 14.5523 17 14 17C13.4477 17 13 17.4477 13 18C13 18.5523 13.4477 19 14 19Z" fill="#293351"/>
+              <path d="M19 13C19 13.5523 18.5523 14 18 14C17.4477 14 17 13.5523 17 13C17 12.4477 17.4477 12 18 12C18.5523 12 19 12.4477 19 13Z" fill="#293351"/>
+              <path d="M18 19C18.5523 19 19 18.5523 19 18C19 17.4477 18.5523 17 18 17C17.4477 17 17 17.4477 17 18C17 18.5523 17.4477 19 18 19Z" fill="#293351"/>
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M16 2H8V1C8 0.447715 7.55228 0 7 0C6.44772 0 6 0.447715 6 1V2H1C0.447715 2 0 2.44772 0 3V23C0 23.5523 0.447715 24 1 24H23C23.5523 24 24 23.5523 24 23V3C24 2.44772 23.5523 2 23 2H18V1C18 0.447715 17.5523 0 17 0C16.4477 0 16 0.447715 16 1V2ZM7 6C6.44772 6 6 5.55228 6 5V4H2V7L22 7V4H18V5C18 5.55228 17.5523 6 17 6C16.4477 6 16 5.55228 16 5V4H8V5C8 5.55228 7.55228 6 7 6ZM2 9V22H22V9L2 9Z" fill="#293351"/>
             </svg>
           </div>
           <div class="intro-feature-text">
-            <div class="intro-feature-title">En eller flere tidsperioder</div>
-            <div class="intro-feature-desc">Sett opp en eller flere tidsperioder der du ønsker å være pålogget kø og vise et alternativt visningsnummer.</div>
-          </div>
-        </div>
-
-        <div class="intro-feature">
-          <div class="intro-feature-icon green">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <path d="M10 2v6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
-              <path d="M6.5 4.8A8 8 0 1 0 13.5 4.8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" fill="none"/>
-            </svg>
-          </div>
-          <div class="intro-feature-text">
-            <div class="intro-feature-title">Jobbprofil på og av</div>
-            <div class="intro-feature-desc">Jobbprofil slås på ved starten av den første tidsperioden og av ved slutten av den siste tidsperioden hver dag. Når jobbprofil slås av, vil du logges av alle køer.</div>
+            <div class="intro-feature-title">Tidsperioder</div>
+            <div class="intro-feature-desc">Velg dager og tidspunkt. Du kan sette opp så mange perioder du trenger.</div>
           </div>
         </div>
 
         <div class="intro-feature">
           <div class="intro-feature-icon">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <path d="M3 10a7 7 0 0 1 14 0" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
-              <rect x="1.5" y="10" width="3" height="5.5" rx="1.5" fill="currentColor"/>
-              <rect x="15.5" y="10" width="3" height="5.5" rx="1.5" fill="currentColor"/>
+            <!-- Wizard / sparkles (Figma) -->
+            <svg width="20" height="20" viewBox="0 0 25 27" fill="none">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M16.176 7.28553C16.444 7.28553 16.7012 7.39221 16.8908 7.58172L19.4183 10.1092L19.4884 10.1862C19.8119 10.5833 19.7883 11.1688 19.4183 11.5388L4.2533 26.7038C4.0637 26.8933 3.80656 27 3.53849 27C3.27042 27 3.01325 26.8933 2.82368 26.7038L0.296191 24.1763C0.106784 23.9867 2.30909e-05 23.7295 0 23.4615C9.183e-05 23.1936 0.106782 22.9362 0.296191 22.7467L15.4612 7.58172C15.6507 7.39218 15.9079 7.28556 16.176 7.28553ZM2.44061 23.4615L3.53849 24.5594L13.7344 14.3625L12.6365 13.2646L2.44061 23.4615ZM14.0671 11.835L15.165 12.9329L17.2738 10.824L16.176 9.72614L14.0671 11.835Z" fill="#293351"/>
+              <path d="M21.0759 12.1628C21.1751 12.1217 21.2868 12.1217 21.386 12.1628C21.5518 12.2316 21.658 12.5312 21.8707 13.1294L21.9181 13.2627C21.961 13.3832 21.983 13.4436 22.0198 13.4927C22.0428 13.5233 22.0701 13.5507 22.1008 13.5737C22.1499 13.6105 22.2101 13.6324 22.3308 13.6754L22.4641 13.7227C23.0623 13.9355 23.3617 14.0418 23.4307 14.2075C23.4718 14.3066 23.4717 14.4184 23.4307 14.5175C23.3618 14.6834 23.0626 14.7904 22.4641 15.0033L22.3308 15.0507C22.2104 15.0935 22.1499 15.1146 22.1008 15.1514C22.0701 15.1743 22.0428 15.2017 22.0198 15.2323C21.9829 15.2815 21.961 15.3418 21.9181 15.4624L21.8707 15.5957C21.6579 16.1941 21.5518 16.4933 21.386 16.5622C21.2867 16.6034 21.1752 16.6034 21.0759 16.5622C20.9101 16.4933 20.804 16.1941 20.5912 15.5957L20.5438 15.4624C20.5009 15.3418 20.479 15.2815 20.4421 15.2323C20.4191 15.2017 20.3918 15.1743 20.3611 15.1514C20.312 15.1146 20.2515 15.0935 20.1311 15.0507L19.9978 15.0033C19.3993 14.7904 19.1001 14.6834 19.0312 14.5175C18.9902 14.4184 18.9901 14.3067 19.0312 14.2075C19.1002 14.0418 19.3996 13.9355 19.9978 13.7227L20.1311 13.6754C20.2518 13.6324 20.312 13.6105 20.3611 13.5737C20.3918 13.5507 20.4191 13.5233 20.4421 13.4927C20.4789 13.4436 20.5009 13.3832 20.5438 13.2627L20.5912 13.1294C20.8039 12.5312 20.9101 12.2316 21.0759 12.1628Z" fill="#293351"/>
+              <path d="M10.966 4.07482C11.0651 4.03371 11.1768 4.03371 11.276 4.07482C11.4418 4.14363 11.548 4.44318 11.7607 5.04139L11.8081 5.17468C11.851 5.29523 11.873 5.35557 11.9098 5.40472C11.9328 5.43537 11.9601 5.46269 11.9908 5.48568C12.04 5.52255 12.1001 5.54445 12.2208 5.58737L12.3541 5.63476C12.9523 5.84749 13.2517 5.95379 13.3207 6.11953C13.3618 6.21867 13.3618 6.33038 13.3207 6.42954C13.2519 6.5954 12.9526 6.70245 12.3541 6.91529L12.2208 6.96268C12.1004 7.00552 12.0399 7.0266 11.9908 7.06339C11.9602 7.08636 11.9328 7.11372 11.9098 7.14435C11.873 7.1935 11.851 7.25381 11.8081 7.37439L11.7607 7.50767C11.5479 8.10607 11.4418 8.40536 11.276 8.47424C11.1768 8.51541 11.0652 8.51541 10.966 8.47424C10.8001 8.40536 10.694 8.10608 10.4812 7.50767L10.4338 7.37439C10.3909 7.2538 10.369 7.1935 10.3321 7.14435C10.3091 7.11372 10.2818 7.08636 10.2512 7.06339C10.202 7.0266 10.1416 7.00552 10.0211 6.96268L9.88783 6.91529C9.28934 6.70245 8.99009 6.5954 8.92126 6.42954C8.88019 6.33037 8.88012 6.21867 8.92126 6.11953C8.99024 5.95379 9.28965 5.84749 9.88783 5.63476L10.0211 5.58737C10.1418 5.54445 10.202 5.52255 10.2512 5.48568C10.2818 5.46269 10.3091 5.43537 10.3321 5.40472C10.3689 5.35557 10.3909 5.29523 10.4338 5.17468L10.4812 5.04139C10.6939 4.44318 10.8001 4.14363 10.966 4.07482Z" fill="#293351"/>
+              <path d="M20.5704 0.0308336C20.6696 -0.0102765 20.7813 -0.0102792 20.8805 0.0308336C21.0463 0.0996404 21.1525 0.399186 21.3652 0.997402L21.8105 2.2493C21.8534 2.36985 21.8754 2.4302 21.9122 2.47934C21.9352 2.51 21.9625 2.53731 21.9931 2.5603C22.0423 2.59718 22.1025 2.61907 22.2232 2.66199L23.4751 3.10727C24.0733 3.32 24.3727 3.4263 24.4417 3.59203C24.4828 3.69118 24.4827 3.80288 24.4417 3.90205C24.3728 4.06791 24.0736 4.17495 23.4751 4.3878L22.2232 4.83307C22.1027 4.87591 22.0423 4.89699 21.9931 4.93378C21.9625 4.95675 21.9352 4.98411 21.9122 5.01473C21.8753 5.0639 21.8534 5.12418 21.8105 5.24478L21.3652 6.49668C21.1524 7.09507 21.0463 7.39436 20.8805 7.46324C20.7812 7.50442 20.6697 7.50442 20.5704 7.46324C20.4046 7.39437 20.2985 7.09508 20.0857 6.49668L19.6404 5.24478C19.5975 5.12417 19.5756 5.0639 19.5387 5.01473C19.5157 4.98411 19.4884 4.95675 19.4578 4.93378C19.4086 4.89699 19.3482 4.87591 19.2277 4.83307L17.9758 4.3878C17.3773 4.17495 17.0781 4.06791 17.0092 3.90205C16.9682 3.80288 16.9681 3.69118 17.0092 3.59203C17.0782 3.4263 17.3776 3.32 17.9758 3.10727L19.2277 2.66199C19.3484 2.61907 19.4086 2.59718 19.4578 2.5603C19.4884 2.53731 19.5157 2.50999 19.5387 2.47934C19.5755 2.4302 19.5975 2.36984 19.6404 2.2493L20.0857 0.997402C20.2984 0.399188 20.4046 0.0996403 20.5704 0.0308336Z" fill="#293351"/>
             </svg>
           </div>
           <div class="intro-feature-text">
-            <div class="intro-feature-title">Køpålogging</div>
-            <div class="intro-feature-desc">Du velger hvilke køer du vil være pålogget for hver tidsperiode. Køer du ikke velger vil ikke påvirkes av tidsstyringen i perioden.</div>
+            <div class="intro-feature-title">Automatisk aktivering</div>
+            <div class="intro-feature-desc">Jobbprofil slås på ved starten av den første tidsperioden og av ved slutten av den siste tidsperioden hver dag. Køer og visningsnummer aktiveres tilsvarende.</div>
           </div>
         </div>
 
         <div class="intro-feature">
-          <div class="intro-feature-icon amber">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <path d="M10 2a5.5 5.5 0 0 0-5.5 5.5v3.5L3 14h14l-1.5-3V7.5A5.5 5.5 0 0 0 10 2z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" fill="none"/>
-              <path d="M8 14a2 2 0 0 0 4 0" stroke="currentColor" stroke-width="1.8" fill="none"/>
+          <div class="intro-feature-icon">
+            <!-- Queue / people (Figma) -->
+            <svg width="20" height="20" viewBox="0 0 26 26" fill="none">
+              <path d="M18 1C18 0.447715 18.4477 0 19 0C21.7614 0 24 2.23858 24 5C24 6.52194 23.32 7.88506 22.2473 8.80212C24.4934 10.0232 25.9999 12.5042 25.9999 15.303V21C25.9999 21.5523 25.5522 22 24.9999 22C24.4476 22 23.9999 21.5523 23.9999 21V15.303C23.9999 12.3125 21.7422 10 19.0908 10C19.0814 10 19.0721 9.99987 19.0628 9.99961C19.0419 9.99987 19.021 10 19 10C18.4477 10 18 9.55229 18 9C18 8.44772 18.4477 8 19 8C20.6569 8 22 6.65685 22 5C22 3.34315 20.6569 2 19 2C18.4477 2 18 1.55228 18 1Z" fill="#293351"/>
+              <path d="M13 2C12.4477 2 12 2.44772 12 3C12 3.55228 12.4477 4 13 4C14.6569 4 16 5.34315 16 7C16 8.65685 14.6569 10 13 10C12.4477 10 12 10.4477 12 11C12 11.5523 12.4477 12 13 12C13.021 12 13.0419 11.9999 13.0628 11.9996C13.0721 11.9999 13.0814 12 13.0908 12C15.7422 12 17.9999 14.3125 17.9999 17.303V23C17.9999 23.5523 18.4476 24 18.9999 24C19.5522 24 19.9999 23.5523 19.9999 23V17.303C19.9999 14.5042 18.4934 12.0232 16.2473 10.8021C17.32 9.88506 18 8.52194 18 7C18 4.23858 15.7614 2 13 2Z" fill="#293351"/>
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M10.2276 12.8189C11.3117 11.9017 12 10.5312 12 9C12 6.23858 9.76142 4 7 4C4.23858 4 2 6.23858 2 9C2 10.5312 2.68831 11.9017 3.7724 12.8189C1.51746 14.0433 0 16.5086 0 19.303V25C0 25.5523 0.447715 26 1 26C1.55228 26 2 25.5523 2 25V19.303C2 16.3272 4.28443 14 7 14C9.71557 14 12 16.3272 12 19.303V25C12 25.5523 12.4477 26 13 26C13.5523 26 14 25.5523 14 25V19.303C14 16.5086 12.4825 14.0433 10.2276 12.8189ZM4 9C4 7.34315 5.34315 6 7 6C8.65685 6 10 7.34315 10 9C10 10.6569 8.65685 12 7 12C5.34315 12 4 10.6569 4 9Z" fill="#293351"/>
+            </svg>
+          </div>
+          <div class="intro-feature-text">
+            <div class="intro-feature-title">Køpålogging</div>
+            <div class="intro-feature-desc">Du velger selv hvilke køer du vil være pålogget i hver tidsperiode. Køer du ikke velger påvirkes ikke av tidsstyringen.</div>
+          </div>
+        </div>
+
+        <div class="intro-feature">
+          <div class="intro-feature-icon">
+            <!-- Notification / bell (Figma) -->
+            <svg width="20" height="20" viewBox="0 0 24 25" fill="none">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M20.636 18V8.48052C20.636 3.77752 16.7498 0 11.9996 0C7.24945 0 3.36328 3.77752 3.36328 8.48052V18H1C0.447716 18 0 18.4477 0 19C0 19.5523 0.447716 20 1 20H7C7 22.7614 9.23858 25 12 25C14.7614 25 17 22.7614 17 20H23C23.5523 20 24 19.5523 24 19C24 18.4477 23.5523 18 23 18H20.636ZM11.9996 2C8.31494 2 5.36328 4.92076 5.36328 8.48052V18H18.636V8.48052C18.636 4.92076 15.6843 2 11.9996 2ZM15 20H9C9 21.6569 10.3431 23 12 23C13.6569 23 15 21.6569 15 20Z" fill="#293351"/>
             </svg>
           </div>
           <div class="intro-feature-text">
             <div class="intro-feature-title">Påminnelse</div>
-            <div class="intro-feature-desc">Du vil få varsel 10 minutter før en periode starter og slutter. Dette kan du velge å slå av senere under innstillinger hvis du ikke ønsker det.</div>
+            <div class="intro-feature-desc">Du får varsel 10 minutter før hver periode starter og slutter. Du kan slå av påminnelsen under Innstillinger.</div>
           </div>
         </div>
 
@@ -682,7 +671,7 @@ body {
 
       <!-- CTA -->
       <div class="btn-group">
-        <button class="btn btn-primary" onclick="startWizard()">Kom i gang →</button>
+        <button class="btn btn-primary" onclick="startWizard()">Kom i gang</button>
       </div>
 
     </div>
@@ -690,7 +679,7 @@ body {
     <!-- STEP 1: Når jobber du? -->
     <div class="step" id="step1">
       <!-- Progress -->
-      <div class="progress">
+      <div class="progress" role="status" aria-label="Steg 1 av 4">
         <div class="prog-dot current"></div>
         <div class="prog-dot"></div>
         <div class="prog-dot"></div>
@@ -699,8 +688,8 @@ body {
 
       <!-- Heading -->
       <div class="step-heading">
-        <div class="step-title">Sett opp første tidsperiode</div>
-        <div class="step-desc">Tidsperioden styrer når du logges på og av køer og hvilket visningsnummer som brukes. Du kan legge til flere tidsperioder under Innstillinger.</div>
+        <h2 class="step-title">Sett opp første tidsperiode</h2>
+        <div class="step-desc">Du kan legge til flere tidsperioder under Innstillinger etter aktivering.</div>
       </div>
 
       <!-- Time picker -->
@@ -751,7 +740,7 @@ body {
 
     <!-- STEP 2: Visningsnummer -->
     <div class="step" id="step2">
-      <div class="progress">
+      <div class="progress" role="status" aria-label="Steg 2 av 4">
         <div class="prog-dot done"></div>
         <div class="prog-dot current"></div>
         <div class="prog-dot"></div>
@@ -759,8 +748,8 @@ body {
       </div>
 
       <div class="step-heading">
-        <div class="step-title">Hvilket nummer skal vises?</div>
-        <div class="step-desc">Velg hvilket nummer som vises når tidsperioden er aktiv</div>
+        <h2 class="step-title">Hvilket visningsnummer skal brukes?</h2>
+        <div class="step-desc">Nummeret vises til de du ringer i tidsperioden</div>
       </div>
 
       <div>
@@ -793,7 +782,7 @@ body {
 
     <!-- STEP 3: Køer -->
     <div class="step" id="step3">
-      <div class="progress">
+      <div class="progress" role="status" aria-label="Steg 3 av 4">
         <div class="prog-dot done"></div>
         <div class="prog-dot done"></div>
         <div class="prog-dot current"></div>
@@ -801,84 +790,83 @@ body {
       </div>
 
       <div class="step-heading">
-        <div class="step-title">Velg køer</div>
-        <div class="step-desc">Velg hvilke køer du vil være pålogget i tidsperioden.</div>
+        <h2 class="step-title">Hvilke køer vil du logge på?</h2>
+        <div class="step-desc">Køer som ikke velges påvirkes ikke av tidsstyringen</div>
       </div>
 
-      <div style="display:flex; flex-direction:column; gap:10px;">
+      <div style="display:flex; flex-direction:column; gap:6px;">
         <!-- Queue card 0 -->
-        <div class="queue-card" id="queueCard0">
-          <div class="queue-card-top">
-            <div class="queue-card-info">
-              <div class="queue-card-name" id="queueName0">Administrasjon</div>
-              <div class="queue-card-number" id="queueNumber0">123 45 678</div>
-            </div>
-            <label class="toggle-wrap" onclick="event.stopPropagation()">
-              <input type="checkbox" id="queueTog0" onchange="onQueueToggle(0)">
-              <span class="toggle-track"></span>
-              <span class="toggle-thumb"></span>
+        <div class="queue-card" id="queueCard0" role="group" aria-labelledby="queueHeader0">
+          <div class="queue-card-header" id="queueHeader0">Administrasjon (123 45 678)</div>
+          <div class="queue-card-body">
+            <label class="queue-cb-row">
+              <span class="queue-cb-label" id="qcbL0-0">Logg på</span>
+              <span class="cb-wrap">
+                <input type="checkbox" id="queueTog0" aria-labelledby="queueHeader0 qcbL0-0" onchange="onQueueToggle(0)">
+                <span class="cb-box"></span>
+              </span>
             </label>
-          </div>
-          <div class="queue-card-sms visible" id="queueSmsRow0">
-            <label class="queue-checkbox-label" onclick="event.stopPropagation()">
-              <input type="checkbox" id="queueSmsTog0" class="queue-checkbox">
-              <span class="queue-checkbox-box"></span>
-              <span class="queue-checkbox-text">MBN SMS-varsling</span>
+            <label class="queue-cb-row">
+              <span class="queue-cb-label" id="qcbL0-1">MBN SMS-varsling</span>
+              <span class="cb-wrap">
+                <input type="checkbox" id="queueSmsTog0" aria-labelledby="queueHeader0 qcbL0-1">
+                <span class="cb-box"></span>
+              </span>
             </label>
           </div>
         </div>
 
         <!-- Queue card 1 -->
-        <div class="queue-card" id="queueCard1">
-          <div class="queue-card-top">
-            <div class="queue-card-info">
-              <div class="queue-card-name" id="queueName1">Support</div>
-              <div class="queue-card-number" id="queueNumber1">444 44 444</div>
-            </div>
-            <label class="toggle-wrap" onclick="event.stopPropagation()">
-              <input type="checkbox" id="queueTog1" onchange="onQueueToggle(1)">
-              <span class="toggle-track"></span>
-              <span class="toggle-thumb"></span>
+        <div class="queue-card" id="queueCard1" role="group" aria-labelledby="queueHeader1">
+          <div class="queue-card-header" id="queueHeader1">Support (444 44 444)</div>
+          <div class="queue-card-body">
+            <label class="queue-cb-row">
+              <span class="queue-cb-label" id="qcbL1-0">Logg på</span>
+              <span class="cb-wrap">
+                <input type="checkbox" id="queueTog1" aria-labelledby="queueHeader1 qcbL1-0" onchange="onQueueToggle(1)">
+                <span class="cb-box"></span>
+              </span>
             </label>
-          </div>
-          <div class="queue-card-sms visible" id="queueSmsRow1">
-            <label class="queue-checkbox-label" onclick="event.stopPropagation()">
-              <input type="checkbox" id="queueSmsTog1" class="queue-checkbox">
-              <span class="queue-checkbox-box"></span>
-              <span class="queue-checkbox-text">MBN SMS-varsling</span>
+            <label class="queue-cb-row">
+              <span class="queue-cb-label" id="qcbL1-1">MBN SMS-varsling</span>
+              <span class="cb-wrap">
+                <input type="checkbox" id="queueSmsTog1" aria-labelledby="queueHeader1 qcbL1-1">
+                <span class="cb-box"></span>
+              </span>
             </label>
           </div>
         </div>
 
         <!-- Queue card 2 -->
-        <div class="queue-card" id="queueCard2">
-          <div class="queue-card-top">
-            <div class="queue-card-info">
-              <div class="queue-card-name" id="queueName2">Verksted</div>
-              <div class="queue-card-number" id="queueNumber2">12 34 56 78</div>
-            </div>
-            <label class="toggle-wrap" onclick="event.stopPropagation()">
-              <input type="checkbox" id="queueTog2" onchange="onQueueToggle(2)">
-              <span class="toggle-track"></span>
-              <span class="toggle-thumb"></span>
+        <div class="queue-card" id="queueCard2" role="group" aria-labelledby="queueHeader2">
+          <div class="queue-card-header" id="queueHeader2">Verksted (12 34 56 78)</div>
+          <div class="queue-card-body">
+            <label class="queue-cb-row">
+              <span class="queue-cb-label" id="qcbL2-0">Logg på</span>
+              <span class="cb-wrap">
+                <input type="checkbox" id="queueTog2" aria-labelledby="queueHeader2 qcbL2-0" onchange="onQueueToggle(2)">
+                <span class="cb-box"></span>
+              </span>
             </label>
-          </div>
-          <div class="queue-card-sms visible" id="queueSmsRow2">
-            <label class="queue-checkbox-label" onclick="event.stopPropagation()">
-              <input type="checkbox" id="queueSmsTog2" class="queue-checkbox">
-              <span class="queue-checkbox-box"></span>
-              <span class="queue-checkbox-text">MBN SMS-varsling</span>
+            <label class="queue-cb-row">
+              <span class="queue-cb-label" id="qcbL2-1">MBN SMS-varsling</span>
+              <span class="cb-wrap">
+                <input type="checkbox" id="queueSmsTog2" aria-labelledby="queueHeader2 qcbL2-1">
+                <span class="cb-box"></span>
+              </span>
             </label>
           </div>
         </div>
       </div>
 
-      <div style="font-size:14px; font-weight:300; color:var(--muted); line-height:1.55;">
-        Ved slutten av tidsperioden logges du av de valgte køene, MBN SMS-varsling slås av og visningsnummer tilbakestilles til ditt nummer. Køer du ikke har valgt vil være upåvirket av tidsstyringen i perioden.
+      <div style="display:flex; flex-direction:column; gap:4px;">
+        <div style="font-size:14px; font-weight:500; color:var(--muted);">Ved slutten av tidsperioden</div>
+        <div style="font-size:14px; font-weight:300; color:var(--muted); line-height:1.55;">Du logges av de valgte køene, MBN SMS-varsling slås av og visningsnummer tilbakestilles til ditt nummer.</div>
       </div>
 
       <div class="btn-group">
-        <button class="btn btn-primary" id="step3Fortsett" onclick="goStep(5)">
+        <p id="step3Error" role="alert" style="display:none; font-size:13px; color:var(--red); text-align:center; margin:0 0 4px;">Velg minst én kø for å fortsette</p>
+        <button class="btn btn-primary" id="step3Fortsett" onclick="tryGoStep5()">
           Fortsett
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
             <path d="M4 9h10M10 5l4 4-4 4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -890,7 +878,7 @@ body {
 
     <!-- STEP 5: Login mode -->
     <div class="step" id="step5">
-      <div class="progress">
+      <div class="progress" role="status" aria-label="Steg 4 av 4">
         <div class="prog-dot done"></div>
         <div class="prog-dot done"></div>
         <div class="prog-dot done"></div>
@@ -898,7 +886,7 @@ body {
       </div>
 
       <div class="step-heading">
-        <div class="step-title">Vil du logges på og av automatisk, eller gjøre det selv?</div>
+        <h2 class="step-title">Vil du logges på og av automatisk, eller gjøre det selv?</h2>
         <div class="step-desc">Innstillingen gjelder hver gang en tidsperiode starter og slutter</div>
       </div>
 
@@ -1026,6 +1014,10 @@ function goStep(n, back = false) {
   to.classList.add('active');
   to.parentElement.scrollTop = 0;
   currentStep = n;
+
+  // Move focus to step heading for screen readers
+  const heading = to.querySelector('h2');
+  if (heading) { heading.setAttribute('tabindex', '-1'); heading.focus(); }
 
   document.getElementById('topBar').style.display = '';
   if (n === 3) initStep3();
@@ -1186,9 +1178,19 @@ function onQueueToggle(idx) {
   updateStep3Fortsett();
 }
 
-function updateStep3Fortsett() {
+function tryGoStep5() {
   const anyOn = queueStates.some(q => q.enabled);
-  document.getElementById('step3Fortsett').disabled = !anyOn;
+  const err = document.getElementById('step3Error');
+  if (!anyOn) { err.style.display = ''; return; }
+  err.style.display = 'none';
+  goStep(5);
+}
+
+function updateStep3Fortsett() {
+  // Button is always enabled; hide the error message once a queue is toggled on
+  const anyOn = queueStates.some(q => q.enabled);
+  const err = document.getElementById('step3Error');
+  if (anyOn && err) err.style.display = 'none';
 }
 
 function initStep3() {
